@@ -18,7 +18,9 @@ class Library:
     version: int = 0
 
     def source(self) -> str:
-        return "\n\n".join(self.functions[k] for k in sorted(self.functions))
+        imports = self.functions.get("__imports__", "")
+        body = "\n\n".join(self.functions[k] for k in sorted(self.functions) if k != "__imports__")
+        return (imports + "\n\n" + body).strip() if imports else body
 
     def with_functions(self, new: dict[str, str]) -> "Library":
         merged = dict(self.functions)
@@ -47,7 +49,7 @@ class Library:
             return set()
         names = {n.func.id for n in ast.walk(tree)
                  if isinstance(n, ast.Call) and isinstance(n.func, ast.Name)}
-        return names & set(self.functions)
+        return names & (set(self.functions) - {"__imports__"})
 
 
 def token_bits(text: str, tokenizer, vocab_size: int) -> float:
