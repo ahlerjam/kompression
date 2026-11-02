@@ -4,6 +4,10 @@ Neueste Einträge oben. Kurz: Datum, was, Ergebnis, Verweis auf `runs/…`.
 
 ## 2026-11-02
 
+- Kalibrierung `mdl` β = 0,001 fertig (`runs/s0a/20261102-125912_kalib_mdl_b0.001`): kein Grokking (Test 1,6–9,3 %), Train 100 %, KL ≈ 0,95–1,07 Mbit, L(W) nach Rezept v2 0,91–1,18 Mbit.
+- L(W) nachträglich (`scripts/lw_posthoc.py`, Toleranz 0,05): `none` 1,88–2,28 Mbit (kein Grokking), `wd` 1,73–2,10 Mbit (groked).
+- **Beobachtung (Kalibrierung, ungepaart, verschiedene Seeds — kein Befund):** MDL β = 0,001 erreicht die kürzeste Beschreibung, generalisiert aber nicht; `wd` generalisiert bei kaum kürzerer Beschreibung als `none`. Spricht gegen die naive Lesart „kürzer ⇒ generalisiert“, zumindest unter diesem Rezept. Alle L(W) liegen weit über der Datenmenge (≈ 25 kbit) → das Rezept ist eine lockere obere Schranke; Low-Rank-Vergröberung (DeMoss) als Rezept-Variante prüfen, bevor 0a eingefroren wird.
+
 - **Kernänderung (Bauphase):** L(W)-Rezept `uq-entropy-v3`: Arme reichen strukturelle Beschreibungen ein (Unterraum: Seed + Z; BitNet: ternäre Indizes + Skalen); der Kern quantisiert, rekonstruiert über `decode` und prüft den Loss selbst. Grund: Unterraum-Lauf hatte nach v2 ≈ 4 Mbit, strukturell ≈ 0,1 Mbit. Smoke (p = 23): Unterraum 2,4 kbit statt 1,7 Mbit; BitNet 638 kbit statt 984 kbit. Kalibrierung `subspace` r64 mit v3 neu gestartet.
 
 - Kalibrierung `subspace` Rang 16 (3 Seeds × 20k, `runs/s0a/20261102-131727_kalib_subspace_r16`): **lernt nicht** (Train 7,5–8,6 %, Test ≈ 1 %), Delta-Norm wächst auf 320–530. Rang 4 deshalb übersprungen, Rang 64 vorgezogen. Offen: Kapazität vs. Optimierung (Basis-Skalierung, lr). Hinweis: L(W) nach Rezept ≈ 3,8–4,1 Mbit, obwohl die strukturelle Beschreibung (Seed + 3.840 Zahlen à 32 Bit ≈ 123 kbit) viel kürzer wäre → strukturelle Beschreibungen müssen in den Kern.
