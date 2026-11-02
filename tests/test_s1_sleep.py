@@ -36,7 +36,7 @@ def test_fallback_and_sleep_accepts_only_if_total_drops():
     lm = FakeLM(probe[0].answer)
     empty = evaluate(lm, w, probe, Library(), n=1, backend="subprocess")
     assert empty.library_bits == 0.0
-    assert empty.task_bits[1] == fallback_bits(probe[1].answer) or empty.solved >= 1
+    assert empty.task_bits[1] == fallback_bits(probe[1].answer, lm, probe[1].question) or empty.solved >= 1
     lib, res, log = sleep_cycle(lm, w, probe, Library(), ["print(1)"], empty, n_proposals=1,
                                 probe_samples=1, backend="subprocess")
     assert log, "Vorschlag wurde nicht bewertet"

@@ -18,9 +18,18 @@ class FrozenLM:
 
         self.repo = repo
         self.model, self.tokenizer = load(repo)
-        self.vocab_size = int(self.model.args.vocab_size) if hasattr(self.model, "args") else len(
-            self.tokenizer.vocab)
+        self.vocab_size = self._vocab_size()
         self.end_id = self.tokenizer.eos_token_id
+
+    def _vocab_size(self) -> int:
+        args = getattr(self.model, "args", None)
+        for obj in (args, getattr(args, "text_config", None)):
+            if obj is None:
+                continue
+            v = obj.get("vocab_size") if isinstance(obj, dict) else getattr(obj, "vocab_size", None)
+            if v:
+                return int(v)
+        return len(self.tokenizer.vocab)
 
     def chat(self, system: str, user: str) -> list[int]:
         msgs = [{"role": "system", "content": system}, {"role": "user", "content": user}]

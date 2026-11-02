@@ -2,7 +2,8 @@
 
 L_gesamt(B) = L(B) + Σ_probe L(x_i),  L(x_i) = min( Bits der kürzesten verifizierten Lösung
 unter dem Modell mit B im Prompt ,  Rückfall: Antwort direkt übertragen ).
-Rückfall-Code: 8 Bit je Zeichen + 8 Bit Ende (gültiger Code auch ohne Lösung).
+Rückfall-Code (v2): −log2 p_Modell(Antwort | Frage) — gültig ohne Lösung, glatter als
+8 Bit/Zeichen (v1 erzeugte Schwankungen von ±600 Bit durch einzelne ungelöste Aufgaben).
 L(B): `token` = Tokens × log2(V) (uniform) oder `lm` = −log2 p_Modell(B | Bibliotheks-Prompt).
 """
 
@@ -18,8 +19,13 @@ LIB_SYSTEM = "You write small, reusable, well-named Python helper functions with
 LIB_USER = "Write a Python library of helper functions."
 
 
-def fallback_bits(answer: str) -> float:
-    return 8.0 * (len(answer) + 1)
+ANSWER_SYSTEM = "Answer with only the final answer, nothing else."
+
+
+def fallback_bits(answer: str, lm=None, question: str | None = None) -> float:
+    if lm is None or question is None:
+        return 8.0 * (len(answer) + 1)
+    return lm.completion_bits(lm.chat(ANSWER_SYSTEM, question), answer)
 
 
 def library_bits(lm, lib: Library, mode: str = "lm") -> float:
@@ -49,10 +55,10 @@ def evaluate(lm, world: World, probe: list[Task], lib: Library, n: int = 4,
         if ok:
             best = min(ok, key=lambda a: a.bits)
             solved += 1
-            task_bits.append(min(best.bits, fallback_bits(t.answer)))
+            task_bits.append(min(best.bits, fallback_bits(t.answer, lm, t.question)))
             for f in best.lib_calls:
                 reuse[f] = reuse.get(f, 0) + 1
         else:
-            task_bits.append(fallback_bits(t.answer))
+            task_bits.append(fallback_bits(t.answer, lm, t.question))
     lb = library_bits(lm, lib, lib_mode)
     return ProbeResult(lb + sum(task_bits), lb, task_bits, solved, reuse)
