@@ -26,7 +26,7 @@
 ## Endpunkte (primär)
 
 1. Stabiler Grok-Schritt: erster Schritt, ab dem Test-Accuracy ≥ 0,99 für mindestens 2.000 Schritte ununterbrochen gilt; Nicht-Grokking = zensiert beim Budget. Zusätzlich berichtet: erster Treffer ≥ 0,99 und Anteil der Evaluationen ≥ 0,99 in der zweiten Hälfte.
-2. L(W) in Bit nach `core/weight_bits.py`, Rezept `uq-entropy-v2` (Minimum aus absolut und Seed+Differenz), Toleranz ε = _festlegen_.
+2. L(W) in Bit nach `core/weight_bits.py`, Rezept `uq-entropy-v3` (Minimum aus absolut, Seed+Differenz und vom Kern geprüften strukturellen Beschreibungen), Toleranz ε = _festlegen_.
 3. Finale Test-Accuracy.
 
 ## Hypothese und Test

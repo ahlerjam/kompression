@@ -70,6 +70,8 @@ def main(a: Args) -> None:
     splits = [split(cfg.task(), cfg.train_frac, s) for s in cfg.seeds]
     data = {k: np.stack([sp[k] for sp in splits]) for k in splits[0]}
     res["weight_bits"] = weight_bits_per_seed(cfg, res, data, a.lw_tolerance)
+    res.pop("trainable", None)
+    res.pop("const", None)
     for key in ("params", "w0"):
         flat = {k: np.array(v) for k, v in tree_flatten(res.pop(key))}
         np.savez_compressed(run.dir / f"{key}.npz", **flat)

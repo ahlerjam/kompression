@@ -87,4 +87,23 @@ def test_weight_bits_diff_description_wins_for_small_update():
     r = weight_bits.weight_bits(w, loss_fn=loss, tolerance=1e-5, init=w0)
     assert r["description"] == "diff"
     assert r["diff"]["bits"] < r["absolute"]["bits"]
-    assert r["recipe"] == "uq-entropy-v2"
+    assert r["recipe"] == "uq-entropy-v3"
+
+
+def test_weight_bits_structural_candidate_is_checked_by_core():
+    """Eine kurze strukturelle Beschreibung gewinnt; eine falsche wird vom Kern verworfen."""
+    rng = np.random.default_rng(3)
+    basis = rng.normal(size=(256, 4))
+    z = rng.normal(size=4)
+    w = [basis @ z]
+
+    def loss(ws):
+        return float(np.mean((ws[0] - w[0]) ** 2))
+
+    good = {"name": "sub", "payload": [z], "decode": lambda p: [basis @ p[0]], "overhead_bits": 32}
+    bad = {"name": "bad", "payload": [np.zeros(1)], "decode": lambda p: [np.zeros(256)],
+           "overhead_bits": 0}
+    r = weight_bits.weight_bits(w, loss, tolerance=1e-6, structural=[good, bad])
+    assert r["description"] == "sub"
+    assert r["candidates"]["bad"] is None
+    assert r["bits"] < r["absolute"]["bits"]

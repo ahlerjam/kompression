@@ -1,6 +1,6 @@
 """L(W): Beschreibungslänge der Gewichte nach festem Rezept (Entscheidungen E8, E27).
 
-Rezept `uq-entropy-v2` (unabhängig vom Trainingsziel, in allen Armen identisch):
+Rezept `uq-entropy-v3` (unabhängig vom Trainingsziel, in allen Armen identisch):
 1. Zwei Beschreibungen werden geprüft:
    - absolut:  W selbst wird quantisiert.
    - Differenz: W = W0(seed) + D; nur D wird quantisiert. W0 ist aus dem Seed
@@ -9,7 +9,11 @@ Rezept `uq-entropy-v2` (unabhängig vom Trainingsziel, in allen Armen identisch)
    Kosten = empirische Entropie der Indizes * Anzahl + Codebuch (64 Bit je Symbol)
    + 64 Bit für delta.
 3. delta aus festem Gitter; zulässig, wenn loss(rekonstruiert) <= loss(original) + tolerance.
-   Pro Beschreibung das Minimum der Bits; L(W) = Minimum beider Beschreibungen.
+   Pro Beschreibung das Minimum der Bits; L(W) = Minimum aller Beschreibungen.
+4. (v3) Zusätzliche strukturelle Beschreibungen eines Arms (z. B. Unterraum: nur Z;
+   BitNet: ternäre Indizes) werden wie oben quantisiert und codiert. Der Kern
+   rekonstruiert die Gewichte selbst über `decode` und prüft den Loss; die Kosten
+   des Decoders selbst (Seed, Skalen) trägt der Arm als `overhead_bits`.
 
 Low-Rank-Vergröberung (DeMoss et al.) ist bewusst nicht enthalten; sie käme als
 eigene, versionierte Rezept-Variante.
@@ -21,7 +25,7 @@ from collections.abc import Callable, Sequence
 
 import numpy as np
 
-RECIPE_VERSION = "uq-entropy-v2"
+RECIPE_VERSION = "uq-entropy-v3"
 SEED_BITS = 32.0
 DEFAULT_DELTAS: tuple[float, ...] = tuple(float(x) for x in np.geomspace(1e-4, 1.0, 41))
 
@@ -51,7 +55,7 @@ def weight_bits_at(weights: Sequence[np.ndarray], delta: float) -> float:
 
 def _search(
     target: list[np.ndarray],
-    offset: list[np.ndarray] | None,
+    decode: Callable[[list[np.ndarray]], list[np.ndarray]],
     loss_fn: Callable[[list[np.ndarray]], float],
     base: float,
     tolerance: float,
@@ -61,8 +65,7 @@ def _search(
     best = None
     for delta in sorted(deltas):
         q = dequantize(quantize(target, delta), delta)
-        recon = q if offset is None else [o + d for o, d in zip(offset, q, strict=True)]
-        loss_q = float(loss_fn(recon))
+        loss_q = float(loss_fn(decode(q)))
         if loss_q <= base + tolerance:
             bits = weight_bits_at(target, delta) + overhead
             if best is None or bits < best["bits"]:
@@ -76,25 +79,40 @@ def weight_bits(
     tolerance: float,
     deltas: Sequence[float] = DEFAULT_DELTAS,
     init: Sequence[np.ndarray] | None = None,
+    structural: Sequence[dict] = (),
 ) -> dict:
-    """L(W) in Bit. Mit `init` (= W0 aus dem Seed) wird zusätzlich die Differenz-Beschreibung geprüft."""
+    """L(W) in Bit als Minimum über alle gültigen Beschreibungen.
+
+    `init` (= W0 aus dem Seed) aktiviert die Differenz-Beschreibung.
+    `structural`: Liste von {"name", "payload": [arrays], "decode": f(payload) -> Gewichte,
+    "overhead_bits": float}. Der Kern quantisiert die Payload und prüft decode(payload).
+    """
     w = [np.asarray(x, dtype=np.float64) for x in weights]
     base = float(loss_fn(w))
-    absolute = _search(w, None, loss_fn, base, tolerance, deltas, 0.0)
-    diff = None
+    found: dict[str, dict | None] = {}
+    found["absolute"] = _search(w, lambda q: q, loss_fn, base, tolerance, deltas, 0.0)
     if init is not None:
         w0 = [np.asarray(x, dtype=np.float64) for x in init]
         d = [a - b for a, b in zip(w, w0, strict=True)]
-        diff = _search(d, w0, loss_fn, base, tolerance, deltas, SEED_BITS)
-    candidates = [c for c in (absolute, diff) if c is not None]
-    if not candidates:
+        found["diff"] = _search(
+            d, lambda q: [o + x for o, x in zip(w0, q, strict=True)],
+            loss_fn, base, tolerance, deltas, SEED_BITS,
+        )
+    for cand in structural:
+        payload = [np.asarray(x, dtype=np.float64) for x in cand["payload"]]
+        found[cand["name"]] = _search(
+            payload, cand["decode"], loss_fn, base, tolerance, deltas, float(cand["overhead_bits"])
+        )
+    valid = {k: v for k, v in found.items() if v is not None}
+    if not valid:
         raise RuntimeError("Kein delta im Gitter erfüllt die Toleranz")
-    best = min(candidates, key=lambda c: c["bits"])
+    name = min(valid, key=lambda k: valid[k]["bits"])
     return {
-        "bits": best["bits"],
-        "description": "diff" if best is diff else "absolute",
-        "absolute": absolute,
-        "diff": diff,
+        "bits": valid[name]["bits"],
+        "description": name,
+        "candidates": found,
+        "absolute": found.get("absolute"),
+        "diff": found.get("diff"),
         "loss_base": base,
         "tolerance": tolerance,
         "recipe": RECIPE_VERSION,

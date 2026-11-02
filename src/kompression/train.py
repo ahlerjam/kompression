@@ -201,6 +201,8 @@ def train(cfg: TrainConfig, log=None, arm: Arm | None = None) -> dict:
     return {
         "params": params,
         "w0": const["w0"],
+        "trainable": tr,
+        "const": const,
         "grok_step": dict(zip(cfg.seeds, grok_step)),
         "final_test_acc": dict(zip(cfg.seeds, np.array(te_acc).tolist())),
         "final_train_acc": dict(zip(cfg.seeds, np.array(tr_acc).tolist())),

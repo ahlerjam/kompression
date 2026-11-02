@@ -4,6 +4,11 @@ Neueste Einträge oben. Kurz: Datum, was, Ergebnis, Verweis auf `runs/…`.
 
 ## 2026-11-02
 
+- **Kernänderung (Bauphase):** L(W)-Rezept `uq-entropy-v3`: Arme reichen strukturelle Beschreibungen ein (Unterraum: Seed + Z; BitNet: ternäre Indizes + Skalen); der Kern quantisiert, rekonstruiert über `decode` und prüft den Loss selbst. Grund: Unterraum-Lauf hatte nach v2 ≈ 4 Mbit, strukturell ≈ 0,1 Mbit. Smoke (p = 23): Unterraum 2,4 kbit statt 1,7 Mbit; BitNet 638 kbit statt 984 kbit. Kalibrierung `subspace` r64 mit v3 neu gestartet.
+
+- Kalibrierung `subspace` Rang 16 (3 Seeds × 20k, `runs/s0a/20261102-131727_kalib_subspace_r16`): **lernt nicht** (Train 7,5–8,6 %, Test ≈ 1 %), Delta-Norm wächst auf 320–530. Rang 4 deshalb übersprungen, Rang 64 vorgezogen. Offen: Kapazität vs. Optimierung (Basis-Skalierung, lr). Hinweis: L(W) nach Rezept ≈ 3,8–4,1 Mbit, obwohl die strukturelle Beschreibung (Seed + 3.840 Zahlen à 32 Bit ≈ 123 kbit) viel kürzer wäre → strukturelle Beschreibungen müssen in den Kern.
+- Kalibrierung `mdl` β = 0,001 (`runs/s0a/20261102-125912_kalib_mdl_b0.001`): bei 15k kein Grokking (Test 2–10 %), KL sinkt von 2,2 auf ≈ 1,0 Mbit.
+
 - Kalibrierung `wd` (λ = 1, StableMax, 5 Seeds × 20k, `runs/s0a/20261102-121039_kalib_wd`): alle Seeds erreichen Test ≥ 0,99 erstmals bei Schritt 2.200–2.400, **brechen danach wiederholt ein** (3–6 Einbrüche unter 0,9) und sind erst ab 16.700–19.600 dauerhaft ≥ 0,99. Endnorm 62–76. Folgerung fürs Protokoll: Endpunkt „erster Treffer“ ist instabil; zusätzlich „stabil gegrokt“ (≥ 0,99 bis Laufende bzw. ≥ 2.000 Schritte am Stück) und Anteil der Zeit ≥ 0,99. Budget 20k zu knapp für stabilen Endpunkt → 40k.
 - Kalibrierung `subspace` (Rang 16/4/64) und `bitnet` gestartet (`scripts/kalib_struct.sh`).
 
