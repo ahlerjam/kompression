@@ -4,6 +4,8 @@ Neueste Einträge oben. Kurz: Datum, was, Ergebnis, Verweis auf `runs/…`.
 
 ## 2026-11-02
 
+- Kalibrierung `bitnet` (ternäre Gewichte, keine weitere Regularisierung, 3 Seeds × 20k, `runs/s0a/20261102-143549_kalib_bitnet`): **alle Seeds groken**; erster Treffer ≥ 0,99 bei 1.500–2.200, **keine Einbrüche**, stabil (2.000-Fenster) ab 2.600 / 3.400 / 10.800; Anteil ≥ 0,99 in der 2. Hälfte 0,98–1,0. L(W) = 674 kbit (ternäre Beschreibung, kürzer als `wd` mit 0,93–1,42 Mbit). Vergleich `wd` mit gleicher Metrik: stabil ab 2.400–17.100, Anteil 0,83–0,98. **Beobachtung (Kalibrierung, ungepaart, kein Befund):** Harte Gewichtskompression (ternär) erzeugt schnelleres und stabileres Grokking als Weight Decay; weiche Kompression (variationales MDL, β ≤ 0,01) groked bisher nicht. Kandidat für die zentrale Hypothese von 0a.
+
 - Kalibrierung `mdl` β = 0,01 (`runs/s0a/20261102-135612_kalib_mdl_b0.01`): kein Grokking (Test 2–9 %), KL ≈ 0,66 Mbit, L(W) ≈ 0,90 Mbit.
 - Prequential ohne Kalibrierung: frühe Blöcke 6,4–10 Bit/Label (> uniform 6,6), weil das Modell auf kleinem Präfix übermütig auswendig lernt. Behoben durch Temperatur-Wahl pro Block aus festem Gitter inkl. uniform, bezahlt mit log2(9) ≈ 3,2 Bit je Block (zweiteiliger Code). Smoke p = 23: 2.100 Bit gegenüber uniform 2.393. Kalibrierung `preq_*` neu gestartet.
 
