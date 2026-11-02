@@ -4,6 +4,9 @@ Neueste Einträge oben. Kurz: Datum, was, Ergebnis, Verweis auf `runs/…`.
 
 ## 2026-11-02
 
+- Kalibrierung `none` (StableMax, keine Regularisierung, 5 Seeds × 20k, `runs/s0a/20261102-115946_kalib_none`): **kein Seed groked**; Train 100 %, Test 1–3 %, Gewichtsnorm ≈ 510–530. Widerspricht dem Bericht von Prieto et al. für unsere Einstellungen (lr 1e-3, Full-Batch, 40 % Train); Ursache offen (dort teils längeres Training/andere Optimierer). Kalibrierung, kein Befund.
+- Kalibrierung `mdl` über β ∈ {0,001; 0,01; 0,1; 1} gestartet (Seeds 100–102, `scripts/kalib_mdl.sh`). Anfangs-KL ≈ 2,2 Mbit (≈ 5,6 Bit/Gewicht bei σ₀ = e⁻⁶).
+
 - Bauphase/Messphase-Regel von Jonas freigegeben (AGENTS.md).
 - apple/container installiert; Sandbox-Backend `container`: VM ohne Netz, 4 CPUs, 2 GB, Start 0,7 s; Netzsperre per Test geprüft (E17 umgesetzt).
 
