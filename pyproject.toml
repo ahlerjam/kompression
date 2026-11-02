@@ -1,0 +1,27 @@
+[project]
+name = "kompression"
+version = "0.1.0"
+description = "Add your description here"
+authors = [
+    { name = "Jonas Müller", email = "jam@ahler.org" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "matplotlib>=3.11.2",
+    "mlx>=0.32",
+    "numpy>=2.5.4",
+    "polars>=2.1.0",
+    "scipy>=1.18.1",
+    "tyro>=1.0.16",
+]
+
+[build-system]
+requires = ["uv_build>=0.13.6,<0.14.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "pytest>=9.2.0",
+    "ruff>=0.17.3",
+    "torch>=2.15",
+]
