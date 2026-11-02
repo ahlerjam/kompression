@@ -27,6 +27,8 @@ Zuletzt aktualisiert: 2026-11-02 (Loop-Durchgang 1)
 
 ## Wartet auf Jonas
 
+- **Richtungsentscheidung 0a (Info, kein Stopp):** L(W) ist in 0a kein tauglicher MDL-Maßstab (alle Netze ≫ 25 kbit Daten, siehe Logbuch). Ich baue die prequentielle Codelänge als primären Endpunkt ein (gehört ohnehin zu 0b). Einspruch bitte in STATUS oder im Chat.
+
 - **Hauptlauf 0a starten** (Wechsel in die Messphase), sobald Kalibrierungen ausgewertet und Protokoll ausgefüllt sind.
 - Optional: Cloud-GPU für Stufe 1 (Kosten grob 50–200 €).
 
