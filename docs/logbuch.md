@@ -4,6 +4,8 @@ Neueste Einträge oben. Kurz: Datum, was, Ergebnis, Verweis auf `runs/…`.
 
 ## 2026-11-02
 
+- **Kernänderung (Bauphase):** Rezept `uq-entropy-v4` ergänzt eine Low-Rank-Beschreibung für alle Arme (SVD, Singulärwerte ≥ τ·σ_max, τ-Gitter 0–0,5; nach DeMoss et al.). Nachgerechnet: `none` 1,88–2,28 Mbit (unverändert, keine Low-Rank-Struktur), `wd` **0,93–1,42 Mbit** (gewinnt mit Low-Rank τ = 0,05–0,1), `mdl` β = 0,001 0,91–1,18 Mbit (unverändert, absolut). **Beobachtung (Kalibrierung, kein Befund):** Gegrokte Netze sind niedrigrangig; MDL komprimiert vergleichbar stark, aber nicht niedrigrangig, und generalisiert nicht. Hypothese für 0a: Es kommt auf die *Art* der Kompression an (strukturell vs. Entropie einzelner Gewichte).
+
 - Kalibrierung `mdl` β = 0,001 fertig (`runs/s0a/20261102-125912_kalib_mdl_b0.001`): kein Grokking (Test 1,6–9,3 %), Train 100 %, KL ≈ 0,95–1,07 Mbit, L(W) nach Rezept v2 0,91–1,18 Mbit.
 - L(W) nachträglich (`scripts/lw_posthoc.py`, Toleranz 0,05): `none` 1,88–2,28 Mbit (kein Grokking), `wd` 1,73–2,10 Mbit (groked).
 - **Beobachtung (Kalibrierung, ungepaart, verschiedene Seeds — kein Befund):** MDL β = 0,001 erreicht die kürzeste Beschreibung, generalisiert aber nicht; `wd` generalisiert bei kaum kürzerer Beschreibung als `none`. Spricht gegen die naive Lesart „kürzer ⇒ generalisiert“, zumindest unter diesem Rezept. Alle L(W) liegen weit über der Datenmenge (≈ 25 kbit) → das Rezept ist eine lockere obere Schranke; Low-Rank-Vergröberung (DeMoss) als Rezept-Variante prüfen, bevor 0a eingefroren wird.

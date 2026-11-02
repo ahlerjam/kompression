@@ -15,8 +15,9 @@ Rezept `uq-entropy-v3` (unabhängig vom Trainingsziel, in allen Armen identisch)
    rekonstruiert die Gewichte selbst über `decode` und prüft den Loss; die Kosten
    des Decoders selbst (Seed, Skalen) trägt der Arm als `overhead_bits`.
 
-Low-Rank-Vergröberung (DeMoss et al.) ist bewusst nicht enthalten; sie käme als
-eigene, versionierte Rezept-Variante.
+5. (v4) Low-Rank-Beschreibung für alle Arme gleich (nach DeMoss et al. 2024): jede
+   Matrix wird per SVD auf die Singulärwerte >= tau * sigma_max gekürzt; Payload sind
+   die Faktoren U*S und V^T (1D-Parameter unverändert). tau aus festem Gitter.
 """
 
 from __future__ import annotations
@@ -25,7 +26,8 @@ from collections.abc import Callable, Sequence
 
 import numpy as np
 
-RECIPE_VERSION = "uq-entropy-v3"
+RECIPE_VERSION = "uq-entropy-v4"
+DEFAULT_TAUS: tuple[float, ...] = (0.0, 0.01, 0.02, 0.05, 0.1, 0.2, 0.3, 0.5)
 SEED_BITS = 32.0
 DEFAULT_DELTAS: tuple[float, ...] = tuple(float(x) for x in np.geomspace(1e-4, 1.0, 41))
 
@@ -73,6 +75,37 @@ def _search(
     return best
 
 
+def _lowrank_candidates(w: list[np.ndarray], taus: Sequence[float]) -> list[dict]:
+    svds = [np.linalg.svd(x, full_matrices=False) if x.ndim == 2 else None for x in w]
+    out = []
+    for tau in taus:
+        payload, layout = [], []
+        for x, svd in zip(w, svds, strict=True):
+            if svd is None:
+                payload.append(x)
+                layout.append(("raw", x.shape))
+                continue
+            u, sv, vt = svd
+            k = max(1, int((sv >= tau * sv[0]).sum()))
+            payload += [u[:, :k] * sv[:k], vt[:k]]
+            layout.append(("lr", k))
+
+        def decode(q, layout=layout):
+            res, i = [], 0
+            for kind, _ in layout:
+                if kind == "raw":
+                    res.append(q[i])
+                    i += 1
+                else:
+                    res.append(q[i] @ q[i + 1])
+                    i += 2
+            return res
+
+        out.append({"name": f"lowrank_tau{tau:g}", "payload": payload, "decode": decode,
+                    "overhead_bits": 32.0 * sum(k == "lr" for k, _ in layout)})
+    return out
+
+
 def weight_bits(
     weights: Sequence[np.ndarray],
     loss_fn: Callable[[list[np.ndarray]], float],
@@ -80,6 +113,7 @@ def weight_bits(
     deltas: Sequence[float] = DEFAULT_DELTAS,
     init: Sequence[np.ndarray] | None = None,
     structural: Sequence[dict] = (),
+    taus: Sequence[float] = DEFAULT_TAUS,
 ) -> dict:
     """L(W) in Bit als Minimum über alle gültigen Beschreibungen.
 
@@ -98,7 +132,7 @@ def weight_bits(
             d, lambda q: [o + x for o, x in zip(w0, q, strict=True)],
             loss_fn, base, tolerance, deltas, SEED_BITS,
         )
-    for cand in structural:
+    for cand in [*structural, *_lowrank_candidates(w, taus)]:
         payload = [np.asarray(x, dtype=np.float64) for x in cand["payload"]]
         found[cand["name"]] = _search(
             payload, cand["decode"], loss_fn, base, tolerance, deltas, float(cand["overhead_bits"])
