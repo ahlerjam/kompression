@@ -44,6 +44,7 @@ class TrainConfig:
     beta_warmup: int = 0
     mdl_k: int = 16
     subspace_rank: int = 16
+    norm_target_run: str = ""  # Run-Ordner, dessen Normtrajektorie erzwungen wird (E10)
     tags: tuple[str, ...] = field(default_factory=tuple)
 
     def task(self) -> ModTask:
@@ -116,6 +117,23 @@ def build_fns(cfg: TrainConfig, arm: Arm, n_train: int):
     return vstep, veval, vdet
 
 
+def load_norm_targets(run_dir: str, seeds: tuple[int, ...], steps: int) -> np.ndarray:
+    """Normtrajektorie [S, steps] aus metrics.jsonl eines anderen Laufs (linear interpoliert)."""
+    import json
+    from pathlib import Path
+
+    rows = [json.loads(x) for x in (Path(run_dir) / "metrics.jsonl").read_text().splitlines()]
+    out = np.zeros((len(seeds), steps), dtype=np.float32)
+    grid = np.arange(1, steps + 1)
+    for i, s in enumerate(seeds):
+        pts = sorted((r["step"], r["weight_norm"]) for r in rows if r["seed"] == s)
+        if not pts:
+            raise ValueError(f"Seed {s} fehlt im Ziel-Lauf {run_dir}")
+        xs, ys = zip(*pts, strict=True)
+        out[i] = np.interp(grid, xs, ys)
+    return out
+
+
 def prepare(cfg: TrainConfig, arm: Arm):
     task = cfg.task()
     splits = [split(task, cfg.train_frac, s) for s in cfg.seeds]
@@ -136,6 +154,13 @@ def train(cfg: TrainConfig, log=None, arm: Arm | None = None) -> dict:
     vstep, veval, vdet = build_fns(cfg, arm, n_train)
     mx.random.seed(1_000_003 * (1 + cfg.seeds[0]) + len(cfg.seeds))
     S = len(cfg.seeds)
+    targets = None
+    if cfg.norm_target_run:
+        if cfg.arm not in ("none", "wd"):
+            raise ValueError("Norm-Projektion nur für Arme none/wd")
+        targets = mx.array(load_norm_targets(cfg.norm_target_run, cfg.seeds, cfg.steps))
+        vnorm = mx.compile(mx.vmap(lambda p: mx.sqrt(sq_norm(p))))
+        vscale = mx.vmap(lambda p, c: tree_map(lambda a: a * c, p), in_axes=(0, 0))
     grok_step = [None] * S
     t0 = time.time()
     for step_i in range(1, cfg.steps + 1):
@@ -145,6 +170,8 @@ def train(cfg: TrainConfig, log=None, arm: Arm | None = None) -> dict:
             tr, const, m, v, mx.array(float(step_i)), mx.array(beta), noise,
             data["x_train"], data["y_train"],
         )
+        if targets is not None:
+            tr = vscale(tr, targets[:, step_i - 1] / (vnorm(tr) + 1e-12))
         if step_i % cfg.eval_every == 0 or step_i == cfg.steps:
             tr_loss, tr_acc, norm, dnorm = veval(tr, const, data["x_train"], data["y_train"])
             te_loss, te_acc, _, _ = veval(tr, const, data["x_test"], data["y_test"])

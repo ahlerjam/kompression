@@ -6,24 +6,24 @@ Zuletzt aktualisiert: 2026-11-02 (Loop-Durchgang 1)
 
 ## Wo wir stehen
 
-- Stufe 0a: alle Arme gebaut (`none`, `wd`, `mdl`, `bitnet`, `subspace`), L(W) mit Seed+Differenz (E27), 27 Tests grün.
-- Stufe-1-Pilot: Welten (Reasoning Gym), Sandbox, Bibliothek mit L(B) gebaut; Entwurf in `docs/stufe1_pilot.md`.
+- Stufe 0a: Arme `none`, `wd`, `mdl`, `bitnet`, `subspace` und Norm-Projektion (E10) gebaut; 31 Tests grün.
+- Kalibrierung: `none` groked in 20k nicht; `wd` groked bei ~2,3k, aber instabil bis ~17–20k → Budget 40k, Endpunkt „stabil gegrokt“ (Protokoll angepasst).
+- Stufe-1-Pilot: Welten, Sandbox (isolierte VM), Bibliothek, eingefrorenes LM, Solver mit Prefill und Bits; erste Messung mit Qwen2.5-Coder-1.5B im Logbuch.
 
 ## Läuft gerade
 
-| tmux | Lauf | Stand |
-|---|---|---|
-| `s0a-kalib` | Kalibrierung `none`, 5 Seeds × 20k | bei 12k kein Grokking (Test ≈ 2 %, Norm ≈ 470) |
-| `s0a-wd` | Kalibrierung `wd` (λ = 1), 5 Seeds × 20k | bei 6,1k: 4/5 Seeds groked (Test ≥ 0,97), Seed 2 noch nicht |
-| `rc` | Remote Control „mac-ai“ | verbunden |
-
-Hinweis: `s0a-kalib` würde nach `none` noch einmal `wd` starten; ein Wächter beendet die Sitzung nach `none` (Dublette).
+| tmux | Lauf |
+|---|---|
+| `s0a-mdl` | Kalibrierung `mdl`, β = 0,001 → 0,01 → 0,1 → 1 (je 3 Seeds × 20k, je ca. 1 h) |
+| `s0a-struct` | Kalibrierung `subspace` Rang 16 → 4 → 64, dann `bitnet` (je 3 Seeds × 20k) |
+| `dl` | Download Qwen3.5-4B und Qwen3.6-35B-A3B |
+| `rc` | Remote Control „mac-ai“ |
 
 ## Nächste Schritte (Loop)
 
-1. Kalibrierung `none`/`wd` auswerten → Schrittbudget und λ ins Protokoll.
-2. GPU: Kalibrierung `mdl` über β ∈ {1; 0,1; 0,01; 0,001} (Seeds 100–102), dann `subspace` (Rang 4/16/64) und `bitnet`.
-3. Pilot: Modell wählen und Durchsatz messen (wenn GPU frei), Solver mit Logprob-Messung, Schlafphase, Bandit-Proposer.
+1. Kalibrierungen auswerten → β, Rang, ε für L(W) ins Protokoll; `wd_normproj` gegen `mdl`-Trajektorie kalibrieren.
+2. Protokoll 0a vervollständigen → Freigabe Hauptlauf (10 Seeds × 40k je Arm) bei Jonas anfragen.
+3. Pilot: Schlafphase (Funktionen aus gelösten Programmen extrahieren, Annahme nur bei sinkendem L_gesamt), L(B) zusätzlich als −log2 p_Modell(B) messen, Bandit-Proposer A/B, Kontrollen.
 
 ## Wartet auf Jonas
 

@@ -4,6 +4,9 @@ Neueste Einträge oben. Kurz: Datum, was, Ergebnis, Verweis auf `runs/…`.
 
 ## 2026-11-02
 
+- Kalibrierung `wd` (λ = 1, StableMax, 5 Seeds × 20k, `runs/s0a/20261102-121039_kalib_wd`): alle Seeds erreichen Test ≥ 0,99 erstmals bei Schritt 2.200–2.400, **brechen danach wiederholt ein** (3–6 Einbrüche unter 0,9) und sind erst ab 16.700–19.600 dauerhaft ≥ 0,99. Endnorm 62–76. Folgerung fürs Protokoll: Endpunkt „erster Treffer“ ist instabil; zusätzlich „stabil gegrokt“ (≥ 0,99 bis Laufende bzw. ≥ 2.000 Schritte am Stück) und Anteil der Zeit ≥ 0,99. Budget 20k zu knapp für stabilen Endpunkt → 40k.
+- Kalibrierung `subspace` (Rang 16/4/64) und `bitnet` gestartet (`scripts/kalib_struct.sh`).
+
 - Pilot-Bench Qwen2.5-Coder-1.5B-Instruct-4bit, ohne Bibliothek, 6 Familien × 4 Aufgaben × 4 Samples (`runs/s1/*bench_prefill`): Pass-Rate gcd 0,94 · count_bits 0,88 · word_sorting 0,64 · letter_counting 0,63 · prime_factorization 0,50 · base_conversion 0,00 (Stichprobe danach 2/8). Verifizierte Programme kosten 1–18 Bit unter dem Modell. 16 Samples dauern 9–26 s bei geteilter GPU. Engineering: Ohne Code-Prefill antwortete das Modell oft direkt (z. B. „6“); Prefill ```` ```python ```` behebt das (count_bits 0 → 0,88).
 - Beobachtung für das Design: Weil das Modell die Programme selbst gesampelt hat, sind sie unter ihm sehr wahrscheinlich (wenige Bit). L(y|x,B) ist damit klein gegenüber L(B); der Kompressionsfortschritt muss vor allem aus kürzeren/häufiger richtigen Lösungen auf schwereren Aufgaben kommen. Prüfen: Bits über alle n Samples (Erwartungswert) statt nur der besten Lösung.
 

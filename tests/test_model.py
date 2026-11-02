@@ -64,3 +64,14 @@ def test_vmap_equivalence():
         np.array(unstack_tree(single["params"], 0)["unemb"]),
         atol=1e-5,
     )
+
+
+def test_norm_projection_follows_target(tmp_path):
+    import json
+
+    steps = 60
+    rows = [{"step": st, "seed": 0, "weight_norm": 20.0 + st / 10} for st in (10, 60)]
+    (tmp_path / "metrics.jsonl").write_text("\n".join(json.dumps(r) for r in rows))
+    r = train(TrainConfig(seeds=(0,), steps=steps, arm="wd", weight_decay=1.0,
+                          norm_target_run=str(tmp_path), **SMALL))
+    assert r["final_weight_norm"][0] == pytest.approx(26.0, rel=1e-3)

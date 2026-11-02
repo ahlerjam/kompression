@@ -9,7 +9,7 @@
 - Optimierer: AdamW, lr = 1e-3, β = (0,9; 0,98), Full-Batch.
 - StableMax in allen Armen.
 - Seeds: 0–9 (10), gepaart über alle Arme.
-- Schrittbudget: _nach Kalibrierung festlegen_ (vorläufig 20.000).
+- Schrittbudget: 40.000 (Kalibrierung `wd`: stabil erst ab 16,7k–19,6k).
 
 ## Arme
 
@@ -17,15 +17,16 @@
 |---|---|---|
 | `none` | keine Regularisierung | gebaut |
 | `wd` | Weight Decay, λ aus Kalibrierung (Seeds 100–102, nicht 0–9) | gebaut |
-| `mdl` | variationale Codelänge, GMM-Prior (K = 16, eine Komponente fix bei 0) | offen |
+| `mdl` | variationale Codelänge, GMM-Prior (K = 16, eine Komponente fix bei 0), β aus Kalibrierung | gebaut, Kalibrierung läuft |
 | `wd_normproj` | Weight Decay, Normtrajektorie auf `mdl` projiziert | offen |
-| `bitnet` | ternäre Gewichte (QAT), L(W) exakt | offen |
+| `bitnet` | ternäre Gewichte (QAT), L(W) exakt | gebaut, Kalibrierung läuft |
 | `mdl_normproj` | optional: MDL, Normtrajektorie auf `wd` projiziert | offen |
+| `subspace` | W = W0 + A·Z·Bᵀ (E27), Rang aus Kalibrierung | gebaut, Kalibrierung läuft |
 
 ## Endpunkte (primär)
 
-1. Grok-Schritt: erster Schritt mit Test-Accuracy ≥ 0,99; Nicht-Grokking = zensiert beim Budget.
-2. L(W) in Bit nach `core/weight_bits.py`, Rezept `uq-entropy-v1`, Toleranz ε = _festlegen_.
+1. Stabiler Grok-Schritt: erster Schritt, ab dem Test-Accuracy ≥ 0,99 für mindestens 2.000 Schritte ununterbrochen gilt; Nicht-Grokking = zensiert beim Budget. Zusätzlich berichtet: erster Treffer ≥ 0,99 und Anteil der Evaluationen ≥ 0,99 in der zweiten Hälfte.
+2. L(W) in Bit nach `core/weight_bits.py`, Rezept `uq-entropy-v2` (Minimum aus absolut und Seed+Differenz), Toleranz ε = _festlegen_.
 3. Finale Test-Accuracy.
 
 ## Hypothese und Test

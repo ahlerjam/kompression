@@ -42,6 +42,7 @@ class Args:
     mdl_k: int = 16
     subspace_rank: int = 16
     lw_tolerance: float = 0.05
+    norm_target_run: str = ""
     name: str = ""
 
 
@@ -60,6 +61,7 @@ def main(a: Args) -> None:
         beta_warmup=a.beta_warmup,
         mdl_k=a.mdl_k,
         subspace_rank=a.subspace_rank,
+        norm_target_run=a.norm_target_run,
         tags=(a.arm,),
     )
     run = Run("s0a", a.name or a.arm, {"args": dataclasses.asdict(a), "train": dataclasses.asdict(cfg)})
