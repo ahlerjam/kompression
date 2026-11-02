@@ -4,7 +4,7 @@
 cd ~/ai/kompression
 while true; do
   for n in "$@"; do
-    for f in runs/s0a/*_"$n"/results.json(N); do echo "fertig: $f"; exit 0; done
+    for f in runs/*/*_"$n"/results.json(N); do echo "fertig: $f"; exit 0; done
   done
   sleep 30
 done
