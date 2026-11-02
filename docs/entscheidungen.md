@@ -1,7 +1,7 @@
 # Architektur- und Engineering-Entscheidungen
 
 Stand: 2026-11-02 · Grundlage: Konzept „Kompressionsgetriebene Selbstverbesserung v2“ und vier Recherchen (Quellen in `recherche.md`).
-Status: E1–E26 am 2026-11-02 freigegeben.
+Status: E1–E27 am 2026-11-02 freigegeben.
 
 | # | Entscheidung | Kurzbegründung |
 |---|---|---|
@@ -31,6 +31,7 @@ Status: E1–E26 am 2026-11-02 freigegeben.
 | E24 | Auditor im Kern ab Stufe 1: liest Logs, sucht Reward Hacking, triviale Funktionen, Vielfalts-Kollaps; vom System nicht veränderbar | Lehre aus der Darwin Gödel Machine |
 | E25 | „Welten mit bekannter Lösung“: Aufgaben aus einer versteckten, selbst geschriebenen Bibliothek erzeugen; messen, ob das System sie wiederfindet | eindeutiger als jeder Benchmark, keine Kontamination |
 | E26 | BitNet (ternäre Gewichte, QAT) als zusätzlicher Arm in 0a, nicht als Hauptarchitektur | L(W) exakt messbar; als Hauptarchitektur erst bei Milliarden Parametern sinnvoll |
+| E27 | L(W) als Minimum aus „W absolut“ und „Seed (32 Bit) + Differenz zu W0“ (Rezept `uq-entropy-v2`); dazu Arm `subspace`: W = W0 + A·Z·Bᵀ mit festen Zufallsbasen aus dem Seed, nur Z trainiert | Idee von Jonas: Die Initialisierung ist aus dem Seed reproduzierbar und darf nichts kosten; der Unterraum macht die Beschreibungslänge exakt steuerbar (verwandt: Li et al. 2018, VeRA, SeedLM) |
 
 ## Was das Konzept-Doc ändern sollte
 

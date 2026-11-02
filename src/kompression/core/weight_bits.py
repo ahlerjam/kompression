@@ -1,14 +1,18 @@
-"""L(W): Beschreibungslänge der Gewichte nach festem Rezept (Entscheidung E8).
+"""L(W): Beschreibungslänge der Gewichte nach festem Rezept (Entscheidungen E8, E27).
 
-Rezept (unabhängig vom Trainingsziel, in allen Armen identisch):
-1. Alle Gewichte gleichförmig quantisieren mit Schrittweite delta (Indizes round(w/delta)).
-2. Kosten = empirische Entropie der Indizes * Anzahl + Codebuch (je Symbol 32 Bit
-   für den Indexwert + 32 Bit für die Häufigkeit) + 64 Bit für delta.
-3. delta wird aus einem festen Gitter gewählt: das größte delta, bei dem der Loss
-   des quantisierten Modells höchstens um `tolerance` steigt. Dann minimale Bits.
+Rezept `uq-entropy-v2` (unabhängig vom Trainingsziel, in allen Armen identisch):
+1. Zwei Beschreibungen werden geprüft:
+   - absolut:  W selbst wird quantisiert.
+   - Differenz: W = W0(seed) + D; nur D wird quantisiert. W0 ist aus dem Seed
+     reproduzierbar und kostet SEED_BITS.
+2. Gleichförmige Quantisierung mit Schrittweite delta (Indizes round(x/delta)).
+   Kosten = empirische Entropie der Indizes * Anzahl + Codebuch (64 Bit je Symbol)
+   + 64 Bit für delta.
+3. delta aus festem Gitter; zulässig, wenn loss(rekonstruiert) <= loss(original) + tolerance.
+   Pro Beschreibung das Minimum der Bits; L(W) = Minimum beider Beschreibungen.
 
-Low-Rank-Vergröberung (DeMoss et al.) ist bewusst noch nicht enthalten; sie kommt
-als eigene, versionierte Rezept-Variante, falls nötig.
+Low-Rank-Vergröberung (DeMoss et al.) ist bewusst nicht enthalten; sie käme als
+eigene, versionierte Rezept-Variante.
 """
 
 from __future__ import annotations
@@ -17,7 +21,8 @@ from collections.abc import Callable, Sequence
 
 import numpy as np
 
-RECIPE_VERSION = "uq-entropy-v1"
+RECIPE_VERSION = "uq-entropy-v2"
+SEED_BITS = 32.0
 DEFAULT_DELTAS: tuple[float, ...] = tuple(float(x) for x in np.geomspace(1e-4, 1.0, 41))
 
 
@@ -44,23 +49,53 @@ def weight_bits_at(weights: Sequence[np.ndarray], delta: float) -> float:
     return entropy_bits(quantize(weights, delta))
 
 
+def _search(
+    target: list[np.ndarray],
+    offset: list[np.ndarray] | None,
+    loss_fn: Callable[[list[np.ndarray]], float],
+    base: float,
+    tolerance: float,
+    deltas: Sequence[float],
+    overhead: float,
+) -> dict | None:
+    best = None
+    for delta in sorted(deltas):
+        q = dequantize(quantize(target, delta), delta)
+        recon = q if offset is None else [o + d for o, d in zip(offset, q, strict=True)]
+        loss_q = float(loss_fn(recon))
+        if loss_q <= base + tolerance:
+            bits = weight_bits_at(target, delta) + overhead
+            if best is None or bits < best["bits"]:
+                best = {"bits": bits, "delta": delta, "loss_quant": loss_q}
+    return best
+
+
 def weight_bits(
     weights: Sequence[np.ndarray],
     loss_fn: Callable[[list[np.ndarray]], float],
     tolerance: float,
     deltas: Sequence[float] = DEFAULT_DELTAS,
+    init: Sequence[np.ndarray] | None = None,
 ) -> dict:
-    """Minimale Bits über das Gitter unter der Bedingung loss(quant) <= loss(orig) + tolerance."""
-    base = float(loss_fn([np.asarray(w, dtype=np.float64) for w in weights]))
-    best = None
-    for delta in sorted(deltas):
-        q = dequantize(quantize(weights, delta), delta)
-        loss_q = float(loss_fn(q))
-        if loss_q <= base + tolerance:
-            bits = weight_bits_at(weights, delta)
-            if best is None or bits < best["bits"]:
-                best = {"bits": bits, "delta": delta, "loss_quant": loss_q}
-    if best is None:
+    """L(W) in Bit. Mit `init` (= W0 aus dem Seed) wird zusätzlich die Differenz-Beschreibung geprüft."""
+    w = [np.asarray(x, dtype=np.float64) for x in weights]
+    base = float(loss_fn(w))
+    absolute = _search(w, None, loss_fn, base, tolerance, deltas, 0.0)
+    diff = None
+    if init is not None:
+        w0 = [np.asarray(x, dtype=np.float64) for x in init]
+        d = [a - b for a, b in zip(w, w0, strict=True)]
+        diff = _search(d, w0, loss_fn, base, tolerance, deltas, SEED_BITS)
+    candidates = [c for c in (absolute, diff) if c is not None]
+    if not candidates:
         raise RuntimeError("Kein delta im Gitter erfüllt die Toleranz")
-    best.update({"loss_base": base, "tolerance": tolerance, "recipe": RECIPE_VERSION})
-    return best
+    best = min(candidates, key=lambda c: c["bits"])
+    return {
+        "bits": best["bits"],
+        "description": "diff" if best is diff else "absolute",
+        "absolute": absolute,
+        "diff": diff,
+        "loss_base": base,
+        "tolerance": tolerance,
+        "recipe": RECIPE_VERSION,
+    }

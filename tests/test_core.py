@@ -43,7 +43,7 @@ def test_weight_bits_prefers_coarse_delta_when_loss_flat():
     rng = np.random.default_rng(0)
     w = [rng.normal(size=(64, 64))]
     r = weight_bits.weight_bits(w, loss_fn=lambda ws: 0.0, tolerance=0.0)
-    assert r["delta"] == pytest.approx(max(weight_bits.DEFAULT_DELTAS))
+    assert r["absolute"]["delta"] == pytest.approx(max(weight_bits.DEFAULT_DELTAS))
     fine = weight_bits.weight_bits_at(w, 1e-3)
     assert r["bits"] < fine
 
@@ -56,8 +56,8 @@ def test_weight_bits_respects_tolerance():
         return float(np.mean((ws[0] - target) ** 2))
 
     r = weight_bits.weight_bits(w, loss_fn=loss, tolerance=1e-4)
-    assert r["loss_quant"] <= 1e-4 + 1e-12
-    assert r["delta"] < 1.0
+    assert r["absolute"]["loss_quant"] <= 1e-4 + 1e-12
+    assert r["absolute"]["delta"] < 1.0
 
 
 def test_holm_monotone_and_bounded():
@@ -73,3 +73,18 @@ def test_paired_tests_detect_shift():
     assert stats.paired_wilcoxon(a, b)["p"] < 0.01
     lo, hi = stats.bootstrap_ci(a, b)
     assert lo > 0.9 and hi < 1.1
+
+
+def test_weight_bits_diff_description_wins_for_small_update():
+    """W = W0 + kleines D: Seed + Differenz muss billiger sein als W selbst (E27)."""
+    rng = np.random.default_rng(2)
+    w0 = [rng.normal(size=(64, 64))]
+    w = [w0[0] + 0.001 * rng.normal(size=(64, 64))]
+
+    def loss(ws):
+        return float(np.mean((ws[0] - w[0]) ** 2))
+
+    r = weight_bits.weight_bits(w, loss_fn=loss, tolerance=1e-5, init=w0)
+    assert r["description"] == "diff"
+    assert r["diff"]["bits"] < r["absolute"]["bits"]
+    assert r["recipe"] == "uq-entropy-v2"
