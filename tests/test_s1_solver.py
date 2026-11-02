@@ -15,7 +15,7 @@ class FakeLM:
         return [1, 2, 3]
 
     def generate(self, prompts, max_tokens, temperature):
-        return ["```python\nprint(gcd_all())\n```", "```python\nprint('x')\n```"] * (len(prompts) // 2)
+        return ["print(gcd_all())\n```", "print('x')\n```"] * (len(prompts) // 2)
 
     def completion_bits(self, prompt, completion):
         return float(len(completion))

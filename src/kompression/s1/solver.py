@@ -21,13 +21,17 @@ def user_prompt(task: Task, lib: Library) -> str:
     return f"{lib_part}Task:\n{task.question}"
 
 
+PREFILL = "```python\n"  # erzwingt Code; Bits zählen nur ab hier (Prefill ist für alle gleich)
+
 _CODE = re.compile(r"```(?:python)?\s*\n(.*?)```", re.S)
 
 
 def extract_code(text: str) -> str | None:
     m = _CODE.findall(text)
     if m:
-        return m[-1].strip()
+        return m[0].strip()
+    if text.startswith(PREFILL):  # abgeschnitten ohne schließende Backticks
+        return text[len(PREFILL):].strip() or None
     return None
 
 
@@ -45,8 +49,10 @@ def solve(lm, world: World, tasks: list[Task], lib: Library, n: int = 4,
           max_tokens: int = 512, temperature: float = 0.7, backend: str = "container",
           score_bits: bool = True) -> list[list[Attempt]]:
     """n Versuche je Aufgabe; Bits nur für verifizierte Lösungen."""
-    prompts = [lm.chat(SYSTEM, user_prompt(t, lib)) for t in tasks]
-    texts = lm.generate([p for p in prompts for _ in range(n)], max_tokens, temperature)
+    prefill = lm.tokenizer.encode(PREFILL, add_special_tokens=False) if hasattr(lm, "tokenizer") else []
+    prompts = [lm.chat(SYSTEM, user_prompt(t, lib)) + prefill for t in tasks]
+    texts = [PREFILL + x for x in
+             lm.generate([p for p in prompts for _ in range(n)], max_tokens, temperature)]
     out = []
     for i, t in enumerate(tasks):
         attempts = []
@@ -57,7 +63,7 @@ def solve(lm, world: World, tasks: list[Task], lib: Library, n: int = 4,
             score = world.verify(t, ans)
             bits = None
             if score >= 1.0 and score_bits:
-                bits = lm.completion_bits(prompts[i], f"```python\n{code}\n```")
+                bits = lm.completion_bits(prompts[i], f"{code}\n```")
             attempts.append(Attempt(t, code, ans, score, bits,
                                     frozenset(lib.called_in(code or ""))))
         out.append(attempts)
