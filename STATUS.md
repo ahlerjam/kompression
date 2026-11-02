@@ -6,24 +6,23 @@ Zuletzt aktualisiert: 2026-11-02 (Loop-Durchgang 1)
 
 ## Wo wir stehen
 
-- Stufe 0a: Arme `none`, `wd`, `mdl`, `bitnet`, `subspace` und Norm-Projektion (E10) gebaut; 31 Tests grün.
-- Kalibrierung: `none` groked in 20k nicht; `wd` groked bei ~2,3k, aber instabil bis ~17–20k → Budget 40k, Endpunkt „stabil gegrokt“ (Protokoll angepasst).
-- Stufe-1-Pilot: Welten, Sandbox (isolierte VM), Bibliothek, eingefrorenes LM, Solver mit Prefill und Bits; erste Messung mit Qwen2.5-Coder-1.5B im Logbuch.
+- **0a Kalibrierung (Seeds 100–102 bzw. 0–4, kein Befund):** `none` groked nicht; `wd` groked instabil; `bitnet` groked schnell und stabil; `mdl` β = 0,001/0,01 groked nicht; `subspace` r16 lernt nicht, r64 lernt nur auswendig.
+- **Messung:** L(W) Rezept v4 (absolut, Seed+Differenz, Low-Rank, strukturell). L(W) taugt in 0a nicht als MDL-Maßstab (alle Netze ≫ 25 kbit Daten) → primärer Endpunkt: prequentielle Codelänge (mit bezahlter Temperatur-Kalibrierung).
+- **Pilot Stufe 1:** Wach-Schlaf-Zyklus läuft end-to-end; Bibliotheken werden vorgeschlagen und genutzt, aber abgelehnt, weil das 1,5B-Modell mit Bibliothek weniger löst.
 
 ## Läuft gerade
 
 | tmux | Lauf |
 |---|---|
-| `s0a-mdl` | Kalibrierung `mdl`, β = 0,001 → 0,01 → 0,1 → 1 (je 3 Seeds × 20k, je ca. 1 h) |
-| `s0a-struct` | Kalibrierung `subspace` Rang 16 → 4 → 64, dann `bitnet` (je 3 Seeds × 20k) |
-| `dl` | Download Qwen3.5-4B und Qwen3.6-35B-A3B |
+| `s0a-mdl` | Kalibrierung `mdl` β = 0,1, dann 1 |
+| `s0a-preq` | Prequential je Arm: wd → none → subspace → mdl → bitnet |
 | `rc` | Remote Control „mac-ai“ |
 
 ## Nächste Schritte (Loop)
 
-1. Kalibrierungen auswerten → β, Rang, ε für L(W) ins Protokoll; `wd_normproj` gegen `mdl`-Trajektorie kalibrieren.
-2. Protokoll 0a vervollständigen → Freigabe Hauptlauf (10 Seeds × 40k je Arm) bei Jonas anfragen.
-3. Pilot: Schlafphase (Funktionen aus gelösten Programmen extrahieren, Annahme nur bei sinkendem L_gesamt), L(B) zusätzlich als −log2 p_Modell(B) messen, Bandit-Proposer A/B, Kontrollen.
+1. Prequential-Ergebnisse auswerten; Protokoll 0a mit prequentieller Codelänge als primärem Endpunkt fertigstellen → Freigabe Hauptlauf anfragen.
+2. Pilot: Rauschen des Probe-Werts messen; Qwen3.5-4B testen; nur relevante Bibliotheksfunktionen zeigen (Kosten mitzählen); danach Bandit-Proposer A/B.
+3. 0b bauen (Transfer per prequentieller Codelänge, Init aus A vs. Zufall vs. Norm-Kontrolle).
 
 ## Wartet auf Jonas
 
