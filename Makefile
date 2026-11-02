@@ -15,7 +15,7 @@ fmt:
 core-check:
 	uv run python scripts/core_manifest.py
 
-# NUR nach menschlicher Freigabe (siehe AGENTS.md, Regel 1)
+# Bauphase: nach bewusster Kernänderung; Messphase: gesperrt (AGENTS.md)
 core-manifest:
 	uv run python scripts/core_manifest.py --write
 

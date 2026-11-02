@@ -1,5 +1,7 @@
 # STATUS
 
+**Phase: BAUPHASE** (Regeln in AGENTS.md)
+
 Zuletzt aktualisiert: 2026-11-02 (Loop-Durchgang 1)
 
 ## Wo wir stehen
@@ -25,9 +27,7 @@ Hinweis: `s0a-kalib` würde nach `none` noch einmal `wd` starten; ein Wächter b
 
 ## Wartet auf Jonas
 
-- **Kernänderung (Vorschlag):** L(B)-Messung (`s1/library.token_bits`) und Logprob-Bits in den Kern verschieben; strukturelle Beschreibungen (z. B. Unterraum: nur Z) als geprüfte zusätzliche Kandidaten für L(W) zulassen.
-- **Sandbox-Isolation (E17):** `apple/container` installieren (neuer Dienst) für unbeaufsichtigte Ausführung von Modellcode. Bis dahin laufen Modellprogramme nur im Subprozess mit Limits.
-- **Protokoll 0a einfrieren**, sobald die Kalibrierungen ausgewertet sind.
+- **Hauptlauf 0a starten** (Wechsel in die Messphase), sobald Kalibrierungen ausgewertet und Protokoll ausgefüllt sind.
 - Optional: Cloud-GPU für Stufe 1 (Kosten grob 50–200 €).
 
 ## Bekannte Befunde Engineering

@@ -39,23 +39,27 @@ runs/                   Ergebnisse, nicht in Git. Ein Ordner pro Lauf.
 docs/                   Entscheidungen, Bauplan, Protokolle, Recherche, Logbuch.
 ```
 
-## Harte Regeln
+## Phasen und Regeln (freigegeben von Jonas am 2026-11-02)
 
-1. **Den Kern (`src/kompression/core/`) nie ohne ausdrückliche menschliche Freigabe ändern.**
-   Der Test `test_core_manifest` schlägt sonst fehl. `make core-manifest` (Neuschreiben der
-   Prüfsummen) nur nach Freigabe ausführen. Grund: Ein System, das seine eigene Messung
-   ändern kann, kann „kürzer“ umdefinieren (Konzept, Abschnitt „Unantastbarer Kern“).
-2. **Protokolle sind eingefroren, sobald ein Hauptlauf startet.** Arme, Endpunkte, Seeds und
-   Tests stehen in `docs/protokoll_*.md`. Änderungen danach nur als neue, datierte Version mit Begründung.
-3. **Jeder Lauf über `kompression.runlog.Run`.** So entstehen `config.json`, `meta.json`
-   (Git-SHA, Diff, Versionen), `metrics.jsonl` und `results.json`. Hauptläufe nur mit sauberem
-   Git-Stand (`git_dirty: false`).
-4. **Gepaartes Design:** Für einen Seed sind Daten-Split und Initialisierung in allen Armen identisch.
-5. **Gleiches Compute für alle Arme** einer Vergleichsfrage.
-6. **Keine Ergebnisse behaupten, die nicht in `runs/` liegen.** Negative Befunde werden
-   genauso dokumentiert wie positive.
-7. Lange Läufe in `tmux` starten (`tmux new -d -s <name> "caffeinate -i …"`), nie im Vordergrund einer Agentensitzung.
-8. Nach jeder Arbeitssitzung `STATUS.md` und `docs/logbuch.md` aktualisieren.
+Aktuelle Phase: **BAUPHASE** (steht auch oben in `STATUS.md`).
+
+| | Bauphase | Messphase (ab Start eines Hauptlaufs) |
+|---|---|---|
+| Kern `src/kompression/core/` ändern | frei; jede Änderung in `docs/logbuch.md` begründen, danach `make core-manifest` | gesperrt |
+| Protokolle `docs/protokoll_*.md` | frei ausfüllen, Kalibrierungen frei starten | eingefroren; Änderung nur als neue datierte Version |
+| Werkzeuge, Pakete, Modelle installieren | frei | frei |
+| Geld ausgeben (Cloud-GPU, APIs) | nur mit Freigabe von Jonas | nur mit Freigabe von Jonas |
+| Hauptlauf starten (Wechsel in die Messphase) | nur mit Freigabe von Jonas | |
+
+Immer gültig:
+
+1. Jeder Lauf über `kompression.runlog.Run` (`config.json`, `meta.json`, `metrics.jsonl`, `results.json`). Hauptläufe nur mit sauberem Git-Stand.
+2. Gepaartes Design: Für einen Seed sind Daten-Split und Initialisierung in allen Armen identisch.
+3. Gleiches Compute für alle Arme einer Vergleichsfrage.
+4. Keine Ergebnisse behaupten, die nicht in `runs/` liegen. Negative Befunde genauso dokumentieren wie positive. Kalibrierungen sind keine Befunde.
+5. Lange Läufe in `tmux` mit `caffeinate -i`, nie im Vordergrund einer Agentensitzung.
+6. Nach jeder Arbeitssitzung `STATUS.md` und `docs/logbuch.md` aktualisieren, committen, pushen.
+7. Der Test `test_core_manifest` schützt den Kern vor unbemerkten Änderungen; in der Bauphase nach bewusster Änderung Manifest neu schreiben.
 
 ## Technische Hinweise
 

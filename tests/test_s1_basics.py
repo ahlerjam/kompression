@@ -1,5 +1,7 @@
 from kompression.s1.library import Library, token_bits
-from kompression.s1.sandbox import run_program
+import pytest
+
+from kompression.s1.sandbox import container_available, run_in_container, run_program
 from kompression.s1.worlds import HELDOUT_FAMILIES, TRAIN_FAMILIES, World
 
 
@@ -36,3 +38,16 @@ def test_library_reuse_and_bits():
 
     assert token_bits("a b c d", Tok(), 1024) == 40.0
     assert token_bits("", Tok(), 1024) == 0.0
+
+
+@pytest.mark.skipif(not container_available(), reason="apple/container fehlt")
+def test_container_sandbox_isolated():
+    lib = Library(Library.parse("def double(x):\n    return 2 * x\n"))
+    r = run_in_container("print(double(21))", lib.source())
+    assert r.ok and r.answer == "42"
+    r = run_in_container(
+        "import urllib.request\nprint(urllib.request.urlopen('http://example.com', timeout=2).status)"
+    )
+    assert not r.ok  # kein Netz
+    r = run_in_container("while True: pass", timeout_s=1.0)
+    assert not r.ok and r.timed_out
