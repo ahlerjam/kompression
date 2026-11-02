@@ -1,0 +1,107 @@
+"""Prequentielle Codelänge der ganzen Additionstabelle für einen Arm (primärer MDL-Endpunkt).
+
+Pro Seed: feste Zufallsreihenfolge aller p*p Paare, Blöcke 64, 128, ... bis p*p.
+Block 1 uniform codiert; für jeden weiteren Block wird auf dem Präfix trainiert
+(Warmstart aus dem vorigen Block, `steps_per_block` Schritte, Full-Batch) und dann
+der Block mit dem Modell codiert, BEVOR es ihn sieht. Gezählt wird im Kern
+(`core.codelength.prequential_codelength`).
+
+  uv run python stages/s0a_grokking/prequential.py --arm wd --seeds 100 101 102
+"""
+
+from __future__ import annotations
+
+import dataclasses
+import math
+import time
+from dataclasses import dataclass
+from typing import Literal
+
+import mlx.core as mx
+import numpy as np
+import tyro
+from mlx.utils import tree_map
+
+from kompression.core.codelength import doubling_blocks, prequential_codelength
+from kompression.model_mlx import forward, init_params, label_logprobs
+from kompression.objectives import make_arm
+from kompression.runlog import Run
+from kompression.train import TrainConfig, build_fns, stack_trees
+
+
+@dataclass(frozen=True)
+class Args:
+    arm: Literal["none", "wd", "mdl", "bitnet", "subspace"] = "wd"
+    seeds: tuple[int, ...] = (100, 101, 102)
+    p: int = 97
+    first_block: int = 64
+    steps_per_block: int = 3000
+    weight_decay: float = 1.0
+    lr: float = 1e-3
+    mdl_beta: float = 0.01
+    subspace_rank: int = 64
+    name: str = ""
+
+
+def main(a: Args) -> None:
+    cfg = TrainConfig(p=a.p, seeds=a.seeds, steps=a.steps_per_block, lr=a.lr,
+                      weight_decay=a.weight_decay if a.arm == "wd" else 0.0, arm=a.arm,
+                      mdl_beta=a.mdl_beta, subspace_rank=a.subspace_rank, tags=(a.arm, "preq"))
+    run = Run("s0a_preq", a.name or a.arm, {"args": dataclasses.asdict(a)})
+    print(f"Lauf: {run.dir}", flush=True)
+    task, mcfg = cfg.task(), cfg.model()
+    arm = make_arm(a.arm, subspace_rank=a.subspace_rank)
+    x_all, y_all = task.all_pairs()
+    n = len(y_all)
+    perms = [np.random.default_rng(s).permutation(n) for s in a.seeds]
+    X = mx.array(np.stack([x_all[pm] for pm in perms]))
+    Y = mx.array(np.stack([y_all[pm] for pm in perms]))
+
+    pairs = [arm.init(init_params(mcfg, s), s) for s in a.seeds]
+    tr = stack_trees([q[0] for q in pairs])
+    const = stack_trees([q[1] for q in pairs])
+    m = tree_map(mx.zeros_like, tr)
+    v = tree_map(mx.zeros_like, tr)
+    t = 0
+
+    def block_logp(tr_, const_, x, y):
+        p_ = arm.deterministic(tr_, const_)
+        return label_logprobs(forward(p_, x, mcfg), y, cfg.use_stablemax)
+
+    vlogp = mx.vmap(block_logp, in_axes=(0, 0, 0, 0))
+    bounds = doubling_blocks(n, a.first_block)
+    per_seed_logp: dict[tuple[int, int], np.ndarray] = {}
+    t0 = time.time()
+    for start, end in zip(bounds, bounds[1:], strict=False):
+        vstep, _, _ = build_fns(cfg, arm, n_train=start)
+        noise_dummy = mx.zeros((1,))
+        for _ in range(a.steps_per_block):
+            t += 1
+            noise = arm.noise_like(tr) if arm.needs_noise else noise_dummy
+            tr, m, v, _, _ = vstep(tr, const, m, v, mx.array(float(t)), mx.array(a.mdl_beta),
+                                   noise, X[:, :start], Y[:, :start])
+        lp = vlogp(tr, const, X[:, start:end], Y[:, start:end])
+        mx.eval(lp)
+        lp = np.array(lp, dtype=np.float64)
+        for i in range(len(a.seeds)):
+            per_seed_logp[(i, start)] = lp[i]
+        bits = -lp.sum(axis=1) / math.log(2)
+        acc = None
+        run.log(block_start=start, block_end=end, bits_per_seed=bits.tolist(),
+                bits_per_label=(bits / (end - start)).tolist(), elapsed_s=time.time() - t0)
+        print(f"Block [{start},{end}) Bits/Label je Seed: {np.round(bits / (end - start), 3)}",
+              flush=True)
+        del acc
+
+    results = {}
+    for i, s in enumerate(a.seeds):
+        r = prequential_codelength(n, task.p, bounds, lambda st, en, i=i: per_seed_logp[(i, st)])
+        results[s] = {"total_bits": r["total_bits"], "uniform_bits": r["uniform_bits"],
+                      "per_block_bits": r["per_block_bits"]}
+    run.finish({"prequential": results, "bounds": bounds, "seconds": time.time() - t0})
+    print({s: round(v["total_bits"]) for s, v in results.items()}, "uniform",
+          round(results[a.seeds[0]]["uniform_bits"]), flush=True)
+
+
+if __name__ == "__main__":
+    main(tyro.cli(Args))
