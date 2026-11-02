@@ -4,6 +4,9 @@ Neueste Einträge oben. Kurz: Datum, was, Ergebnis, Verweis auf `runs/…`.
 
 ## 2026-11-02
 
+- Kalibrierung `mdl` β = 0,01 (`runs/s0a/20261102-135612_kalib_mdl_b0.01`): kein Grokking (Test 2–9 %), KL ≈ 0,66 Mbit, L(W) ≈ 0,90 Mbit.
+- Prequential ohne Kalibrierung: frühe Blöcke 6,4–10 Bit/Label (> uniform 6,6), weil das Modell auf kleinem Präfix übermütig auswendig lernt. Behoben durch Temperatur-Wahl pro Block aus festem Gitter inkl. uniform, bezahlt mit log2(9) ≈ 3,2 Bit je Block (zweiteiliger Code). Smoke p = 23: 2.100 Bit gegenüber uniform 2.393. Kalibrierung `preq_*` neu gestartet.
+
 - Kalibrierung `subspace` Rang 64 (`runs/s0a/20261102-135741_kalib_subspace_r64`, L(W) v3): Train 100 %, **Test ≈ 1 % (reines Auswendiglernen)**, L(W) = **500–574 kbit** (strukturell: Seed + Z), kürzeste Beschreibung aller Arme.
 - **Methodischer Befund zum Design von 0a:** Die 3.764 Trainings-Labels kosten uniform nur **24,8 kbit** (die ganze Tabelle 62,1 kbit). *Jedes* trainierte Netz liegt mit L(W) = 0,5–2,3 Mbit 20- bis 90-mal darüber. Kein Netz ist damit eine Kompression der Daten; L(W)-Vergleiche zwischen Armen sagen in diesem Regime nichts über MDL-Optimalität (der kürzeste Code ist eine Tabelle). Folge: Der Unterraum lernt auswendig *und* ist am kürzesten, `wd` generalisiert *und* ist länger. Der geeignete MDL-Messwert für 0a ist die **prequentielle Codelänge der Daten** (misst, wie gut der Lerner ungesehene Beispiele vorhersagt, und belohnt damit Generalisierung direkt), nicht L(W). Vorschlag: prequentielle Codelänge als primären Kompressions-Endpunkt in 0a und 0b; L(W) als sekundär.
 

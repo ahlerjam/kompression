@@ -3,7 +3,9 @@
 Pro Seed: feste Zufallsreihenfolge aller p*p Paare, Blöcke 64, 128, ... bis p*p.
 Block 1 uniform codiert; für jeden weiteren Block wird auf dem Präfix trainiert
 (Warmstart aus dem vorigen Block, `steps_per_block` Schritte, Full-Batch) und dann
-der Block mit dem Modell codiert, BEVOR es ihn sieht. Gezählt wird im Kern
+der Block mit dem Modell codiert, BEVOR es ihn sieht. Kalibrierung: pro Block wählt
+der Codierer eine Temperatur T aus einem festen Gitter (T = inf heißt uniform) und
+zahlt dafür log2(|Gitter|) Bit (Zweiteiliger Code, ehrlich mitgezählt). Gezählt wird im Kern
 (`core.codelength.prequential_codelength`).
 
   uv run python stages/s0a_grokking/prequential.py --arm wd --seeds 100 101 102
@@ -64,9 +66,13 @@ def main(a: Args) -> None:
     v = tree_map(mx.zeros_like, tr)
     t = 0
 
+    temps = (1.0, 1.5, 2.0, 3.0, 5.0, 8.0, 16.0, 32.0)
+    switch_bits = math.log2(len(temps) + 1)  # + uniform
+
     def block_logp(tr_, const_, x, y):
         p_ = arm.deterministic(tr_, const_)
-        return label_logprobs(forward(p_, x, mcfg), y, cfg.use_stablemax)
+        logits = forward(p_, x, mcfg)
+        return mx.stack([label_logprobs(logits / tt, y, cfg.use_stablemax) for tt in temps])
 
     vlogp = mx.vmap(block_logp, in_axes=(0, 0, 0, 0))
     bounds = doubling_blocks(n, a.first_block)
@@ -82,16 +88,23 @@ def main(a: Args) -> None:
                                    noise, X[:, :start], Y[:, :start])
         lp = vlogp(tr, const, X[:, start:end], Y[:, start:end])
         mx.eval(lp)
-        lp = np.array(lp, dtype=np.float64)
+        lp = np.array(lp, dtype=np.float64)  # [S, len(temps), block]
+        uni = np.full(lp.shape[-1], -math.log(task.p))
+        chosen, bits = [], []
         for i in range(len(a.seeds)):
-            per_seed_logp[(i, start)] = lp[i]
-        bits = -lp.sum(axis=1) / math.log(2)
-        acc = None
+            options = [*lp[i], uni]
+            costs = [-o.sum() for o in options]
+            k = int(np.argmin(costs))
+            # Wahl der Temperatur wird als Teil des Codes bezahlt (switch_bits)
+            per_seed_logp[(i, start)] = options[k] - switch_bits * math.log(2) / len(uni)
+            chosen.append("uniform" if k == len(temps) else temps[k])
+            bits.append(costs[k] / math.log(2) + switch_bits)
+        bits = np.array(bits)
         run.log(block_start=start, block_end=end, bits_per_seed=bits.tolist(),
-                bits_per_label=(bits / (end - start)).tolist(), elapsed_s=time.time() - t0)
-        print(f"Block [{start},{end}) Bits/Label je Seed: {np.round(bits / (end - start), 3)}",
+                bits_per_label=(bits / (end - start)).tolist(), temperature=chosen,
+                elapsed_s=time.time() - t0)
+        print(f"Block [{start},{end}) Bits/Label je Seed: {np.round(bits / (end - start), 3)} T={chosen}",
               flush=True)
-        del acc
 
     results = {}
     for i, s in enumerate(a.seeds):
