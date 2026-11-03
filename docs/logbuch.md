@@ -4,6 +4,7 @@ Neueste Einträge oben. Kurz: Datum, was, Ergebnis, Verweis auf `runs/…`.
 
 ## 2026-11-03
 
+- 11:37 Hauptlauf 0a, Teil B: `runs/s0a_preq/20261103-100908_Hpreq_wd_l0.3` fertig (Gitterpunkt, kein Befund für sich): 52,8–55,0 kbit, Mittel 53,6 (λ = 0,3 ist zu schwach; kalibriert war λ = 1). `Hpreq_wd_l1.0` läuft seit 11:36. Teil A: `H_wd` bei Schritt 22.200. Speicher 80 % frei.
 - 10:37 Hauptlauf 0a, Teil B: `runs/s0a_preq/20261103-074624_Hpreq_mdl_b0.3` fertig (Gitterpunkt, kein Befund für sich): 28,5–37,9 kbit, Mittel 34,3, Median 35,2; streut weniger als β = 0,1 (29,5–52,8), keine Ausreißer. mdl-Gitter damit komplett; `Hpreq_wd_l0.3` läuft seit 10:09. Teil A: `H_wd` bei Schritt 14.000.
 - 10:37 **Fehlerquelle beseitigt:** Der umbenannte Abbruch `abgebrochen_speicher_…_Hpreq_wd_l0.3` passte auf das Suchmuster von analyse.py (`*_Hpreq_wd_l0.3`) und hätte als „neuester“ Lauf gegolten (Buchstaben sortieren hinter Ziffern). Verschoben nach `runs/abgebrochen/`. Regel: abgebrochene Läufe immer nach `runs/abgebrochen/` verschieben, nicht nur umbenennen.
 - 09:38 Hauptlauf 0a, Teil A: `runs/s0a/20261103-023705_H_mdl` fertig (6,5 h; ein Arm, kein Befund für sich): alle 10 Seeds groked, finale Test-Accuracy 1,0; erster Schritt ≥ 0,99 bei 4.300–9.600 (der stabile Grok-Schritt nach Protokoll kommt aus analyse.py); L(W) 77,7–179,6 kbit, Ausreißer Seed 15 mit 494 kbit. `H_wd` läuft seit 09:07 (darauf folgt `H_wd_normproj` mit der Normtrajektorie aus `H_mdl`). Teil B: `Hpreq_mdl_b0.3` im letzten Block (24 GB, Speicher 52 % frei).
