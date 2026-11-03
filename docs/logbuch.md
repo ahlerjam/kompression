@@ -4,6 +4,8 @@ Neueste Einträge oben. Kurz: Datum, was, Ergebnis, Verweis auf `runs/…`.
 
 ## 2026-11-03
 
+- 05:50 **Entscheidung Jonas:** streng nacheinander — erst 0a, dann 0b, dann Entscheidung über Stufe 1; Stufe 1 ruht komplett; alle GPU-Ressourcen an das aktuelle Gate.
+- 05:50 Teil B des Hauptlaufs auf mehr GPU-Stränge verteilt (`scripts/hauptlauf_0a_parallel.sh`, gleiche Befehle und Parameter, nur andere Reihenfolge): `H-C` rechnet das wd-Gitter jetzt; `H-D` wartet auf `Hpreq_mdl_b0.3`, beendet dann `H-B` (damit nichts doppelt läuft; angefangene Doppel werden als `abgebrochen_doppel_*` umbenannt) und rechnet bitnet und none. Messung: GPU meldet 100 % belegt; mit drittem Strang sinkt `H_mdl` von ca. 155 auf ca. 111 Schritte/min (−28 %) → Gesamtdurchsatz nur leicht höher, ein vierter gleichzeitiger Strang lohnt sich daher nicht. Gewinn vor allem durch kürzeren kritischen Pfad in Teil B.
 - 05:37 Hauptlauf 0a, Teil B: `runs/s0a_preq/20261103-023705_Hpreq_mdl_b0.03` fertig (ein Gitterpunkt, kein Befund für sich): Seeds 10–19 = 51,9–54,2 kbit (uniform 62,1), wie Kalibrierung (52–54). `Hpreq_mdl_b0.1` läuft seit 05:10. Teil A: `H_mdl` bei Schritt 17.600/40.000. Speicher 69 % frei, Swap 1,3 GB.
 - 04:20 Speicher kritisch (Swap 19,6 von 20,5 GB belegt; Claude Code beendete einen Wächter wegen Speichermangel). Hauptlauf unversehrt (`H_mdl` Schritt 8.300, `Hpreq_mdl_b0.03` Block 2.048). Zum Schutz des Hauptlaufs Stufe-1-Kampagnen (`s1-amort`, 35B-Modell ≈ 20 GB) pausiert; `KA_learnability_s1` unvollständig, umbenannt in `abgebrochen_KA_learnability_s1_speicher`. Fortsetzung nach dem Hauptlauf.
 

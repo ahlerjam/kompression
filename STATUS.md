@@ -1,6 +1,8 @@
 # STATUS
 
-**Phase: MESSPHASE für Stufe 0a** seit 2026-11-03 (Protokoll v2 eingefroren; Kern und `docs/protokoll_0a.md` gesperrt). Stufe 0b und Stufe 1 bleiben in der Bauphase.
+**Phase: MESSPHASE für Stufe 0a** seit 2026-11-03 (Protokoll v2 eingefroren; Kern und `docs/protokoll_0a.md` gesperrt).
+
+**Reihenfolge streng nacheinander (Entscheidung Jonas, 2026-11-03 05:50):** erst 0a fertig messen und auswerten, dann Hauptlauf 0b, dann auf Basis beider Ergebnisse über Stufe 1 entscheiden. **Stufe 1 ruht komplett** (keine Läufe, kein Weiterbau). Alle GPU-Ressourcen gehen an das aktuelle Gate; Bauarbeit nur für 0b (Vorbereitung, damit 0b direkt nach 0a starten kann).
 
 ## Morgen-Zusammenfassung für Jonas (Stand 2026-11-03, 00:35)
 
@@ -23,7 +25,7 @@
 
 **Speicher (04:20):** Stufe-1-Kampagnen pausiert, weil der Swap fast voll war; Hauptlauf hat Vorrang. Fortsetzung nach dem Hauptlauf.
 
-**Stufe 1:** Kampagnen (Kompression vs. Learnability vs. Zufall) laufen; erste Bibliothek wurde in einer Learnability-Kampagne angenommen. Ergebnisse folgen.
+**Stufe 1:** ruht bis nach 0b (siehe oben). Stand beim Anhalten: Kampagnen gebaut; eine Bibliothek wurde einmal angenommen (Learnability-Kampagne), sonst abgelehnt.
 
 Zuletzt aktualisiert: 2026-11-02 (Loop-Durchgang 1)
 

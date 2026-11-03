@@ -41,7 +41,7 @@ docs/                   Entscheidungen, Bauplan, Protokolle, Recherche, Logbuch.
 
 ## Phasen und Regeln (freigegeben von Jonas am 2026-11-02)
 
-Aktuelle Phase: **MESSPHASE für Stufe 0a** (Kern und Protokoll 0a gesperrt); Stufe 0b und Stufe 1 in der **BAUPHASE**. Steht auch oben in `STATUS.md`.
+Aktuelle Phase: **MESSPHASE für Stufe 0a** (Kern und Protokoll 0a gesperrt); Stufe 0b in der **BAUPHASE**; **Stufe 1 ruht** bis 0a und 0b ausgewertet sind (Reihenfolge streng nacheinander, Entscheidung Jonas 2026-11-03). Steht auch oben in `STATUS.md`.
 
 | | Bauphase | Messphase (ab Start eines Hauptlaufs) |
 |---|---|---|
