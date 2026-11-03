@@ -4,6 +4,9 @@ Neueste Einträge oben. Kurz: Datum, was, Ergebnis, Verweis auf `runs/…`.
 
 ## 2026-11-02
 
+- Prequential `none` (`runs/s0a_preq/20261102-153913_preq_none`): **62.124 Bit** = uniform (62.099) + Umschaltkosten; Temperatur-Wahl in jedem Block „uniform“ → keinerlei Vorhersagekraft auf ungesehenen Paaren. Zum Vergleich `wd`: 44,1–45,2 kbit.
+- Zwischenstand `mdl` β = 0,1 (läuft): alle 3 Seeds erreichen Test ≥ 0,99 (erstmals bei 5.100 / 9.500 / 9.700), KL bei Schritt 15.200: 91–375 kbit.
+
 - Prequential `wd` (λ = 1, 3.000 Schritte/Block, Temperatur-Kalibrierung, `runs/s0a_preq/20261102-150036_preq_wd`): **44,1–45,2 kbit** für die ganze Tabelle gegenüber uniform 62,1 kbit (−28 %). Blöcke bis 1.024 uniform gewählt; letzter Block 1,06–1,24 Bit/Label.
 - Pilot: Probe-Rauschen mit Rückfall-Code v1 (8 Bit/Zeichen) bei leerer Bibliothek: 1.455 / 323 / 1.469 Bit (sd 657) → einzelne ungelöste Aufgaben dominieren. Rückfall-Code v2 = −log2 p_Modell(Antwort | Frage): **105 ± 18 Bit** (13/16 gelöst, 3 Wiederholungen, 1,5B). Folgerung: Bei leichten Aufgaben kostet das ganze Probe-Set ≈ 105 Bit, eine Bibliothek allein 100–217 Bit → kann sich nicht lohnen. **Design-Konsequenz für Stufe 1:** größeres Probe-Set und schwerere Familien, deren verifizierte Lösungen unter dem Modell viele Bits kosten (bzw. die ohne Bibliothek oft scheitern).
 
