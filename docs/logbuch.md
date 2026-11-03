@@ -4,6 +4,9 @@ Neueste Einträge oben. Kurz: Datum, was, Ergebnis, Verweis auf `runs/…`.
 
 ## 2026-11-02
 
+- Pilot-Bench Qwen3.5-4B auf 16 schweren Familien (3 Aufgaben × 4 Samples, `runs/s1/*bench_hard_4b`): gelöst u. a. game_of_life 1,00 · largest_island 0,92 · spiral_matrix/course_schedule/knights_knaves 0,75 · maze 0,67 · graph_color 0,50 · shortest_path 0,42 · word_ladder 0,17; 0,00 bei jugs, rotten_oranges, n_queens, mini_sudoku, puzzle24, futoshiki, countdown 0,02. Verifizierte Lösungen kosten 18–175 Bit (deutlich mehr als bei leichten Familien). Durchsatz grob 35–40 Token/s bei geteilter GPU.
+- **Bug gefunden:** Die Sandbox nahm nur die letzte Ausgabezeile als Antwort; mehrzeilige Antworten (Gitter bei n_queens, mini_sudoku, futoshiki …) konnten nie stimmen. Behoben: Antwort = gesamte Ausgabe; Prompt fordert exaktes Format. Die Nullen oben sind dadurch teilweise Artefakt → Bench wird wiederholt.
+
 - **Kalibrierung `mdl` β = 0,1** (`runs/s0a/20261102-145916_kalib_mdl_b0.1`): **alle 3 Seeds groken**, Test 100 %, keine Einbrüche, stabil ab 7.400 / 10.600 / 12.400, Anteil ≥ 0,99 in der 2. Hälfte 0,95–1,0. Variationale Codelänge (KL) 66–75 kbit; **L(W) nach Rezept v3: 110–122 kbit** — etwa 8× kürzer als `wd` (0,93–1,42 Mbit) und 6× kürzer als `bitnet` (674 kbit), und erstmals in der Größenordnung der Daten (ganze Tabelle uniform 62 kbit). **Beobachtung (Kalibrierung, kein Befund):** Mit ausreichendem Kompressionsdruck groked MDL zuverlässig *und* liefert die mit Abstand kürzeste Beschreibung. Zusammen mit β ≤ 0,01 (kein Grokking) deutet das auf eine Schwelle im Kompressionsdruck. Für das Protokoll: β = 0,1 als Hauptarm, β = 1 wird noch kalibriert.
 
 - Prequential `none` (`runs/s0a_preq/20261102-153913_preq_none`): **62.124 Bit** = uniform (62.099) + Umschaltkosten; Temperatur-Wahl in jedem Block „uniform“ → keinerlei Vorhersagekraft auf ungesehenen Paaren. Zum Vergleich `wd`: 44,1–45,2 kbit.

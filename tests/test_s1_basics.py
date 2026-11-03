@@ -51,3 +51,8 @@ def test_container_sandbox_isolated():
     assert not r.ok  # kein Netz
     r = run_in_container("while True: pass", timeout_s=1.0)
     assert not r.ok and r.timed_out
+
+
+def test_multiline_answer_is_kept():
+    r = run_program("print('1 2')\nprint('3 4')")
+    assert r.ok and r.answer == "1 2\n3 4"

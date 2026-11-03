@@ -5,7 +5,8 @@ Zwei Backends:
   ohne Netz, Speicher- und CPU-begrenzt; Programme laufen per `container exec`.
 - `subprocess`: lokaler Subprozess mit Zeit- und CPU-Limit (nur Tests/Notfall,
   kein Netz- und Dateischutz).
-Konvention: Das Programm gibt die Antwort als letzte Zeile auf stdout aus.
+Konvention: Das Programm gibt NUR die Antwort auf stdout aus; sie darf mehrzeilig sein
+(z. B. Gitter). Antwort = gesamte Ausgabe ohne führende/abschließende Leerzeilen.
 """
 
 from __future__ import annotations
@@ -26,6 +27,12 @@ class ExecResult:
     stdout: str
     stderr: str
     timed_out: bool
+
+
+def _answer(stdout: str) -> str | None:
+    lines = [ln.rstrip() for ln in stdout.strip("\n").splitlines()]
+    text = "\n".join(lines).strip()
+    return text or None
 
 
 def _limits(cpu_s: int, mem_mb: int):
@@ -55,9 +62,8 @@ def run_program(code: str, library_source: str = "", timeout_s: float = 5.0,
             )
         except subprocess.TimeoutExpired as e:
             return ExecResult(False, None, e.stdout or "", e.stderr or "", True)
-    lines = [ln for ln in p.stdout.strip().splitlines() if ln.strip()]
-    return ExecResult(p.returncode == 0 and bool(lines), lines[-1] if lines else None,
-                      p.stdout, p.stderr, False)
+    answer = _answer(p.stdout)
+    return ExecResult(p.returncode == 0 and answer is not None, answer, p.stdout, p.stderr, False)
 
 
 CONTAINER_NAME = "kompression-sandbox"
@@ -92,10 +98,10 @@ def run_in_container(code: str, library_source: str = "", timeout_s: float = 5.0
         )
     except subprocess.TimeoutExpired as e:
         return ExecResult(False, None, e.stdout or "", e.stderr or "", True)
-    lines = [ln for ln in p.stdout.strip().splitlines() if ln.strip()]
+    answer = _answer(p.stdout)
     timed_out = p.returncode in (124, 137, -9)
-    return ExecResult(p.returncode == 0 and bool(lines), lines[-1] if lines else None,
-                      p.stdout, p.stderr, timed_out)
+    return ExecResult(p.returncode == 0 and answer is not None, answer, p.stdout, p.stderr,
+                      timed_out)
 
 
 def execute(code: str, library_source: str = "", timeout_s: float = 5.0,

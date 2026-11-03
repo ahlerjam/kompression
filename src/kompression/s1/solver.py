@@ -10,8 +10,8 @@ from kompression.s1.sandbox import execute
 from kompression.s1.worlds import Task, World
 
 SYSTEM = (
-    "You solve tasks by writing a short Python program that prints ONLY the final answer "
-    "as its last line. Library functions shown to you are already defined; call them, "
+    "You solve tasks by writing a short Python program that prints ONLY the final answer, "
+    "exactly in the requested format (it may span several lines), and nothing else. Library functions shown to you are already defined; call them, "
     "do not redefine them. Reply with a single ```python code block and nothing else."
 )
 
