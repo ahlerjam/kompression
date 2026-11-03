@@ -4,6 +4,9 @@ Neueste Einträge oben. Kurz: Datum, was, Ergebnis, Verweis auf `runs/…`.
 
 ## 2026-11-02
 
+- Kalibrierung `mdl` β = 1 (`runs/s0a/20261102-161857_kalib_mdl_b1.0`): **lernt nicht** (Train 1,2–1,4 %, Test ≈ 0,9 %), KL ≈ 17 kbit, L(W) 7,3–7,8 kbit — Kollaps auf den Prior, wie von echtem MDL bei 24,8 kbit Trainingsdaten vorhergesagt. MDL-Kalibrierung komplett: β 0,001/0,01 lernen auswendig, **β = 0,1 groked stabil**, β = 1 lernt nichts → Hauptarm `mdl` mit β = 0,1.
+- Prequential `mdl` lief versehentlich mit Standard-β 0,01 → abgebrochen, Standard auf 0,1 gesetzt, neu gestartet (danach `bitnet`).
+
 - **Pilot v2** (Qwen3.5-4B, 11 schwere Familien, Probe 22, 2 Zyklen, `runs/s1/*_pilot_v2_4b`): Start L_gesamt = 300 Bit bei nur 10/22 gelöst; Wachphase 21/33. Ein BFS-Bibliotheksvorschlag (bfs_shortest_path…, get_start_pos …; L(B) 446 Bit) senkte die Lösungsrate auf 7/22 und wurde abgelehnt; Zyklus 2 ohne gültigen Vorschlag. ≈ 15–22 min je Zyklus bei geteilter GPU.
 - **Fehler im Ziel erkannt und behoben:** Mit dem Rückfall-Code „Antwort direkt über das Modell codieren“ waren ungelöste Aufgaben *billiger* als verifizierte Programme (300 Bit für 22 Aufgaben bei 12 ungelösten). Das belohnt Raten statt Lösen und widerspricht dem Konzept („Kompression ersetzt nie Korrektheit“). Neu: ungelöst = feste Strafe UNSOLVED_BITS = 1.000 Bit (praktisch lexikographisch: erst lösen, dann kürzen). Alle Pilot-L_gesamt-Werte davor sind nicht vergleichbar.
 

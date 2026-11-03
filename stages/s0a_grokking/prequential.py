@@ -45,7 +45,7 @@ class Args:
     steps_per_block: int = 3000
     weight_decay: float = 1.0
     lr: float = 1e-3
-    mdl_beta: float = 0.01
+    mdl_beta: float = 0.1
     subspace_rank: int = 64
     op: Literal["add", "sub", "mul"] = "add"
     init_from: str = ""
