@@ -4,6 +4,8 @@ Neueste Einträge oben. Kurz: Datum, was, Ergebnis, Verweis auf `runs/…`.
 
 ## 2026-11-02
 
+- Prequential v2 (S = 3.000): `bitnet` 56,1–57,6 kbit · `none` 62,1 kbit (= uniform). 0b v2 (S = 3.000): A-Norm-skaliert 61,3–61,8 kbit, A-permutiert 61,4–61,9 kbit — wie Zufall (61,2–61,4) und A-Init (62,0): bei S = 3.000 ist **kein Transfer messbar**. Entscheidend sind die kurzen S (laufen: `s0b-steps`).
+
 - **Pilot v4** (35B-A3B, 1.024 Token, `runs/s1/*_pilot_v4_35b`): Probe **15/24 gelöst** (v3: 4/24), L_gesamt 9.597 Bit; Wachphase 18–19/24. Schlafphase lieferte keine verwertbaren Vorschläge (Zyklus 1: keiner gültig; Zyklus 2: 0 verifizierte Umschriften). Vermutung: Token-Grenzen der Schlafphase (768) schneiden Bibliothek und Umschriften ab → auf 1.536 erhöht, Ablehnungsgründe werden jetzt protokolliert.
 
 - **Pilot v3** (35B-A3B, schweres Profil, verifizierte Wiederverwendung, `runs/s1/*_pilot_v3_35b`): nur 4/24 Probe- und 4–7/24 Wach-Aufgaben gelöst, weil `cycle.py` Antworten auf 512 Token begrenzte (Bench: 1.024) → Programme abgeschnitten. Positiv: Verifizierte Wiederverwendung funktioniert (greedy_coloring, build_adjacency_list je 3 verifizierte Umschriften); Einmal-Funktionen werden verworfen. Keine Bibliothek angenommen (Lösungszahl fiel). Behoben: `max_tokens` durchgereicht, Standard 1.024. Neustart als Pilot v4.
