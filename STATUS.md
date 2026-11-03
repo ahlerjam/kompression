@@ -21,19 +21,21 @@ Zuletzt aktualisiert: 2026-11-02 (Loop-Durchgang 1)
 - **0b gebaut**, Kalibrierung läuft (Transfer add → sub; Zufall, A, A-Norm-skaliert, A-permutiert).
 - **Stufe-1-Pilot:** Ziel korrigiert (ungelöst = 1.000 Bit Strafe, Korrektheit vor Kompression). 35B-A3B als Pilotmodell gewählt. Bibliotheken wurden bisher abgelehnt (kleinere Modelle wurden abgelenkt).
 
-## Läuft gerade
+## Läuft gerade (Stand 20:01)
 
 | tmux | Lauf |
 |---|---|
-| `s0a-preq` | prequential `mdl` β = 0,1 |
-| `s0b` | 0b-Kalibrierung |
+| `s0a-preq` | prequential v2: bitnet, dann none |
+| `s0a-preq-mdl` | wartet; danach mdl mit Strafterm-Normierung ≥ 3.764 (S = 3.000, 1.000) |
+| `s0b` | 0b v2: A-Norm-skaliert, A-permutiert (S = 3.000) |
+| `s0b-steps` | wartet; danach 0b mit S = 30/100/300 (Zufall, A, A-permutiert) |
+| `s1-pilot` | Pilot v3: 35B-A3B, schweres Profil, verifizierte Wiederverwendung |
 | `rc` | Remote Control „mac-ai“ |
 
 ## Nächste Schritte (Loop)
 
-1. Prequential `mdl` auswerten → Protokoll 0a fertig → **Freigabe Hauptlauf bei Jonas anfragen**.
-2. 0b auswerten, Protokoll 0b entwerfen.
-3. Pilot v3: 35B-A3B, schwerere Aufgaben (Schwierigkeitsparameter), Schlafphase ReGAL-artig (Programme mit Bibliothek umschreiben und neu verifizieren), dann Bandit-Proposer A/B mit Kontrollen.
+1. Prequential-Instrument fair machen: mdl mit Normierung prüfen; 0b mit kurzen S prüfen, ob Transfer messbar ist. Erst dann Protokoll 0a (Teil B) finalisieren und Freigabe erneut anfragen.
+2. Pilot v3 auswerten; danach Bandit-Proposer A/B mit Kontrollen.
 
 ## Wartet auf Jonas
 
