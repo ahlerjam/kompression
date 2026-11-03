@@ -4,6 +4,8 @@ Neueste Einträge oben. Kurz: Datum, was, Ergebnis, Verweis auf `runs/…`.
 
 ## 2026-11-02
 
+- **Prequential v2 `mdl` β = 0,1 (`runs/s0a_preq/20261102-185912_preq2_mdl`): 62,14 kbit = uniform — keine Vorhersagekraft**, obwohl derselbe Arm im Trainingsregime (3.764 Beispiele) stabil groked. Ursache: Der Strafterm wird durch die Präfixgröße geteilt; bei 64–1.024 Beispielen ist der Druck so groß, dass das Modell auf den Prior kollabiert (wie β = 1). **Folge: Der primäre Endpunkt benachteiligt MDL in der jetzigen Form systematisch; Protokoll 0a ist nicht freigabereif.** Test: Normierung durch max(Präfix, 3.764) (`--penalty-n-min 3764`), S = 3.000 und 1.000, eingereiht.
+
 - 0b v2 A-Init (`runs/s0a_preq/20261102-185921_0b2_from_wd_none`): **62,0 kbit — weiterhin kein Transfer**. Grund: Der Self-Switch wählt nur den Codier-Zeitpunkt, weitertrainiert wird vom Endstand (3.000 Schritte auf kleinem Präfix zerstören die A-Struktur). Korrekte Behandlung: Schritte je Block S als **globaler Hyperparameter** — getrennte Durchläufe für S ∈ {30, 100, 300, 1.000, 3.000}, Codelänge = Minimum + log2(5) Bit. Kalibrierung mit S = 30/100/300 für Zufall, A-Init, A-permutiert eingereiht (`scripts/kalib_0b_steps.sh`). Gilt analog für den primären Endpunkt von 0a (Protokoll wird angepasst).
 
 - Pilot v3 (35B-A3B) abgestürzt: `METAL Insufficient Memory` bei großen Generierungs-Batches parallel zu zwei Prequential-Läufen. Behoben: Generierung in Paketen von höchstens 8 mit `mx.clear_cache()`. Neustart direkt mit verifizierter Wiederverwendung (`--min-uses 2`).

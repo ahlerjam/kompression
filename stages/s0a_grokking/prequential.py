@@ -48,6 +48,7 @@ class Args:
     weight_decay: float = 1.0
     lr: float = 1e-3
     mdl_beta: float = 0.1
+    penalty_n_min: int = 0  # mdl: Strafterm durch max(Präfixgröße, penalty_n_min) teilen
     subspace_rank: int = 64
     op: Literal["add", "sub", "mul"] = "add"
     init_from: str = ""
@@ -127,7 +128,7 @@ def main(a: Args) -> None:
     per_seed_logp: dict[tuple[int, int], np.ndarray] = {}
     t0 = time.time()
     for start, end in zip(bounds, bounds[1:], strict=False):
-        vstep, _, _ = build_fns(cfg, arm, n_train=start)
+        vstep, _, _ = build_fns(cfg, arm, n_train=max(start, a.penalty_n_min))
         noise_dummy = mx.zeros((1,))
         cands = []  # je Checkpoint: [S, len(temps), block]
         for step_in_block in range(a.steps_per_block + 1):
