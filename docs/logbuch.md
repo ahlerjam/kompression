@@ -4,6 +4,8 @@ Neueste Einträge oben. Kurz: Datum, was, Ergebnis, Verweis auf `runs/…`.
 
 ## 2026-11-02
 
+- 0b v2 Zufallsstart (Subtraktion, `runs/s0a_preq/20261102-183039_0b2_random`): **61,2–61,4 kbit** (v1: 60,8–61,2) — Basislinie für Transfer.
+
 - Prequential v2 `wd` (`runs/s0a_preq/20261102-183039_preq2_wd`): **43,7–44,7 kbit** (v1: 44,1–45,2) — konsistent, leicht kürzer; späte Blöcke wählen 1.000–3.000 Schritte.
 
 - **0b mit A-Init (alte Methode, 3.000 Schritte fest; `runs/s0a_preq/20261102-175608_0b_from_wd_none`): 61,7–62,1 kbit — kein Transfer**, obwohl der Smoke mit 30 Schritten/Block 35–53 kbit zeigte. Deutung: Langes Training auf kleinen Präfixen lernt auswendig und überschreibt die übertragbare Struktur; die prequentielle Codelänge hing damit stark von der fest gewählten Schrittzahl ab.
