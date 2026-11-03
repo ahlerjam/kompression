@@ -4,6 +4,8 @@ Neueste Einträge oben. Kurz: Datum, was, Ergebnis, Verweis auf `runs/…`.
 
 ## 2026-11-03
 
+- `mdl` β = 0,03 mit Neustart, S = 3.000 (`runs/s0a_preq/20261103-010607_preq6_mdl_b0.03_restart_s3000`): **52,0–53,9 kbit**; Block [4.096, 8.192) noch fast uniform, aber letzter Block nur 53–86 Bit (exakt gelernt ab Präfix 8.192). Muster: schwächerer Druck → Grokking erst bei mehr Daten. Reihenfolge der Datenschwelle: β 0,1 ≈ 4.096 < β 0,03 ≈ 8.192.
+
 - Zwischenstand `mdl` β = 0,03 mit Neustart: Block [4.096, 8.192) 6,1–6,5 Bit/Label (β = 0,1: 0,55) → schwächerer Druck verallgemeinert schlechter, nicht früher. Warmstart-Reihe S = 10.000 (`mdl` weiter uniform bis 4.096) abgebrochen — bestätigt den Warmstart als Ursache. Neu: `mdl` β = 0,3 und `none` mit Neustart.
 
 - **Prequential `bitnet` mit Neustart, S = 3.000** (`runs/s0a_preq/20261103-003346_preq6_bitnet_restart_s3000`): **26,7–26,8 kbit** (wd 26,7–27,6; mdl 29,5–29,6). Block [4.096, 8.192) nur **35–217 Bit** (≤ 0,05 Bit/Label), letzter Block 11–18 Bit → nach dem Grokking praktisch exakte Regel. **Beobachtung (Kalibrierung, kein Befund):** harte Kompression liefert die präzisesten Lösungen; Gesamtsumme gleichauf/knapp besser als wd.
