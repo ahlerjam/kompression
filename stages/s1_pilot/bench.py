@@ -15,7 +15,7 @@ from kompression.runlog import Run
 from kompression.s1.library import Library
 from kompression.s1.lm import FrozenLM
 from kompression.s1.solver import solve
-from kompression.s1.worlds import World
+from kompression.s1.worlds import HARD_CONFIGS, World
 
 
 @dataclass(frozen=True)
@@ -27,12 +27,13 @@ class Args:
     samples: int = 4
     max_tokens: int = 384
     seed: int = 7
+    hard: bool = False
     name: str = "bench"
 
 
 def main(a: Args) -> None:
     run = Run("s1", a.name, a)
-    lm, world = FrozenLM(a.repo), World()
+    lm, world = FrozenLM(a.repo), World(HARD_CONFIGS if a.hard else None)
     rows = []
     t0 = time.time()
     for fam in a.families:
