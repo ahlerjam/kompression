@@ -4,6 +4,9 @@ Neueste Einträge oben. Kurz: Datum, was, Ergebnis, Verweis auf `runs/…`.
 
 ## 2026-11-02
 
+- **Erste Kampagne `compression` Seed 0** (`runs/s1_campaign/*_K_compression_s0`, 34 min): keine Bibliothek angenommen; Probe 9/12, zurückgehalten 5/8. Diagnose: verifizierte Wiederverwendung funktioniert (find_empty_cell 8×, step_game_of_life 8×, bfs_path_search 5×); Bibliotheken senken die Lösungsbits (Sudoku/BFS: −190 Bit), kosten selbst aber 213–402 Bit → auf 12 Probe-Aufgaben ΔL = −175 bzw. −50 Bit, abgelehnt. Ein Vorschlag in Runde 2 scheiterte noch an Abschneiden.
+- **Ziel an das Konzept angeglichen:** Das Konzept definiert L_gesamt über *alle gesehenen Aufgaben*; das Probe-Set schätzt diese Summe nur. Neu (Kampagnen-Standard): L(B) + (n_gesehen / |Probe|) · Σ_Probe L(x). Damit kann sich eine Bibliothek über viele Aufgaben amortisieren. Die laufende `learnability`-Kampagne Seed 0 nutzt noch die alte Regel (vergleichbar mit `compression` Seed 0).
+
 - Prequential v2 (S = 3.000): `bitnet` 56,1–57,6 kbit · `none` 62,1 kbit (= uniform). 0b v2 (S = 3.000): A-Norm-skaliert 61,3–61,8 kbit, A-permutiert 61,4–61,9 kbit — wie Zufall (61,2–61,4) und A-Init (62,0): bei S = 3.000 ist **kein Transfer messbar**. Entscheidend sind die kurzen S (laufen: `s0b-steps`).
 
 - **Pilot v4** (35B-A3B, 1.024 Token, `runs/s1/*_pilot_v4_35b`): Probe **15/24 gelöst** (v3: 4/24), L_gesamt 9.597 Bit; Wachphase 18–19/24. Schlafphase lieferte keine verwertbaren Vorschläge (Zyklus 1: keiner gültig; Zyklus 2: 0 verifizierte Umschriften). Vermutung: Token-Grenzen der Schlafphase (768) schneiden Bibliothek und Umschriften ab → auf 1.536 erhöht, Ablehnungsgründe werden jetzt protokolliert.

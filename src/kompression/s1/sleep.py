@@ -98,12 +98,15 @@ def filter_by_verified_reuse(lm, world, solved: list[tuple], fns: dict[str, str]
 
 def sleep_cycle(lm, world, probe, lib: Library, programs: list, current: ProbeResult,
                 n_proposals: int = 2, probe_samples: int = 4, lib_mode: str = "lm",
-                backend: str = "container", min_uses: int = 0, max_tokens: int = 1024):
+                backend: str = "container", min_uses: int = 0, max_tokens: int = 1024,
+                n_seen: int = 0):
     """Gibt (neue Bibliothek, ProbeResult, Protokoll) zurück; unverändert, wenn nichts L senkt.
 
     programs: Liste von Programmen oder von (Task, Programm). Mit min_uses > 0 und Paaren
     werden Vorschläge erst per verifizierter Umschrift gefiltert (ReGAL-artig).
     Annahme: L_gesamt sinkt UND die Zahl gelöster Probe-Aufgaben sinkt nicht.
+    Mit n_seen > 0 wird L_gesamt über alle gesehenen Aufgaben hochgerechnet (Konzept-Ziel),
+    sodass sich eine Bibliothek über viele Aufgaben amortisieren kann.
     """
     log = []
     best_lib, best = lib, current
@@ -121,9 +124,10 @@ def sleep_cycle(lm, world, probe, lib: Library, programs: list, current: ProbeRe
         r = evaluate(lm, world, probe, cand, n=probe_samples, lib_mode=lib_mode, backend=backend,
                      max_tokens=max_tokens)
         log.append({"functions": sorted(k for k in fns if k != "__imports__"),
-                    "total_bits": r.total_bits, "library_bits": r.library_bits,
+                    "total_bits": r.total_bits, "amortized_bits": r.amortized(n_seen),
+                    "amortized_before": best.amortized(n_seen), "library_bits": r.library_bits,
                     "solved": r.solved, "reuse": r.reuse, "verified_uses": uses})
-        if r.total_bits < best.total_bits and r.solved >= best.solved:
+        if r.amortized(n_seen) < best.amortized(n_seen) and r.solved >= best.solved:
             best_lib, best = cand, r
     if diag:
         log.append({"verworfene_vorschlaege": diag})

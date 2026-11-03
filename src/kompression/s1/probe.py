@@ -51,6 +51,12 @@ class ProbeResult:
     solved: int
     reuse: dict[str, int]
 
+    def amortized(self, n_seen: int) -> float:
+        """Schätzung des Konzept-Ziels über ALLE gesehenen Aufgaben:
+        L(B) + (n_seen / |Probe|) · Σ_Probe L(x). Ohne n_seen (0) = Probe-Summe."""
+        k = max(1.0, n_seen / max(1, len(self.task_bits)))
+        return self.library_bits + k * sum(self.task_bits)
+
 
 def evaluate(lm, world: World, probe: list[Task], lib: Library, n: int = 4,
              lib_mode: str = "lm", backend: str = "container", max_tokens: int = 1024) -> ProbeResult:

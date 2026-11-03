@@ -54,6 +54,7 @@ class Args:
     probe_samples: int = 2
     max_tokens: int = 1024
     min_uses: int = 2
+    amortize: bool = True  # L_gesamt über alle gesehenen Aufgaben hochrechnen (Konzept-Ziel)
     seed: int = 0
     name: str = ""
 
@@ -69,6 +70,7 @@ def main(a: Args) -> None:
     pool: list[tuple] = []
     pool_fams: Counter = Counter()
     gens = 0
+    n_seen = 0
     t0 = time.time()
     for r in range(1, a.rounds + 1):
         fams = pol.select(a.families_per_round)
@@ -77,6 +79,7 @@ def main(a: Args) -> None:
                                    n=a.tasks_per_family)
             res = solve(lm, world, tasks, lib, n=a.samples, max_tokens=a.max_tokens)
             gens += len(tasks) * a.samples
+            n_seen += len(tasks)
             per_task = [np.mean([x.score >= 1 for x in atts]) for atts in res]
             for atts in res:
                 ok = [x for x in atts if x.score >= 1 and x.bits is not None]
@@ -90,11 +93,12 @@ def main(a: Args) -> None:
             run.log(round=r, family=f, pass_rate=float(np.mean(per_task)), gens=gens,
                     t=time.time() - t0)
         if a.control == "none" and r % a.sleep_every == 0 and pool:
-            before = current.total_bits
+            ns = n_seen if a.amortize else 0
+            before = current.amortized(ns)
             lib, current, log = sleep_cycle(lm, world, probe, lib, pool, current,
                                             min_uses=a.min_uses, max_tokens=a.max_tokens,
-                                            probe_samples=a.probe_samples)
-            evaluated = [p["total_bits"] for p in log if "total_bits" in p]
+                                            probe_samples=a.probe_samples, n_seen=ns)
+            evaluated = [p["amortized_bits"] for p in log if "amortized_bits" in p]
             delta = before - min(evaluated) if evaluated else 0.0  # mit Vorzeichen, ohne Clipping
             if a.policy == "compression":
                 for f, rew in compression_credit(delta, dict(pool_fams)).items():

@@ -59,3 +59,11 @@ def test_verified_reuse_filter_keeps_only_reused_functions():
                                           [(t, "print(1)") for t in tasks], fns, Library(),
                                           min_uses=2, backend="subprocess")
     assert set(keep) == {"echo"} and uses == {"echo": 2}
+
+
+def test_amortized_objective_scales_task_bits_not_library():
+    from kompression.s1.probe import ProbeResult
+
+    r = ProbeResult(total_bits=0, library_bits=100.0, task_bits=[10.0, 10.0], solved=2, reuse={})
+    assert r.amortized(0) == 120.0
+    assert r.amortized(20) == 100.0 + 10 * 20.0
