@@ -4,6 +4,8 @@
 
 **Reihenfolge streng nacheinander (Entscheidung Jonas, 2026-11-03 05:50):** erst 0a fertig messen und auswerten, dann Hauptlauf 0b, dann auf Basis beider Ergebnisse über Stufe 1 entscheiden. **Stufe 1 ruht komplett** (keine Läufe, kein Weiterbau). Alle GPU-Ressourcen gehen an das aktuelle Gate (zwei Stränge `H-A`/`H-B`; ein dritter sprengte den Speicher, siehe Logbuch 06:49); Bauarbeit nur für 0b (Vorbereitung, damit 0b direkt nach 0a starten kann).
 
+**Ziel danach:** Bewerbung bei Google TPU Research Cloud (nur eine Einreichung pro Person → erst mit Ergebnissen aus 0a/0b). Claude meldet sich bei Jonas, sobald es so weit ist, mit fertigem Antragstext.
+
 ## Morgen-Zusammenfassung für Jonas (Stand 2026-11-03, 00:35)
 
 **Was über Nacht geklärt wurde**
