@@ -63,6 +63,14 @@ def preq_endpoints(runs: list[Path]) -> tuple[dict[int, float], dict[int, float]
     return prim, sec
 
 
+def preq_patterns(prefix: str) -> dict[str, str]:
+    """Suchmuster der prequentiellen Läufe. Hauptlauf heißt `Hpreq_*` (Präfix `H_` ohne `_`),
+    Kalibrierung `preq_*` (Präfix leer)."""
+    pp = prefix.rstrip("_") + "preq_"
+    return {"mdl": f"s0a_preq/*_{pp}mdl_b*", "wd": f"s0a_preq/*_{pp}wd_l*",
+            "bitnet": f"s0a_preq/*_{pp}bitnet", "none": f"s0a_preq/*_{pp}none"}
+
+
 def compare(name: str, a: dict, b: dict, lower_is_better: bool = True) -> dict:
     seeds = sorted(set(a) & set(b))
     x = [a[s] for s in seeds]
@@ -78,13 +86,14 @@ def compare(name: str, a: dict, b: dict, lower_is_better: bool = True) -> dict:
 def main(prefix: str = "H_") -> None:
     arms = ["mdl", "wd", "wd_normproj", "bitnet", "none"]
     tr = {a: train_endpoints(r) for a in arms if (r := latest(f"s0a/*_{prefix}{a}"))}
-    grids = {"mdl": f"s0a_preq/*_{prefix}preq_mdl_b*", "wd": f"s0a_preq/*_{prefix}preq_wd_l*",
-             "bitnet": f"s0a_preq/*_{prefix}preq_bitnet", "none": f"s0a_preq/*_{prefix}preq_none"}
+    grids = preq_patterns(prefix)
     pq, pq_late = {}, {}
     for a_, pat in grids.items():
         runs = sorted(RUNS.glob(pat))
         if runs:
             pq[a_], pq_late[a_] = preq_endpoints(runs)
+        else:
+            print(f"WARNUNG: keine prequentiellen Läufe für {a_} ({pat})")
     print("# Endpunkte je Arm (Mittel über Seeds)")
     for a, d in tr.items():
         v = list(d.values())
