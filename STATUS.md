@@ -14,7 +14,7 @@
 |---|---|---|---|
 | `mdl` β = 0,1 | stabil | **110–122 kbit** (kürzeste) | 29,5–29,6 kbit; letzter Block **0,13 Bit/Label** |
 | `wd` | instabil | 0,93–1,42 Mbit | **26,7–27,6 kbit**; letzter Block 0,29 Bit/Label |
-| `bitnet` | stabil | 674 kbit | (mit Warmstart 56 kbit; Neustart offen) |
+| `bitnet` | stabil | 674 kbit | **26,7–26,8 kbit**; letzter Block **0,01 Bit/Label** (praktisch exakt) |
 | `none` | nein | 1,9–2,3 Mbit | 62,1 kbit (= Raten) |
 
    MDL findet die mit Abstand kürzesten Gewichte und ist auf großen Datenmengen doppelt so präzise — **lernt aber später** (ab ≈ 4.096 statt ≈ 2.048 Beispielen) und verliert deshalb in der Gesamtsumme. Die primäre Hypothese H1 („mdl codiert die Daten kürzer als wd“) würde nach dieser Kalibrierung eher scheitern.

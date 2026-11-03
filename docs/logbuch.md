@@ -4,6 +4,8 @@ Neueste Einträge oben. Kurz: Datum, was, Ergebnis, Verweis auf `runs/…`.
 
 ## 2026-11-03
 
+- **Prequential `bitnet` mit Neustart, S = 3.000** (`runs/s0a_preq/20261103-003346_preq6_bitnet_restart_s3000`): **26,7–26,8 kbit** (wd 26,7–27,6; mdl 29,5–29,6). Block [4.096, 8.192) nur **35–217 Bit** (≤ 0,05 Bit/Label), letzter Block 11–18 Bit → nach dem Grokking praktisch exakte Regel. **Beobachtung (Kalibrierung, kein Befund):** harte Kompression liefert die präzisesten Lösungen; Gesamtsumme gleichauf/knapp besser als wd.
+
 - Stufe 1, Nadelöhr Schlafphase: Bibliothek im Prompt senkte bisher die Lösungsrate. Änderung: Solver sieht nur Signaturen + Docstrings (`Library.signatures()`, Standard `LIB_VIEW = "signatures"`); ausgeführt wird der volle Code, L(B) zählt den vollen Quelltext. Gilt ab den nächsten Kampagnen (laufende `learnability`/`random` Seed 1 nutzen noch den vollen Code).
 
 - Kampagne `compression` Seed 1 mit amortisiertem Ziel (`runs/s1_campaign/20261102-224334_KA_compression_s1`, 2,1 h): **keine Bibliothek angenommen** (ΔL der besten Vorschläge −1.369 / −2.195 / −283 Bit); Probe 10/12, zurückgehalten 5/8. Alle Banditwerte negativ (−167 bis −1.317) → das Belohnungssignal unterscheidet Familien kaum sinnvoll, solange keine Bibliothek angenommen wird. Folgerung: Für einen fairen Kompressions-vs.-Learnability-Vergleich muss die Schlafphase erst zuverlässig nützliche Bibliotheken liefern (aktuell meist durch sinkende Lösungszahl mit Bibliothek im Prompt blockiert).
