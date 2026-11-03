@@ -4,6 +4,8 @@ Neueste Einträge oben. Kurz: Datum, was, Ergebnis, Verweis auf `runs/…`.
 
 ## 2026-11-02
 
+- `preq4_mdl_wu_s3000` (`runs/s0a_preq/20261102-224259_preq4_mdl_wu_s3000`): auch mit Warmup 62,14 kbit = uniform, selbst im letzten Block (Training auf 8.192 Beispielen). Neue Hypothese: Warmstart nach Prior-Kollaps auf winzigen Präfixen ist irreversibel. Option `--restart` (je Block frisch von der Initialisierung, wie Blier & Ollivier; gleiche Rechenzeit) gebaut; `mdl` und `wd` mit Neustart, S = 3.000, eingereiht. Restliche S-Varianten der Warmstart-Reihe abgebrochen.
+
 - Zwischenstand `preq4_mdl_wu_s3000`: bis Block 4.096 uniform. Hypothese: MDL groked langsamer (Training: 5–10k Schritte) und wird von S ≤ 3.000 benachteiligt. S = 10.000 für `mdl` und `wd` eingereiht (`scripts/kalib_preq_s10k.sh`); Checkpoint-Gitter um 10.000 erweitert.
 
 - Kampagne `learnability` Seed 0 **abgestürzt (GPU-Speicher, lange Prompts mit Bibliothek)** nach Runde 6; Ordner umbenannt in `runs/s1_campaign/abgebrochen_K_learnability_s0_oom`. Bis dahin: Bandit konzentrierte sich auf game_of_life (Pass 0,25–0,92); in Runde 4 wurde eine Bibliothek **angenommen** (count_neighbors, find_empty, solve_sudoku; ΔL = +759 Bit auf 12 Probe-Aufgaben, alte Regel ohne Amortisierung). Behoben: Generierungspakete 8 → 4. Amortisierte Kampagnen neu gestartet; Learnability Seed 0 wird nachgeholt.

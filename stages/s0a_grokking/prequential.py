@@ -50,6 +50,7 @@ class Args:
     mdl_beta: float = 0.1
     penalty_n_min: int = 0  # mdl: Strafterm durch max(Präfixgröße, penalty_n_min) teilen
     beta_warmup: int = 2000  # mdl: beta linear über die ersten Schritte hochfahren (wie im Training)
+    restart: bool = False  # je Block von der Initialisierung neu trainieren (Blier & Ollivier) statt Warmstart
     subspace_rank: int = 64
     op: Literal["add", "sub", "mul"] = "add"
     init_from: str = ""
@@ -131,6 +132,11 @@ def main(a: Args) -> None:
     for start, end in zip(bounds, bounds[1:], strict=False):
         vstep, _, _ = build_fns(cfg, arm, n_train=max(start, a.penalty_n_min))
         noise_dummy = mx.zeros((1,))
+        if a.restart:  # frischer Start je Block: gleiche Init, Optimizer und Warmup zurückgesetzt
+            tr = stack_trees([q[0] for q in pairs])
+            m = tree_map(mx.zeros_like, tr)
+            v = tree_map(mx.zeros_like, tr)
+            t = 0
         cands = []  # je Checkpoint: [S, len(temps), block]
         for step_in_block in range(a.steps_per_block + 1):
             if step_in_block in checkpoints:
