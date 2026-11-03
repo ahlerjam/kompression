@@ -1,9 +1,13 @@
 """L_gesamt auf einem versiegelten Probe-Set (Stufe-1-Ziel).
 
-L_gesamt(B) = L(B) + Σ_probe L(x_i),  L(x_i) = min( Bits der kürzesten verifizierten Lösung
-unter dem Modell mit B im Prompt ,  Rückfall: Antwort direkt übertragen ).
-Rückfall-Code (v2): −log2 p_Modell(Antwort | Frage) — gültig ohne Lösung, glatter als
-8 Bit/Zeichen (v1 erzeugte Schwankungen von ±600 Bit durch einzelne ungelöste Aufgaben).
+L_gesamt(B) = L(B) + Σ_probe L(x_i)
+  L(x_i) = Bits der kürzesten verifizierten Lösung unter dem Modell mit B im Prompt,
+           oder UNSOLVED_BITS, wenn keine verifizierte Lösung gefunden wurde.
+
+Konzept: „Nur Lösungen, die der Prüfer akzeptiert, zählen. Kompression ersetzt nie Korrektheit.“
+Die feste, hohe Strafe macht das Ziel praktisch lexikographisch: erst lösen, dann kürzen.
+Frühere Varianten (Antwort direkt codieren) belohnten Raten statt Lösen und sind verworfen;
+`fallback_bits` bleibt nur als Diagnose.
 L(B): `token` = Tokens × log2(V) (uniform) oder `lm` = −log2 p_Modell(B | Bibliotheks-Prompt).
 """
 
@@ -18,6 +22,8 @@ from kompression.s1.worlds import Task, World
 LIB_SYSTEM = "You write small, reusable, well-named Python helper functions with docstrings."
 LIB_USER = "Write a Python library of helper functions."
 
+
+UNSOLVED_BITS = 1000.0
 
 ANSWER_SYSTEM = "Answer with only the final answer, nothing else."
 
@@ -55,10 +61,10 @@ def evaluate(lm, world: World, probe: list[Task], lib: Library, n: int = 4,
         if ok:
             best = min(ok, key=lambda a: a.bits)
             solved += 1
-            task_bits.append(min(best.bits, fallback_bits(t.answer, lm, t.question)))
+            task_bits.append(min(best.bits, UNSOLVED_BITS))
             for f in best.lib_calls:
                 reuse[f] = reuse.get(f, 0) + 1
         else:
-            task_bits.append(fallback_bits(t.answer, lm, t.question))
+            task_bits.append(UNSOLVED_BITS)
     lb = library_bits(lm, lib, lib_mode)
     return ProbeResult(lb + sum(task_bits), lb, task_bits, solved, reuse)

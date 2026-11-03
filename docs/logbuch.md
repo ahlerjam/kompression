@@ -4,6 +4,9 @@ Neueste Einträge oben. Kurz: Datum, was, Ergebnis, Verweis auf `runs/…`.
 
 ## 2026-11-02
 
+- **Pilot v2** (Qwen3.5-4B, 11 schwere Familien, Probe 22, 2 Zyklen, `runs/s1/*_pilot_v2_4b`): Start L_gesamt = 300 Bit bei nur 10/22 gelöst; Wachphase 21/33. Ein BFS-Bibliotheksvorschlag (bfs_shortest_path…, get_start_pos …; L(B) 446 Bit) senkte die Lösungsrate auf 7/22 und wurde abgelehnt; Zyklus 2 ohne gültigen Vorschlag. ≈ 15–22 min je Zyklus bei geteilter GPU.
+- **Fehler im Ziel erkannt und behoben:** Mit dem Rückfall-Code „Antwort direkt über das Modell codieren“ waren ungelöste Aufgaben *billiger* als verifizierte Programme (300 Bit für 22 Aufgaben bei 12 ungelösten). Das belohnt Raten statt Lösen und widerspricht dem Konzept („Kompression ersetzt nie Korrektheit“). Neu: ungelöst = feste Strafe UNSOLVED_BITS = 1.000 Bit (praktisch lexikographisch: erst lösen, dann kürzen). Alle Pilot-L_gesamt-Werte davor sind nicht vergleichbar.
+
 - **0b gebaut** (`prequential.py --op sub --init-from <A-Lauf> --init-control none|scaled|permuted`). Smoke (30 Schritte/Block, kein Befund): Start aus `wd`-A-Gewichten 35,5 / 53,2 kbit für die Subtraktionstabelle, permutierte A-Gewichte 62,1 kbit (= uniform). Kalibrierung 0b (Zufall, A, A-Norm-skaliert, A-permutiert; Seeds 0–2; 3.000 Schritte/Block) in `scripts/kalib_0b.sh`, startet nach der 0a-Prequential-Warteschlange.
 
 - Prequential `subspace` r64 (`runs/s0a_preq/20261102-161424_preq_subspace`): 62.124 Bit = uniform → keine Vorhersagekraft (passt zu reinem Auswendiglernen trotz kürzestem L(W) unter v3). Bestätigt: prequentielle Codelänge trennt Generalisierung, L(W) nicht.
