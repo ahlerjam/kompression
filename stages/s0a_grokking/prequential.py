@@ -3,9 +3,11 @@
 Pro Seed: feste Zufallsreihenfolge aller p*p Paare, Blöcke 64, 128, ... bis p*p.
 Block 1 uniform codiert; für jeden weiteren Block wird auf dem Präfix trainiert
 (Warmstart aus dem vorigen Block, `steps_per_block` Schritte, Full-Batch) und dann
-der Block mit dem Modell codiert, BEVOR es ihn sieht. Kalibrierung: pro Block wählt
-der Codierer eine Temperatur T aus einem festen Gitter (T = inf heißt uniform) und
-zahlt dafür log2(|Gitter|) Bit (Zweiteiliger Code, ehrlich mitgezählt). Gezählt wird im Kern
+der Block mit dem Modell codiert, BEVOR es ihn sieht. Self-Switch (v2): pro Block wählt
+der Codierer einen Trainingsstand (nach 0, 30, 100, 300, 1.000, 3.000 Schritten auf dem
+Präfix) und eine Temperatur T (oder uniform) und zahlt dafür log2(Anzahl Optionen) Bit
+(zweiteiliger Code, ehrlich mitgezählt; „Early Stopping als Codewahl“, Blier & Ollivier).
+Weitertrainiert wird immer vom Endstand. Gezählt wird im Kern
 (`core.codelength.prequential_codelength`).
 
   uv run python stages/s0a_grokking/prequential.py --arm wd --seeds 100 101 102
@@ -110,7 +112,10 @@ def main(a: Args) -> None:
     t = 0
 
     temps = (1.0, 1.5, 2.0, 3.0, 5.0, 8.0, 16.0, 32.0)
-    switch_bits = math.log2(len(temps) + 1)  # + uniform
+    checkpoints = tuple(c for c in (0, 30, 100, 300, 1000, 3000) if c <= a.steps_per_block)
+    if a.steps_per_block not in checkpoints:
+        checkpoints = (*checkpoints, a.steps_per_block)
+    switch_bits = math.log2(len(checkpoints) * len(temps) + 1)  # + uniform
 
     def block_logp(tr_, const_, x, y):
         p_ = arm.deterministic(tr_, const_)
@@ -124,16 +129,21 @@ def main(a: Args) -> None:
     for start, end in zip(bounds, bounds[1:], strict=False):
         vstep, _, _ = build_fns(cfg, arm, n_train=start)
         noise_dummy = mx.zeros((1,))
-        for _ in range(a.steps_per_block):
+        cands = []  # je Checkpoint: [S, len(temps), block]
+        for step_in_block in range(a.steps_per_block + 1):
+            if step_in_block in checkpoints:
+                lp_c = vlogp(tr, const, X[:, start:end], Y[:, start:end])
+                mx.eval(lp_c)
+                cands.append(np.array(lp_c, dtype=np.float64))
+            if step_in_block == a.steps_per_block:
+                break
             t += 1
             noise = arm.noise_like(tr) if arm.needs_noise else noise_dummy
             tr, m, v, _, _ = vstep(tr, const, m, v, mx.array(float(t)), mx.array(a.mdl_beta),
                                    noise, X[:, :start], Y[:, :start])
             if t % 50 == 0:  # Graph regelmäßig auswerten (sonst Metal-Pufferlimit, v. a. bei mdl)
                 mx.eval(tr, m, v)
-        lp = vlogp(tr, const, X[:, start:end], Y[:, start:end])
-        mx.eval(lp)
-        lp = np.array(lp, dtype=np.float64)  # [S, len(temps), block]
+        lp = np.concatenate(cands, axis=1)  # [S, len(checkpoints)*len(temps), block]
         uni = np.full(lp.shape[-1], -math.log(task.p))
         chosen, bits = [], []
         for i in range(len(a.seeds)):
@@ -142,7 +152,8 @@ def main(a: Args) -> None:
             k = int(np.argmin(costs))
             # Wahl der Temperatur wird als Teil des Codes bezahlt (switch_bits)
             per_seed_logp[(i, start)] = options[k] - switch_bits * math.log(2) / len(uni)
-            chosen.append("uniform" if k == len(temps) else temps[k])
+            chosen.append("uniform" if k == lp.shape[1] else
+                          f"c{checkpoints[k // len(temps)]}/T{temps[k % len(temps)]:g}")
             bits.append(costs[k] / math.log(2) + switch_bits)
         bits = np.array(bits)
         run.log(block_start=start, block_end=end, bits_per_seed=bits.tolist(),

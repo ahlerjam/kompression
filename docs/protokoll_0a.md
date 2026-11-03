@@ -36,7 +36,7 @@ Endpunkte je Seed:
 ## Teil B: Prequentielle Codelänge (primärer Endpunkt)
 
 - Ganze Tabelle (9.409 Paare), Reihenfolge je Seed fest, Blöcke 64, 128, … 9.409.
-- 3.000 Schritte je Block mit Warmstart; Temperatur-Wahl je Block aus {1; 1,5; 2; 3; 5; 8; 16; 32; uniform}, bezahlt mit log2(9) Bit je Block.
+- Bis 3.000 Schritte je Block mit Warmstart; **Self-Switch (v2):** je Block Wahl aus Trainingsständen {0, 30, 100, 300, 1.000, 3.000} × Temperaturen {1; 1,5; 2; 3; 5; 8; 16; 32} oder uniform, bezahlt mit log2(49) Bit je Block.
 - Arme: `wd`, `mdl`, `bitnet`, `none` (Norm-Projektion ist hier nicht definiert; die Norm-Kontrolle läuft über Teil A).
 - **Primärer Endpunkt:** prequentielle Codelänge in Bit (kleiner = bessere Kompression der Daten durch den Lerner).
 
