@@ -4,6 +4,8 @@ Neueste Einträge oben. Kurz: Datum, was, Ergebnis, Verweis auf `runs/…`.
 
 ## 2026-11-02
 
+- **Kalibrierung `mdl` β = 0,1** (`runs/s0a/20261102-145916_kalib_mdl_b0.1`): **alle 3 Seeds groken**, Test 100 %, keine Einbrüche, stabil ab 7.400 / 10.600 / 12.400, Anteil ≥ 0,99 in der 2. Hälfte 0,95–1,0. Variationale Codelänge (KL) 66–75 kbit; **L(W) nach Rezept v3: 110–122 kbit** — etwa 8× kürzer als `wd` (0,93–1,42 Mbit) und 6× kürzer als `bitnet` (674 kbit), und erstmals in der Größenordnung der Daten (ganze Tabelle uniform 62 kbit). **Beobachtung (Kalibrierung, kein Befund):** Mit ausreichendem Kompressionsdruck groked MDL zuverlässig *und* liefert die mit Abstand kürzeste Beschreibung. Zusammen mit β ≤ 0,01 (kein Grokking) deutet das auf eine Schwelle im Kompressionsdruck. Für das Protokoll: β = 0,1 als Hauptarm, β = 1 wird noch kalibriert.
+
 - Prequential `none` (`runs/s0a_preq/20261102-153913_preq_none`): **62.124 Bit** = uniform (62.099) + Umschaltkosten; Temperatur-Wahl in jedem Block „uniform“ → keinerlei Vorhersagekraft auf ungesehenen Paaren. Zum Vergleich `wd`: 44,1–45,2 kbit.
 - Zwischenstand `mdl` β = 0,1 (läuft): alle 3 Seeds erreichen Test ≥ 0,99 (erstmals bei 5.100 / 9.500 / 9.700), KL bei Schritt 15.200: 91–375 kbit.
 
