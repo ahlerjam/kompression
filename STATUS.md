@@ -2,7 +2,7 @@
 
 **Phase: MESSPHASE für Stufe 0a** seit 2026-11-03 (Protokoll v2 eingefroren; Kern und `docs/protokoll_0a.md` gesperrt).
 
-**Reihenfolge streng nacheinander (Entscheidung Jonas, 2026-11-03 05:50):** erst 0a fertig messen und auswerten, dann Hauptlauf 0b, dann auf Basis beider Ergebnisse über Stufe 1 entscheiden. **Stufe 1 ruht komplett** (keine Läufe, kein Weiterbau). Alle GPU-Ressourcen gehen an das aktuelle Gate; Bauarbeit nur für 0b (Vorbereitung, damit 0b direkt nach 0a starten kann).
+**Reihenfolge streng nacheinander (Entscheidung Jonas, 2026-11-03 05:50):** erst 0a fertig messen und auswerten, dann Hauptlauf 0b, dann auf Basis beider Ergebnisse über Stufe 1 entscheiden. **Stufe 1 ruht komplett** (keine Läufe, kein Weiterbau). Alle GPU-Ressourcen gehen an das aktuelle Gate (zwei Stränge `H-A`/`H-B`; ein dritter sprengte den Speicher, siehe Logbuch 06:49); Bauarbeit nur für 0b (Vorbereitung, damit 0b direkt nach 0a starten kann).
 
 ## Morgen-Zusammenfassung für Jonas (Stand 2026-11-03, 00:35)
 

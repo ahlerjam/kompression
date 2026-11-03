@@ -1,4 +1,5 @@
 #!/bin/zsh
+# ACHTUNG: nicht mehr benutzen (3 Stränge sprengen den Speicher, Logbuch 2026-11-03 06:49).
 # Hauptlauf 0a, Teil B auf weitere GPU-Stränge verteilt (2026-11-03, Wunsch Jonas: alle GPU an das Gate).
 # Gleiche Befehle und Parameter wie scripts/hauptlauf_0a.sh B; nur die Reihenfolge/Parallelität ändert sich.
 #   C: wd-Gitter   D: bitnet, none
