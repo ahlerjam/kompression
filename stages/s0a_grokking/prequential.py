@@ -9,6 +9,11 @@ zahlt dafür log2(|Gitter|) Bit (Zweiteiliger Code, ehrlich mitgezählt). Gezäh
 (`core.codelength.prequential_codelength`).
 
   uv run python stages/s0a_grokking/prequential.py --arm wd --seeds 100 101 102
+
+Stufe 0b (Transfer): `--op sub --init-from runs/s0a/<A-Lauf>` startet von den Gewichten eines
+auf Aufgabe A trainierten Laufs (gleiche Seeds). Kontrollen: `--init-control scaled`
+(Zufallsinit, je Tensor auf die Norm der A-Gewichte skaliert) und `permuted` (A-Gewichte je
+Tensor zufällig permutiert: gleiche Werteverteilung, Struktur zerstört). Nur für Arme none/wd.
 """
 
 from __future__ import annotations
@@ -42,11 +47,44 @@ class Args:
     lr: float = 1e-3
     mdl_beta: float = 0.01
     subspace_rank: int = 64
+    op: Literal["add", "sub", "mul"] = "add"
+    init_from: str = ""
+    init_control: Literal["none", "scaled", "permuted"] = "none"
     name: str = ""
 
 
+def load_inits(run_dir: str, seeds, random_inits, control: str):
+    """A-Gewichte je Seed laden (gestapelt in params*.npz); optional Kontrolle anwenden."""
+    import json
+    from pathlib import Path
+
+    from mlx.utils import tree_flatten, tree_unflatten
+
+    d = Path(run_dir)
+    run_seeds = json.loads((d / "config.json").read_text())
+    run_seeds = (run_seeds.get("train") or run_seeds.get("args"))["seeds"]
+    npz = d / ("params.npz" if (d / "params.npz").exists() else "params_final.npz")
+    flat = dict(np.load(npz))
+    out = []
+    for s, rnd in zip(seeds, random_inits, strict=True):
+        i = run_seeds.index(s)
+        a_w = {k: v[i] for k, v in flat.items()}
+        res = []
+        rng = np.random.default_rng(10_000 + s)
+        for k, r in tree_flatten(rnd):
+            w = a_w[k]
+            if control == "scaled":
+                r = np.array(r)
+                w = r * (np.linalg.norm(w) / (np.linalg.norm(r) + 1e-12))
+            elif control == "permuted":
+                w = rng.permutation(w.ravel()).reshape(w.shape)
+            res.append((k, mx.array(np.asarray(w, dtype=np.float32))))
+        out.append(tree_unflatten(res))
+    return out
+
+
 def main(a: Args) -> None:
-    cfg = TrainConfig(p=a.p, seeds=a.seeds, steps=a.steps_per_block, lr=a.lr,
+    cfg = TrainConfig(p=a.p, op=a.op, seeds=a.seeds, steps=a.steps_per_block, lr=a.lr,
                       weight_decay=a.weight_decay if a.arm == "wd" else 0.0, arm=a.arm,
                       mdl_beta=a.mdl_beta, subspace_rank=a.subspace_rank, tags=(a.arm, "preq"))
     run = Run("s0a_preq", a.name or a.arm, {"args": dataclasses.asdict(a)})
@@ -59,7 +97,12 @@ def main(a: Args) -> None:
     X = mx.array(np.stack([x_all[pm] for pm in perms]))
     Y = mx.array(np.stack([y_all[pm] for pm in perms]))
 
-    pairs = [arm.init(init_params(mcfg, s), s) for s in a.seeds]
+    inits = [init_params(mcfg, s) for s in a.seeds]
+    if a.init_from:
+        if a.arm not in ("none", "wd"):
+            raise ValueError("Transfer-Init nur für Arme none/wd")
+        inits = load_inits(a.init_from, a.seeds, inits, a.init_control)
+    pairs = [arm.init(p0, s) for p0, s in zip(inits, a.seeds, strict=True)]
     tr = stack_trees([q[0] for q in pairs])
     const = stack_trees([q[1] for q in pairs])
     m = tree_map(mx.zeros_like, tr)

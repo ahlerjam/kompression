@@ -4,6 +4,8 @@ Neueste Einträge oben. Kurz: Datum, was, Ergebnis, Verweis auf `runs/…`.
 
 ## 2026-11-02
 
+- **0b gebaut** (`prequential.py --op sub --init-from <A-Lauf> --init-control none|scaled|permuted`). Smoke (30 Schritte/Block, kein Befund): Start aus `wd`-A-Gewichten 35,5 / 53,2 kbit für die Subtraktionstabelle, permutierte A-Gewichte 62,1 kbit (= uniform). Kalibrierung 0b (Zufall, A, A-Norm-skaliert, A-permutiert; Seeds 0–2; 3.000 Schritte/Block) in `scripts/kalib_0b.sh`, startet nach der 0a-Prequential-Warteschlange.
+
 - Prequential `subspace` r64 (`runs/s0a_preq/20261102-161424_preq_subspace`): 62.124 Bit = uniform → keine Vorhersagekraft (passt zu reinem Auswendiglernen trotz kürzestem L(W) unter v3). Bestätigt: prequentielle Codelänge trennt Generalisierung, L(W) nicht.
 
 - Wiederholung nach Mehrzeilen-Fix (`runs/s1/*bench_hard_4b_fix`): mini_sudoku 0 → 0,29 (2/3 gelöst, 44 Bit); futoshiki, jugs, rotten_oranges, puzzle24, countdown weiter 0 (puzzle24/countdown scheitern in ≈ 10 s → vermutlich Format/Fehler, offen). Kandidaten-Set für Pilot v2 (schwer, aber teilweise lösbar, gemeinsame Bausteine Suche/Backtracking/Gitter): maze, shortest_path, word_ladder, largest_island, graph_color, course_schedule, mini_sudoku, n_queens, spiral_matrix, game_of_life, knights_knaves.
