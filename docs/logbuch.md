@@ -4,6 +4,8 @@ Neueste Einträge oben. Kurz: Datum, was, Ergebnis, Verweis auf `runs/…`.
 
 ## 2026-11-03
 
+- 04:20 Speicher kritisch (Swap 19,6 von 20,5 GB belegt; Claude Code beendete einen Wächter wegen Speichermangel). Hauptlauf unversehrt (`H_mdl` Schritt 8.300, `Hpreq_mdl_b0.03` Block 2.048). Zum Schutz des Hauptlaufs Stufe-1-Kampagnen (`s1-amort`, 35B-Modell ≈ 20 GB) pausiert; `KA_learnability_s1` unvollständig, umbenannt in `abgebrochen_KA_learnability_s1_speicher`. Fortsetzung nach dem Hauptlauf.
+
 - Kalibrierung `none` mit Neustart (`runs/s0a_preq/20261103-025209_preq6_none_restart_s3000`): **55,2 / 55,7 / 58,3 kbit** (mit Warmstart: 62,1 = uniform). Auch ohne Regularisierung lernt das Modell bei frischem Start auf großen Präfixen etwas Übertragbares. Kalibrierung mit Neustart damit komplett: bitnet 26,7–26,8 · wd 26,7–27,6 · mdl β 0,1 29,5–29,6 · β 0,3 30,2–36,2 · β 0,03 52,0–53,9 · none 55,2–58,3 kbit.
 
 - Kalibrierung `mdl` β = 0,3 mit Neustart (`runs/s0a_preq/20261103-015844_preq6_mdl_b0.3_restart_s3000`): **30,2 / 31,2 / 36,2 kbit** (β = 0,1: 29,5–29,6; β = 0,03: 52–54). Stärkerer Druck lernt nicht früher (nur Seed 101 teilweise ab 2.048) und ist am Ende weniger präzise (316–369 Bit im letzten Block vs. 146–182). β = 0,1 ist in der Kalibrierung der beste Punkt des Gitters; das Gitter im Hauptlauf bleibt wie eingefroren.
