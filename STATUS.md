@@ -6,23 +6,34 @@ Zuletzt aktualisiert: 2026-11-02 (Loop-Durchgang 1)
 
 ## Wo wir stehen
 
-- **0a Kalibrierung (Seeds 100–102 bzw. 0–4, kein Befund):** `none` groked nicht; `wd` groked instabil; `bitnet` groked schnell und stabil; `mdl` β = 0,001/0,01 groked nicht; `subspace` r16 lernt nicht, r64 lernt nur auswendig.
-- **Messung:** L(W) Rezept v4 (absolut, Seed+Differenz, Low-Rank, strukturell). L(W) taugt in 0a nicht als MDL-Maßstab (alle Netze ≫ 25 kbit Daten) → primärer Endpunkt: prequentielle Codelänge (mit bezahlter Temperatur-Kalibrierung).
-- **Pilot Stufe 1:** Wach-Schlaf-Zyklus läuft end-to-end; Bibliotheken werden vorgeschlagen und genutzt, aber abgelehnt, weil das 1,5B-Modell mit Bibliothek weniger löst.
+- **0a Kalibrierung abgeschlossen bis auf prequential `mdl`** (Seeds 100–102 bzw. 0–4, kein Befund):
+
+| Arm | groked | stabil | L(W) | prequential (ganze Tabelle, uniform 62,1 kbit) |
+|---|---|---|---|---|
+| `none` | nein | – | 1,9–2,3 Mbit | 62,1 kbit (= uniform) |
+| `wd` λ = 1 | ja | instabil, stabil ab 2,4k–17,1k | 0,93–1,42 Mbit | 44,1–45,2 kbit |
+| `bitnet` | ja | ja, ab 2,6k–10,8k | 674 kbit | 55,7–56,2 kbit |
+| `mdl` β = 0,1 | ja | ja, ab 7,4k–12,4k | 110–122 kbit | läuft |
+| `mdl` β ≤ 0,01 | nein | – | 0,9–1,2 Mbit | – |
+| `mdl` β = 1 | lernt nicht | – | 7 kbit | – |
+| `subspace` r64 | nein (auswendig) | – | 0,5 Mbit | 62,1 kbit (= uniform) |
+
+- **0b gebaut**, Kalibrierung läuft (Transfer add → sub; Zufall, A, A-Norm-skaliert, A-permutiert).
+- **Stufe-1-Pilot:** Ziel korrigiert (ungelöst = 1.000 Bit Strafe, Korrektheit vor Kompression). 35B-A3B als Pilotmodell gewählt. Bibliotheken wurden bisher abgelehnt (kleinere Modelle wurden abgelenkt).
 
 ## Läuft gerade
 
 | tmux | Lauf |
 |---|---|
-| `s0a-mdl` | Kalibrierung `mdl` β = 0,1, dann 1 |
-| `s0a-preq` | Prequential je Arm: wd → none → subspace → mdl → bitnet |
+| `s0a-preq` | prequential `mdl` β = 0,1 |
+| `s0b` | 0b-Kalibrierung |
 | `rc` | Remote Control „mac-ai“ |
 
 ## Nächste Schritte (Loop)
 
-1. Prequential-Ergebnisse auswerten; Protokoll 0a mit prequentieller Codelänge als primärem Endpunkt fertigstellen → Freigabe Hauptlauf anfragen.
-2. Pilot: Rauschen des Probe-Werts messen; Qwen3.5-4B testen; nur relevante Bibliotheksfunktionen zeigen (Kosten mitzählen); danach Bandit-Proposer A/B.
-3. 0b bauen (Transfer per prequentieller Codelänge, Init aus A vs. Zufall vs. Norm-Kontrolle).
+1. Prequential `mdl` auswerten → Protokoll 0a fertig → **Freigabe Hauptlauf bei Jonas anfragen**.
+2. 0b auswerten, Protokoll 0b entwerfen.
+3. Pilot v3: 35B-A3B, schwerere Aufgaben (Schwierigkeitsparameter), Schlafphase ReGAL-artig (Programme mit Bibliothek umschreiben und neu verifizieren), dann Bandit-Proposer A/B mit Kontrollen.
 
 ## Wartet auf Jonas
 

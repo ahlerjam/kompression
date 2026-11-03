@@ -4,6 +4,8 @@ Neueste Einträge oben. Kurz: Datum, was, Ergebnis, Verweis auf `runs/…`.
 
 ## 2026-11-02
 
+- Bench Qwen3.6-35B-A3B-4bit auf schweren Familien (3 × 4, `runs/s1/*_bench_hard_35b`): maze 0,83 · shortest_path 1,00 · largest_island 0,92 · graph_color 0,83 · course_schedule 1,00 · mini_sudoku 0,67 · n_queens 0,25 · spiral_matrix 1,00 · game_of_life 0,83 · knights_knaves 0,67 · word_ladder 0,00 · jugs 0,01. Deutlich besser als 4B bei ähnlicher Laufzeit (≈ 50–220 s je Familie, geteilte GPU, ≈ 20 GB). Verifizierte Lösungen 11–101 Bit. **Entscheidung: 35B-A3B wird Pilotmodell** (wie E2 vorgesehen). Folge: Aufgaben über Reasoning-Gym-Schwierigkeitsparameter schwerer machen, damit sie im Bereich „teilweise lösbar“ liegen.
+
 - Prequential `bitnet` (`runs/s0a_preq/20261102-164821_preq_bitnet`): **55,7–56,2 kbit** (uniform 62,1; `wd` 44,1–45,2). Letzter Block 1,7–1,9 Bit/Label.
 - Prequential `mdl` stürzte ab: `metal::malloc Resource limit (499000) exceeded` — der Rechengraph wurde nur am Blockende ausgewertet (bis 3.000 Schritte lazy). Behoben: `mx.eval` alle 50 Schritte. Neu gestartet mit β = 0,1. (Der erste Versuch mit β = 0,01 war aus demselben Grund still abgestürzt.)
 
