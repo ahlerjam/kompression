@@ -4,6 +4,8 @@ Neueste Einträge oben. Kurz: Datum, was, Ergebnis, Verweis auf `runs/…`.
 
 ## 2026-11-02
 
+- 0b-Kalibrierung komplett (S = 30/100/300/3.000): Transfer nimmt mit S monoton ab; permutierte Kontrolle in jeder Variante ≈ uniform. Minimum über S je Bedingung: Ersparnis A-Init gegenüber Zufall 26,4 / 7,6 / 11,0 kbit (Seeds 0/1/2). Protokoll 0b Version 1 entworfen (`docs/protokoll_0b.md`), inkl. H4: übertragen MDL-komprimierte A-Lösungen besser?
+
 - **0b mit S = 30 Schritten je Block** (Subtraktion, Lerner `wd`, A = `kalib_wd`-Gewichte, Seeds 0–2): Zufall **62,13 kbit** · **A-Init 35,0 / 53,7 / 43,8 kbit** · A-permutiert **62,13 kbit** (`runs/s0a_preq/*_0b3_*_s30`). **Beobachtung (Kalibrierung, 3 Seeds, kein Befund):** Transfer ist in Bit messbar, 8–27 kbit Ersparnis (14–44 %); die permutierte Kontrolle (gleiche Werte, zerstörte Struktur) spart nichts → übertragen wird Struktur, nicht Statistik. Bestätigt die Methodik „S als globaler Hyperparameter“: bei S = 3.000 verschwindet der Effekt. S = 100/300 laufen.
 
 - Engineering-Bug: Warteschlangen mit `tmux has-session -t s0a-preq` warteten auf sich selbst (tmux vergleicht Namen per Präfix: `s0a-preq-mdl`, `s0b-steps`); ≈ 1 h GPU-Zeit verloren. Behoben mit exaktem Abgleich `-t '=name'` (in zsh in Anführungszeichen, sonst Befehls-Expansion).
