@@ -4,6 +4,8 @@ Neueste Einträge oben. Kurz: Datum, was, Ergebnis, Verweis auf `runs/…`.
 
 ## 2026-11-03
 
+- **Prequential `wd` mit Neustart je Block, S = 3.000** (`runs/s0a_preq/20261103-000330_preq6_wd_restart_s3000`, gleiche Seeds 100–102 wie `mdl`): **26,7 / 27,3 / 27,6 kbit** gegenüber `mdl` 29,5 / 29,6 / 29,5 kbit. `wd` generalisiert ab Präfix ≈ 2.048 (Block [2.048, 4.096) 12,1–12,5 kbit statt 13,5 uniform), `mdl` erst ab 4.096; im letzten Block ist `mdl` doppelt so präzise (0,12–0,15 vs. 0,26–0,32 Bit/Label). **Beobachtung (Kalibrierung, 3 gepaarte Seeds, kein Befund): In der Gesamtsumme spricht die Kalibrierung gegen H1 (mdl < wd).** Deutung im Sinne der MDL-Theorie: starker Kompressionsdruck zahlt sich erst bei genug Daten aus. Entscheidung über Protokoll (H1 beibehalten, β als bezahlte Wahl, Datenregime) liegt bei Jonas.
+
 - **Prequential `mdl` β = 0,1 mit Neustart je Block, S = 3.000** (`runs/s0a_preq/20261102-231828_preq6_mdl_restart_s3000`): **29,5–29,6 kbit** (uniform 62,1; −53 %). Blöcke bis 4.096 uniform, Block [4.096, 8.192) ≈ 0,56 Bit/Label, letzter Block ≈ 0,13 Bit/Label. Vergleichswert `wd` mit Neustart läuft (bisher nur Warmstart: 43,7–44,7 kbit — nicht vergleichbar).
 
 ## 2026-11-02

@@ -2,6 +2,32 @@
 
 **Phase: BAUPHASE** (Regeln in AGENTS.md)
 
+## Morgen-Zusammenfassung für Jonas (Stand 2026-11-03, 00:35)
+
+**Was über Nacht geklärt wurde**
+
+1. **Messinstrument (prequentielle Codelänge) funktioniert jetzt fair** — nach vier Korrekturen: Temperatur-Wahl, Self-Switch, Schritte je Block als globale Wahl, und vor allem **Neustart je Block** (der Warmstart ließ MDL auf kleinen Datenmengen irreversibel kollabieren).
+2. **Stufe 0b: Transfer ist in Bit messbar.** Additions-Wissen spart beim Lernen der Subtraktion 7,6–26,4 kbit; die Kontrolle mit vermischten Gewichten spart nichts → übertragen wird Struktur.
+3. **Stufe 0a, ehrliches Zwischenergebnis (Kalibrierung, 3 gepaarte Seeds):**
+
+| Arm | Grokking (Training) | L(W) | prequential (Neustart, S = 3.000) |
+|---|---|---|---|
+| `mdl` β = 0,1 | stabil | **110–122 kbit** (kürzeste) | 29,5–29,6 kbit; letzter Block **0,13 Bit/Label** |
+| `wd` | instabil | 0,93–1,42 Mbit | **26,7–27,6 kbit**; letzter Block 0,29 Bit/Label |
+| `bitnet` | stabil | 674 kbit | (mit Warmstart 56 kbit; Neustart offen) |
+| `none` | nein | 1,9–2,3 Mbit | 62,1 kbit (= Raten) |
+
+   MDL findet die mit Abstand kürzesten Gewichte und ist auf großen Datenmengen doppelt so präzise — **lernt aber später** (ab ≈ 4.096 statt ≈ 2.048 Beispielen) und verliert deshalb in der Gesamtsumme. Die primäre Hypothese H1 („mdl codiert die Daten kürzer als wd“) würde nach dieser Kalibrierung eher scheitern.
+
+**Deine Entscheidung für den Hauptlauf 0a** (eine der Optionen, oder eigene):
+- **A) Protokoll so lassen** (H1 primär) und ehrlich messen — ein Negativbefund ist auch ein Ergebnis.
+- **B) β als bezahlte globale Wahl** (z. B. β ∈ {0,01; 0,03; 0,1}, wie S): MDL darf seinen Kompressionsdruck an die Datenmenge anpassen; fairer im Sinne der MDL-Theorie, aber mehr Rechenzeit.
+- **C) Primären Endpunkt auf „Präzision bei viel Daten“ (letzte Blöcke) legen** — trifft die These besser, wäre aber eine Festlegung *nach* Sicht auf Kalibrierungsdaten (muss so benannt werden).
+
+Meine Empfehlung: **B**, mit A-Auswertung als Sekundärergebnis. Antwort einfach im Chat.
+
+**Stufe 1:** Kampagnen (Kompression vs. Learnability vs. Zufall) laufen; erste Bibliothek wurde in einer Learnability-Kampagne angenommen. Ergebnisse folgen.
+
 Zuletzt aktualisiert: 2026-11-02 (Loop-Durchgang 1)
 
 ## Wo wir stehen
