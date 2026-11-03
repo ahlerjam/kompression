@@ -4,6 +4,8 @@ Neueste Einträge oben. Kurz: Datum, was, Ergebnis, Verweis auf `runs/…`.
 
 ## 2026-11-02
 
+- Engineering-Bug: Warteschlangen mit `tmux has-session -t s0a-preq` warteten auf sich selbst (tmux vergleicht Namen per Präfix: `s0a-preq-mdl`, `s0b-steps`); ≈ 1 h GPU-Zeit verloren. Behoben mit exaktem Abgleich `-t '=name'` (in zsh in Anführungszeichen, sonst Befehls-Expansion).
+
 - **Erste Kampagne `compression` Seed 0** (`runs/s1_campaign/*_K_compression_s0`, 34 min): keine Bibliothek angenommen; Probe 9/12, zurückgehalten 5/8. Diagnose: verifizierte Wiederverwendung funktioniert (find_empty_cell 8×, step_game_of_life 8×, bfs_path_search 5×); Bibliotheken senken die Lösungsbits (Sudoku/BFS: −190 Bit), kosten selbst aber 213–402 Bit → auf 12 Probe-Aufgaben ΔL = −175 bzw. −50 Bit, abgelehnt. Ein Vorschlag in Runde 2 scheiterte noch an Abschneiden.
 - **Ziel an das Konzept angeglichen:** Das Konzept definiert L_gesamt über *alle gesehenen Aufgaben*; das Probe-Set schätzt diese Summe nur. Neu (Kampagnen-Standard): L(B) + (n_gesehen / |Probe|) · Σ_Probe L(x). Damit kann sich eine Bibliothek über viele Aufgaben amortisieren. Die laufende `learnability`-Kampagne Seed 0 nutzt noch die alte Regel (vergleichbar mit `compression` Seed 0).
 
