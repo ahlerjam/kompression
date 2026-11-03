@@ -4,6 +4,8 @@ Neueste Einträge oben. Kurz: Datum, was, Ergebnis, Verweis auf `runs/…`.
 
 ## 2026-11-02
 
+- **Zwischenstand `preq6_mdl_restart_s3000` (Neustart je Block, läuft):** bis Block 2.048 uniform, **Block [4.096, 8.192): 0,55–0,57 Bit/Label** (uniform 6,6; `wd` mit Warmstart im selben Block 4,4). Der Warmstart war die Ursache der bisherigen MDL-Nullwerte (Prior-Kollaps auf kleinen Präfixen irreversibel). Fairer Vergleich: `wd` mit Neustart folgt in derselben Warteschlange.
+
 - `preq4_mdl_wu_s3000` (`runs/s0a_preq/20261102-224259_preq4_mdl_wu_s3000`): auch mit Warmup 62,14 kbit = uniform, selbst im letzten Block (Training auf 8.192 Beispielen). Neue Hypothese: Warmstart nach Prior-Kollaps auf winzigen Präfixen ist irreversibel. Option `--restart` (je Block frisch von der Initialisierung, wie Blier & Ollivier; gleiche Rechenzeit) gebaut; `mdl` und `wd` mit Neustart, S = 3.000, eingereiht. Restliche S-Varianten der Warmstart-Reihe abgebrochen.
 
 - Zwischenstand `preq4_mdl_wu_s3000`: bis Block 4.096 uniform. Hypothese: MDL groked langsamer (Training: 5–10k Schritte) und wird von S ≤ 3.000 benachteiligt. S = 10.000 für `mdl` und `wd` eingereiht (`scripts/kalib_preq_s10k.sh`); Checkpoint-Gitter um 10.000 erweitert.
