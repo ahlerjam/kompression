@@ -33,3 +33,9 @@
 - Transfer: L_gesamt auf zurückgehaltenen Familien mit gelernter Bibliothek minus ohne.
 - Pass-Rate auf zurückgehaltenen Familien.
 - Wiederverwendung: pro Funktion Anzahl verschiedener Lösungen auf zurückgehaltenen Aufgaben, die sie aufrufen.
+
+## Kampagne (Stand 2026-11-02, gebaut, noch nicht gelaufen)
+
+`stages/s1_pilot/campaign.py`: Proposer-Politik {compression, learnability, random} × Kontrolle {none, empty_library, self_consistency}, gleiches Wach-Budget (Familien × Aufgaben × Samples je Runde). Trainingsfamilien: shortest_path, graph_color, sudoku, n_queens, game_of_life, knights_knaves (schweres Profil). Zurückgehalten (Transfer): maze, largest_island, course_schedule, spiral_matrix. Kompressions-Belohnung = ΔL_gesamt (mit Vorzeichen, ohne Clipping) anteilig auf die Familien der Schlafphase; Learnability = 1 − r̄. Endmessung: L_gesamt und Lösungszahl auf Probe und zurückgehaltenen Familien.
+
+Grobe Rechenzeit je Bedingung mit 35B-A3B auf dem Mac: mehrere Stunden. Für saubere Statistik (mehrere Seeds × 5 Bedingungen) ist eine Cloud-GPU sinnvoll (Freigabe Jonas).
