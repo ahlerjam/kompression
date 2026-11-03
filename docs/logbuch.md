@@ -4,6 +4,8 @@ Neueste Einträge oben. Kurz: Datum, was, Ergebnis, Verweis auf `runs/…`.
 
 ## 2026-11-03
 
+- Kalibrierung `mdl` β = 0,3 mit Neustart (`runs/s0a_preq/20261103-015844_preq6_mdl_b0.3_restart_s3000`): **30,2 / 31,2 / 36,2 kbit** (β = 0,1: 29,5–29,6; β = 0,03: 52–54). Stärkerer Druck lernt nicht früher (nur Seed 101 teilweise ab 2.048) und ist am Ende weniger präzise (316–369 Bit im letzten Block vs. 146–182). β = 0,1 ist in der Kalibrierung der beste Punkt des Gitters; das Gitter im Hauptlauf bleibt wie eingefroren.
+
 - **Entscheidung Protokoll 0a Version 2 (von Jonas an Claude delegiert, „data driven“).** Begründung: (1) Der Zeitpunkt, ab dem ein Arm generalisiert, hängt stark von seinem Hyperparameter ab (mdl β 0,1 ≈ 4.096 vs. β 0,03 ≈ 8.192 Beispiele) → ein fester Wert misst unsere Kalibrierung, nicht die These; daher bezahltes Gitter je Arm (mdl β, wd λ). (2) Neustart je Block ist das richtige Verfahren (Warmstart-Kollaps); mit Neustart ersetzt der Self-Switch das Gitter über Schritte je Block. (3) Endpunkt nicht nachträglich verlegt (Option C verworfen); „Präzision bei viel Daten“ nur sekundär. (4) BitNet als zweite primäre Kompressions-Hypothese (H4), da harte Kompression stärkster Kandidat. Erwartung aus Kalibrierung offen dokumentiert: H4 eher als H1. **Wechsel in die Messphase für 0a, Hauptlauf gestartet.**
 
 - `mdl` β = 0,03 mit Neustart, S = 3.000 (`runs/s0a_preq/20261103-010607_preq6_mdl_b0.03_restart_s3000`): **52,0–53,9 kbit**; Block [4.096, 8.192) noch fast uniform, aber letzter Block nur 53–86 Bit (exakt gelernt ab Präfix 8.192). Muster: schwächerer Druck → Grokking erst bei mehr Daten. Reihenfolge der Datenschwelle: β 0,1 ≈ 4.096 < β 0,03 ≈ 8.192.
