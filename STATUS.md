@@ -1,6 +1,6 @@
 # STATUS
 
-**Phase: BAUPHASE** (Regeln in AGENTS.md)
+**Phase: MESSPHASE für Stufe 0a** seit 2026-11-03 (Protokoll v2 eingefroren; Kern und `docs/protokoll_0a.md` gesperrt). Stufe 0b und Stufe 1 bleiben in der Bauphase.
 
 ## Morgen-Zusammenfassung für Jonas (Stand 2026-11-03, 00:35)
 
@@ -19,12 +19,7 @@
 
    MDL findet die mit Abstand kürzesten Gewichte und ist auf großen Datenmengen doppelt so präzise — **lernt aber später** (ab ≈ 4.096 statt ≈ 2.048 Beispielen) und verliert deshalb in der Gesamtsumme. Die primäre Hypothese H1 („mdl codiert die Daten kürzer als wd“) würde nach dieser Kalibrierung eher scheitern.
 
-**Deine Entscheidung für den Hauptlauf 0a** (eine der Optionen, oder eigene):
-- **A) Protokoll so lassen** (H1 primär) und ehrlich messen — ein Negativbefund ist auch ein Ergebnis.
-- **B) β als bezahlte globale Wahl** (z. B. β ∈ {0,01; 0,03; 0,1}, wie S): MDL darf seinen Kompressionsdruck an die Datenmenge anpassen; fairer im Sinne der MDL-Theorie, aber mehr Rechenzeit.
-- **C) Primären Endpunkt auf „Präzision bei viel Daten“ (letzte Blöcke) legen** — trifft die These besser, wäre aber eine Festlegung *nach* Sicht auf Kalibrierungsdaten (muss so benannt werden).
-
-Meine Empfehlung: **B**, mit A-Auswertung als Sekundärergebnis. Antwort einfach im Chat.
+**Entscheidung (2026-11-03, von Jonas an Claude delegiert, datenbasiert):** Option B — jeder Arm bekommt ein bezahltes Hyperparameter-Gitter (mdl β ∈ {0,03; 0,1; 0,3}, wd λ ∈ {0,3; 1; 3}), Neustart je Block, primär H1 (mdl < wd) und H4 (bitnet < wd) mit Holm; „Präzision bei viel Daten“ als sekundärer Endpunkt. **Hauptlauf 0a gestartet** (tmux `H-A`, `H-B`; ca. 1,5 Tage).
 
 **Stufe 1:** Kampagnen (Kompression vs. Learnability vs. Zufall) laufen; erste Bibliothek wurde in einer Learnability-Kampagne angenommen. Ergebnisse folgen.
 

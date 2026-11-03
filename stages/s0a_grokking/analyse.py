@@ -43,17 +43,24 @@ def train_endpoints(run: Path) -> dict[int, dict]:
     return out
 
 
-def preq_endpoints(runs: list[Path]) -> dict[int, float]:
-    """Minimum über die Durchläufe mit verschiedenen Schritten je Block + log2(K) Bit (Protokoll)."""
+def preq_endpoints(runs: list[Path]) -> tuple[dict[int, float], dict[int, float]]:
+    """Primär: Minimum über das Hyperparameter-Gitter + log2(K) Bit (Protokoll v2).
+    Sekundär: Bits der letzten beiden Blöcke beim jeweils gewählten Gitterpunkt."""
     import math
 
-    per_seed: dict[int, list[float]] = {}
+    per_seed: dict[int, list[tuple[float, float]]] = {}
     for run in runs:
         res = json.loads((run / "results.json").read_text())
         for s, v in res["prequential"].items():
-            per_seed.setdefault(int(s), []).append(v["total_bits"])
+            per_seed.setdefault(int(s), []).append((v["total_bits"], sum(v["per_block_bits"][-2:])))
     k = len(runs)
-    return {s: min(v) + math.log2(k) for s, v in per_seed.items() if len(v) == k}
+    prim, sec = {}, {}
+    for s, v in per_seed.items():
+        if len(v) == k:
+            best = min(v)
+            prim[s] = best[0] + math.log2(k)
+            sec[s] = best[1]
+    return prim, sec
 
 
 def compare(name: str, a: dict, b: dict, lower_is_better: bool = True) -> dict:
@@ -71,11 +78,13 @@ def compare(name: str, a: dict, b: dict, lower_is_better: bool = True) -> dict:
 def main(prefix: str = "H_") -> None:
     arms = ["mdl", "wd", "wd_normproj", "bitnet", "none"]
     tr = {a: train_endpoints(r) for a in arms if (r := latest(f"s0a/*_{prefix}{a}"))}
-    pq = {}
-    for a in ["mdl", "wd", "bitnet", "none"]:
-        runs = [r for S in (100, 300, 1000, 3000) if (r := latest(f"s0a_preq/*_{prefix}preq_{a}_s{S}"))]
+    grids = {"mdl": f"s0a_preq/*_{prefix}preq_mdl_b*", "wd": f"s0a_preq/*_{prefix}preq_wd_l*",
+             "bitnet": f"s0a_preq/*_{prefix}preq_bitnet", "none": f"s0a_preq/*_{prefix}preq_none"}
+    pq, pq_late = {}, {}
+    for a_, pat in grids.items():
+        runs = sorted(RUNS.glob(pat))
         if runs:
-            pq[a] = preq_endpoints(runs)
+            pq[a_], pq_late[a_] = preq_endpoints(runs)
     print("# Endpunkte je Arm (Mittel über Seeds)")
     for a, d in tr.items():
         v = list(d.values())
@@ -86,9 +95,12 @@ def main(prefix: str = "H_") -> None:
     def col(arm, key):
         return {s: v[key] for s, v in tr[arm].items() if v[key] is not None}
 
-    tests = []
+    primary = []
     if "mdl" in pq and "wd" in pq:
-        tests.append(compare("H1 prequential mdl < wd", pq["mdl"], pq["wd"]))
+        primary.append(compare("H1 prequential mdl < wd", pq["mdl"], pq["wd"]))
+    if "bitnet" in pq and "wd" in pq:
+        primary.append(compare("H4 prequential bitnet < wd", pq["bitnet"], pq["wd"]))
+    tests = []
     if "mdl" in tr and "wd_normproj" in tr:
         tests.append(compare("H2a stabiler Grok mdl < wd_normproj", col("mdl", "stable_grok"),
                              col("wd_normproj", "stable_grok")))
@@ -100,18 +112,23 @@ def main(prefix: str = "H_") -> None:
     if "bitnet" in tr and "wd" in tr:
         tests.append(compare("H4a stabiler Grok bitnet < wd", col("bitnet", "stable_grok"),
                              col("wd", "stable_grok")))
-    if "bitnet" in pq and "wd" in pq:
-        tests.append(compare("H4b prequential bitnet < wd", pq["bitnet"], pq["wd"]))
+    for arm in ("mdl", "bitnet"):
+        if arm in pq_late and "wd" in pq_late:
+            tests.append(compare(f"H5 letzte Blöcke {arm} < wd", pq_late[arm], pq_late["wd"]))
+    if primary:
+        for t, p_adj in zip(primary, holm([t["p"] for t in primary]), strict=True):
+            t["p_holm"] = p_adj
+        print("\n# Primäre Tests (H1, H4; Holm)")
+        for t in primary:
+            print(json.dumps(t, ensure_ascii=False))
+        ok = any(t["p_holm"] < 0.05 and t["richtung_wie_erwartet"] for t in primary)
+        print("\nGate 0a:", "BESTANDEN" if ok else "nicht bestanden (Negativbefund dokumentieren)")
     if tests:
         for t, p_adj in zip(tests, holm([t["p"] for t in tests]), strict=True):
             t["p_holm"] = p_adj
-        print("\n# Gepaarte Tests (Wilcoxon, Bootstrap-KI, Holm)")
+        print("\n# Sekundäre Tests (H2, H3, H4a, H5; Holm)")
         for t in tests:
             print(json.dumps(t, ensure_ascii=False))
-        h1 = next((t for t in tests if t["kontrast"].startswith("H1")), None)
-        if h1:
-            ok = h1["p_holm"] < 0.05 and h1["richtung_wie_erwartet"]
-            print("\nGate 0a (H1):", "BESTANDEN" if ok else "nicht bestanden (Negativbefund dokumentieren)")
 
 
 if __name__ == "__main__":
