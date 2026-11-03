@@ -36,7 +36,8 @@ Endpunkte je Seed:
 ## Teil B: Prequentielle Codelänge (primärer Endpunkt)
 
 - Ganze Tabelle (9.409 Paare), Reihenfolge je Seed fest, Blöcke 64, 128, … 9.409.
-- Bis 3.000 Schritte je Block mit Warmstart; **Self-Switch (v2):** je Block Wahl aus Trainingsständen {0, 30, 100, 300, 1.000, 3.000} × Temperaturen {1; 1,5; 2; 3; 5; 8; 16; 32} oder uniform, bezahlt mit log2(49) Bit je Block.
+- Schritte je Block S ∈ {100, 300, 1.000, 3.000} als **globaler Hyperparameter**: je S ein eigener Durchlauf mit Warmstart; Codelänge eines Arms = Minimum über S + log2(4) Bit (Wahl ehrlich bezahlt). Grund: 0b-Kalibrierung zeigte, dass langes Training auf kleinen Präfixen Struktur zerstört.
+- Innerhalb eines Durchlaufs **Self-Switch (v2):** je Block Wahl aus Trainingsständen {0, 30, 100, 300, 1.000, 3.000} ≤ S × Temperaturen {1; 1,5; 2; 3; 5; 8; 16; 32} oder uniform, bezahlt mit log2(Anzahl Optionen) Bit je Block.
 - Arme: `wd`, `mdl`, `bitnet`, `none` (Norm-Projektion ist hier nicht definiert; die Norm-Kontrolle läuft über Teil A).
 - **Primärer Endpunkt:** prequentielle Codelänge in Bit (kleiner = bessere Kompression der Daten durch den Lerner).
 
@@ -57,8 +58,8 @@ Endpunkte je Seed:
 ## Rechenzeit (Schätzung aus den Kalibrierungen)
 
 - Teil A: ca. 2,5 h je Arm (10 Seeds × 40k), `mdl` ca. doppelt so lang → zusammen ca. 15 h.
-- Teil B: ca. 2–3 h je Arm → zusammen ca. 10 h.
-- Reihenfolge: `mdl` (Teil A) zuerst, weil `wd_normproj` dessen Normtrajektorie braucht. Insgesamt etwa 1–1,5 Tage.
+- Teil B: ca. 3–4 h je Arm (alle vier S zusammen; kurze S sind billig) → zusammen ca. 14 h.
+- Reihenfolge: `mdl` (Teil A) zuerst, weil `wd_normproj` dessen Normtrajektorie braucht. Insgesamt etwa 1,5 Tage.
 
 ## Bekannte Grenzen
 

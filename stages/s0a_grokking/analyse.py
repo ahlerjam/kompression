@@ -43,9 +43,17 @@ def train_endpoints(run: Path) -> dict[int, dict]:
     return out
 
 
-def preq_endpoints(run: Path) -> dict[int, float]:
-    res = json.loads((run / "results.json").read_text())
-    return {int(s): v["total_bits"] for s, v in res["prequential"].items()}
+def preq_endpoints(runs: list[Path]) -> dict[int, float]:
+    """Minimum über die Durchläufe mit verschiedenen Schritten je Block + log2(K) Bit (Protokoll)."""
+    import math
+
+    per_seed: dict[int, list[float]] = {}
+    for run in runs:
+        res = json.loads((run / "results.json").read_text())
+        for s, v in res["prequential"].items():
+            per_seed.setdefault(int(s), []).append(v["total_bits"])
+    k = len(runs)
+    return {s: min(v) + math.log2(k) for s, v in per_seed.items() if len(v) == k}
 
 
 def compare(name: str, a: dict, b: dict, lower_is_better: bool = True) -> dict:
@@ -63,8 +71,11 @@ def compare(name: str, a: dict, b: dict, lower_is_better: bool = True) -> dict:
 def main(prefix: str = "H_") -> None:
     arms = ["mdl", "wd", "wd_normproj", "bitnet", "none"]
     tr = {a: train_endpoints(r) for a in arms if (r := latest(f"s0a/*_{prefix}{a}"))}
-    pq = {a: preq_endpoints(r) for a in ["mdl", "wd", "bitnet", "none"]
-          if (r := latest(f"s0a_preq/*_{prefix}preq_{a}"))}
+    pq = {}
+    for a in ["mdl", "wd", "bitnet", "none"]:
+        runs = [r for S in (100, 300, 1000, 3000) if (r := latest(f"s0a_preq/*_{prefix}preq_{a}_s{S}"))]
+        if runs:
+            pq[a] = preq_endpoints(runs)
     print("# Endpunkte je Arm (Mittel über Seeds)")
     for a, d in tr.items():
         v = list(d.values())

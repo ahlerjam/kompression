@@ -13,5 +13,7 @@ eval $R --arm wd --norm-target-run $MDL --name H_wd_normproj
 eval $R --arm bitnet --name H_bitnet
 eval $R --arm none --name H_none
 P="uv run python stages/s0a_grokking/prequential.py --seeds $S"
-for arm in mdl wd bitnet none; do eval $P --arm $arm --name Hpreq_$arm; done
+for arm in mdl wd bitnet none; do
+  for S in 100 300 1000 3000; do eval $P --arm $arm --steps-per-block $S --name Hpreq_${arm}_s$S; done
+done
 uv run python stages/s0a_grokking/analyse.py > runs/H_0a_auswertung.txt
