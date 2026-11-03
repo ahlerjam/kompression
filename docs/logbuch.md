@@ -2,6 +2,10 @@
 
 Neueste Einträge oben. Kurz: Datum, was, Ergebnis, Verweis auf `runs/…`.
 
+## 2026-11-03
+
+- **Prequential `mdl` β = 0,1 mit Neustart je Block, S = 3.000** (`runs/s0a_preq/20261102-231828_preq6_mdl_restart_s3000`): **29,5–29,6 kbit** (uniform 62,1; −53 %). Blöcke bis 4.096 uniform, Block [4.096, 8.192) ≈ 0,56 Bit/Label, letzter Block ≈ 0,13 Bit/Label. Vergleichswert `wd` mit Neustart läuft (bisher nur Warmstart: 43,7–44,7 kbit — nicht vergleichbar).
+
 ## 2026-11-02
 
 - **Zwischenstand `preq6_mdl_restart_s3000` (Neustart je Block, läuft):** bis Block 2.048 uniform, **Block [4.096, 8.192): 0,55–0,57 Bit/Label** (uniform 6,6; `wd` mit Warmstart im selben Block 4,4). Der Warmstart war die Ursache der bisherigen MDL-Nullwerte (Prior-Kollaps auf kleinen Präfixen irreversibel). Fairer Vergleich: `wd` mit Neustart folgt in derselben Warteschlange.
