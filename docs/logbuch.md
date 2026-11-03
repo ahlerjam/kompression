@@ -4,6 +4,8 @@ Neueste Einträge oben. Kurz: Datum, was, Ergebnis, Verweis auf `runs/…`.
 
 ## 2026-11-02
 
+- Prequential `subspace` r64 (`runs/s0a_preq/20261102-161424_preq_subspace`): 62.124 Bit = uniform → keine Vorhersagekraft (passt zu reinem Auswendiglernen trotz kürzestem L(W) unter v3). Bestätigt: prequentielle Codelänge trennt Generalisierung, L(W) nicht.
+
 - Wiederholung nach Mehrzeilen-Fix (`runs/s1/*bench_hard_4b_fix`): mini_sudoku 0 → 0,29 (2/3 gelöst, 44 Bit); futoshiki, jugs, rotten_oranges, puzzle24, countdown weiter 0 (puzzle24/countdown scheitern in ≈ 10 s → vermutlich Format/Fehler, offen). Kandidaten-Set für Pilot v2 (schwer, aber teilweise lösbar, gemeinsame Bausteine Suche/Backtracking/Gitter): maze, shortest_path, word_ladder, largest_island, graph_color, course_schedule, mini_sudoku, n_queens, spiral_matrix, game_of_life, knights_knaves.
 
 - Pilot-Bench Qwen3.5-4B auf 16 schweren Familien (3 Aufgaben × 4 Samples, `runs/s1/*bench_hard_4b`): gelöst u. a. game_of_life 1,00 · largest_island 0,92 · spiral_matrix/course_schedule/knights_knaves 0,75 · maze 0,67 · graph_color 0,50 · shortest_path 0,42 · word_ladder 0,17; 0,00 bei jugs, rotten_oranges, n_queens, mini_sudoku, puzzle24, futoshiki, countdown 0,02. Verifizierte Lösungen kosten 18–175 Bit (deutlich mehr als bei leichten Familien). Durchsatz grob 35–40 Token/s bei geteilter GPU.
