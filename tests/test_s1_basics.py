@@ -56,3 +56,10 @@ def test_container_sandbox_isolated():
 def test_multiline_answer_is_kept():
     r = run_program("print('1 2')\nprint('3 4')")
     assert r.ok and r.answer == "1 2\n3 4"
+
+
+def test_library_signatures_view_is_compact():
+    lib = Library(Library.parse(
+        'def bfs(grid, start):\n    """Breitensuche, gibt Distanzen zurück."""\n    return {}\n'))
+    sig = lib.signatures()
+    assert "def bfs(grid, start):" in sig and "Breitensuche" in sig and "return {}" not in sig

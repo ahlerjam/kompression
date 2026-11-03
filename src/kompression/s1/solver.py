@@ -16,9 +16,15 @@ SYSTEM = (
 )
 
 
-def user_prompt(task: Task, lib: Library) -> str:
-    lib_part = f"Library:\n```python\n{lib.source()}\n```\n\n" if lib.functions else ""
-    return f"{lib_part}Task:\n{task.question}"
+LIB_VIEW = "signatures"  # "signatures" (kompakt) oder "source" (voller Code im Prompt)
+
+
+def user_prompt(task: Task, lib: Library, view: str | None = None) -> str:
+    view = view or LIB_VIEW
+    if not [k for k in lib.functions if k != "__imports__"]:
+        return f"Task:\n{task.question}"
+    shown = lib.signatures() if view == "signatures" else lib.source()
+    return f"Library (already defined):\n```python\n{shown}\n```\n\nTask:\n{task.question}"
 
 
 PREFILL = "```python\n"  # erzwingt Code; Bits zählen nur ab hier (Prefill ist für alle gleich)

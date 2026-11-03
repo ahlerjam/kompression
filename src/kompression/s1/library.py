@@ -22,6 +22,21 @@ class Library:
         body = "\n\n".join(self.functions[k] for k in sorted(self.functions) if k != "__imports__")
         return (imports + "\n\n" + body).strip() if imports else body
 
+    def signatures(self) -> str:
+        """Kompakte Ansicht für den Prompt: nur def-Zeile und Docstring je Funktion.
+        Ausgeführt wird immer der volle Quelltext (source()); L(B) zählt den vollen Quelltext."""
+        out = []
+        for name in sorted(k for k in self.functions if k != "__imports__"):
+            try:
+                node = ast.parse(self.functions[name]).body[0]
+            except (SyntaxError, IndexError):
+                continue
+            args = ast.unparse(node.args)
+            doc = ast.get_docstring(node) or ""
+            line = f"def {name}({args}):"
+            out.append(line + (f'\n    """{doc.strip()}"""' if doc else "") + "\n    ...")
+        return "\n\n".join(out)
+
     def with_functions(self, new: dict[str, str]) -> "Library":
         merged = dict(self.functions)
         merged.update(new)
