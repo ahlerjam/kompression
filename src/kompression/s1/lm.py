@@ -39,14 +39,20 @@ class FrozenLM:
         except TypeError:
             return self.tokenizer.apply_chat_template(msgs, add_generation_prompt=True)
 
+    max_batch: int = 8  # begrenzt den GPU-Speicher (35B + parallele Läufe: OOM bei großen Batches)
+
     def generate(self, prompts: list[list[int]], max_tokens: int = 512,
                  temperature: float = 0.7) -> list[str]:
         from mlx_lm import batch_generate
         from mlx_lm.sample_utils import make_sampler
 
-        r = batch_generate(self.model, self.tokenizer, prompts, max_tokens=max_tokens,
-                           sampler=make_sampler(temp=temperature))
-        return list(r.texts)
+        out: list[str] = []
+        for i in range(0, len(prompts), self.max_batch):
+            r = batch_generate(self.model, self.tokenizer, prompts[i : i + self.max_batch],
+                               max_tokens=max_tokens, sampler=make_sampler(temp=temperature))
+            out.extend(r.texts)
+            mx.clear_cache()
+        return out
 
     def completion_bits(self, prompt: list[int], completion: str) -> float:
         ids = self.tokenizer.encode(completion, add_special_tokens=False)
