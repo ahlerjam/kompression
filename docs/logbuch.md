@@ -4,6 +4,7 @@ Neueste Einträge oben. Kurz: Datum, was, Ergebnis, Verweis auf `runs/…`.
 
 ## 2026-11-03
 
+- 14:37 Hauptlauf 0a, Teil B: `runs/s0a_preq/20261103-130256_Hpreq_wd_l3.0` fertig (Gitterpunkt, kein Befund für sich): 25,7–27,3 kbit (λ = 1: 26,4–28,6); wd-Gitter damit komplett. `Hpreq_bitnet` läuft seit 14:31, danach `Hpreq_none`. Teil A: `H_wd_normproj` seit 13:35. Speicher 79 % frei, Swap 0,7 GB.
 - 13:37 Hauptlauf 0a, Teil A: `runs/s0a/20261103-090742_H_wd` fertig (4,4 h; kein Befund für sich): erster Schritt ≥ 0,99 bei 2.200–2.800 (früher als `H_mdl`: 4.300–9.600), finale Test-Accuracy 0,983–1,0 (Seed 10: 0,983); L(W) 0,71–2,31 Mbit (`H_mdl`: 78–494 kbit). Stabilität (Protokoll-Endpunkt) erst in analyse.py. `H_wd_normproj` läuft seit 13:35. Teil B: `Hpreq_wd_l1.0` fertig, 26,4–28,6 kbit (Median 27,7); `Hpreq_wd_l3.0` läuft seit 13:02.
 - 13:37 0b vorbereitet (Bauphase, ohne GPU): `stages/s0a_grokking/analyse_0b.py` (je Seed Minimum über S + log2(5), T, H1–H4 mit Holm, Gate H1 und H2 für sub; Tests `tests/test_analyse_0b.py`) und `scripts/hauptlauf_0b.sh` (CAL = Kalibrierung mit Neustart, Seeds 0–2; Strang 1/2 = Hauptlauf, sub zuerst, dann mul). Vorschlag Umfang: Kontrollen (permutiert, Norm-skaliert) nur für die wd-A-Gewichte; für mdl- und bitnet-A nur A-Init (genügt für H4) → 6 Bedingungen × 5 S × 2 Aufgaben. Neustart je Block: Entscheidung nach Kalibrierung (Variable NEUSTART).
 - 12:40 **Fehler in der Auswertung 0a behoben (vor jeder Auswertung, ohne Blick auf Teststatistiken):** `analyse.py` suchte die prequentiellen Läufe als `*_H_preq_*`, der Hauptlauf heißt aber `Hpreq_*` → H1/H4 und das Gate wären stillschweigend gar nicht berechnet worden. Neu: `preq_patterns()` (Hauptlauf `Hpreq_*`, Kalibrierung `preq_*`), Warnung bei fehlendem Gitter, Test `tests/test_analyse_patterns.py`. Geprüft: findet jetzt mdl 3, wd 2 (läuft) Läufe. Messung und Protokoll unverändert (nur Dateisuche). Teil A: `H_wd` bei 31.200; Teil B: `Hpreq_wd_l1.0` im letzten Block.
@@ -152,9 +153,3 @@ Neueste Einträge oben. Kurz: Datum, was, Ergebnis, Verweis auf `runs/…`.
 - Befund Engineering: Metal-GPU ist nicht bitgenau deterministisch (Abweichung ca. 6e-8); Tests prüfen mit Toleranz.
 - Befund Engineering: `mx.vmap` über 10 Seeds ≈ 10 × Zeit eines Seeds (4,7 vs. 47,7 Schritte/s). Kein Parallelgewinn bei diesem Modell.
 - Kalibrierungslauf `none` / `wd` gestartet.
-
-### 14:37 Hauptlauf 0a: Hpreq_wd_l3.0 fertig
-
-- `Hpreq_wd_l3.0` (Teil B): 25,7–27,3 kbit (Seeds 10–19), uniform 62,1 kbit. Knapp unter λ = 1 (26,4–28,6); das wd-Gitter ist damit vollständig.
-- Teil B läuft weiter mit `Hpreq_bitnet` (seit 14:31), danach `Hpreq_none`. Teil A: `H_wd_normproj` seit 13:35.
-- Speicher: 79 % frei, Swap 0,7 GB.
