@@ -39,6 +39,8 @@ runs/                   Ergebnisse, nicht in Git. Ein Ordner pro Lauf.
 docs/                   Entscheidungen, Bauplan, Protokolle, Recherche, Logbuch.
 ```
 
+- Abgebrochene Läufe nach `runs/abgebrochen/` verschieben (sonst findet `analyse.py` sie per Suchmuster).
+
 ## Phasen und Regeln (freigegeben von Jonas am 2026-11-02)
 
 Aktuelle Phase: **MESSPHASE für Stufe 0a** (Kern und Protokoll 0a gesperrt); Stufe 0b in der **BAUPHASE**; **Stufe 1 ruht** bis 0a und 0b ausgewertet sind (Reihenfolge streng nacheinander, Entscheidung Jonas 2026-11-03). Steht auch oben in `STATUS.md`.
