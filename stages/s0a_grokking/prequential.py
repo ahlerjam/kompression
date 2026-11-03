@@ -114,7 +114,7 @@ def main(a: Args) -> None:
     t = 0
 
     temps = (1.0, 1.5, 2.0, 3.0, 5.0, 8.0, 16.0, 32.0)
-    checkpoints = tuple(c for c in (0, 30, 100, 300, 1000, 3000) if c <= a.steps_per_block)
+    checkpoints = tuple(c for c in (0, 30, 100, 300, 1000, 3000, 10000) if c <= a.steps_per_block)
     if a.steps_per_block not in checkpoints:
         checkpoints = (*checkpoints, a.steps_per_block)
     switch_bits = math.log2(len(checkpoints) * len(temps) + 1)  # + uniform

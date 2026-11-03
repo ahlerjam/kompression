@@ -4,6 +4,8 @@ Neueste Einträge oben. Kurz: Datum, was, Ergebnis, Verweis auf `runs/…`.
 
 ## 2026-11-02
 
+- Zwischenstand `preq4_mdl_wu_s3000`: bis Block 4.096 uniform. Hypothese: MDL groked langsamer (Training: 5–10k Schritte) und wird von S ≤ 3.000 benachteiligt. S = 10.000 für `mdl` und `wd` eingereiht (`scripts/kalib_preq_s10k.sh`); Checkpoint-Gitter um 10.000 erweitert.
+
 - Kampagne `learnability` Seed 0 **abgestürzt (GPU-Speicher, lange Prompts mit Bibliothek)** nach Runde 6; Ordner umbenannt in `runs/s1_campaign/abgebrochen_K_learnability_s0_oom`. Bis dahin: Bandit konzentrierte sich auf game_of_life (Pass 0,25–0,92); in Runde 4 wurde eine Bibliothek **angenommen** (count_neighbors, find_empty, solve_sudoku; ΔL = +759 Bit auf 12 Probe-Aufgaben, alte Regel ohne Amortisierung). Behoben: Generierungspakete 8 → 4. Amortisierte Kampagnen neu gestartet; Learnability Seed 0 wird nachgeholt.
 
 - Prequential `mdl` mit Normierung ≥ 3.764, S = 3.000 (`runs/s0a_preq/20261102-220035_preq3_mdl_n3764_s3000`): **weiter 62,14 kbit = uniform**. Unterschied zum erfolgreichen Training: dort β-Warmup über 2.000 Schritte, hier voller Druck ab Schritt 1 → sofortiger Prior-Kollaps. Warmup in `prequential.py` ergänzt (`--beta-warmup`, global über alle Schritte); neu gestartet mit S = 3.000/1.000/300 (`preq4_mdl_wu_*`).
