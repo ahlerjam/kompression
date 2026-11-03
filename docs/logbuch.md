@@ -4,6 +4,8 @@ Neueste Einträge oben. Kurz: Datum, was, Ergebnis, Verweis auf `runs/…`.
 
 ## 2026-11-02
 
+- 0b v2 A-Init (`runs/s0a_preq/20261102-185921_0b2_from_wd_none`): **62,0 kbit — weiterhin kein Transfer**. Grund: Der Self-Switch wählt nur den Codier-Zeitpunkt, weitertrainiert wird vom Endstand (3.000 Schritte auf kleinem Präfix zerstören die A-Struktur). Korrekte Behandlung: Schritte je Block S als **globaler Hyperparameter** — getrennte Durchläufe für S ∈ {30, 100, 300, 1.000, 3.000}, Codelänge = Minimum + log2(5) Bit. Kalibrierung mit S = 30/100/300 für Zufall, A-Init, A-permutiert eingereiht (`scripts/kalib_0b_steps.sh`). Gilt analog für den primären Endpunkt von 0a (Protokoll wird angepasst).
+
 - Pilot v3 (35B-A3B) abgestürzt: `METAL Insufficient Memory` bei großen Generierungs-Batches parallel zu zwei Prequential-Läufen. Behoben: Generierung in Paketen von höchstens 8 mit `mx.clear_cache()`. Neustart direkt mit verifizierter Wiederverwendung (`--min-uses 2`).
 
 - Pilot: Schlafphase ReGAL-artig erweitert — vorgeschlagene Funktionen werden nur behalten, wenn gelöste Programme mit ihnen umgeschrieben werden und die Umschrift wieder verifiziert (≥ 2 Nutzungen); Annahme zusätzlich nur ohne Rückgang der gelösten Probe-Aufgaben. Gegen „Library Learning Doesn't“ (Einmal-Funktionen). Pilot v3 läuft noch mit der alten Schlafphase.
