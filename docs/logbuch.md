@@ -4,6 +4,8 @@ Neueste Einträge oben. Kurz: Datum, was, Ergebnis, Verweis auf `runs/…`.
 
 ## 2026-11-02
 
+- **Pilot v4** (35B-A3B, 1.024 Token, `runs/s1/*_pilot_v4_35b`): Probe **15/24 gelöst** (v3: 4/24), L_gesamt 9.597 Bit; Wachphase 18–19/24. Schlafphase lieferte keine verwertbaren Vorschläge (Zyklus 1: keiner gültig; Zyklus 2: 0 verifizierte Umschriften). Vermutung: Token-Grenzen der Schlafphase (768) schneiden Bibliothek und Umschriften ab → auf 1.536 erhöht, Ablehnungsgründe werden jetzt protokolliert.
+
 - **Pilot v3** (35B-A3B, schweres Profil, verifizierte Wiederverwendung, `runs/s1/*_pilot_v3_35b`): nur 4/24 Probe- und 4–7/24 Wach-Aufgaben gelöst, weil `cycle.py` Antworten auf 512 Token begrenzte (Bench: 1.024) → Programme abgeschnitten. Positiv: Verifizierte Wiederverwendung funktioniert (greedy_coloring, build_adjacency_list je 3 verifizierte Umschriften); Einmal-Funktionen werden verworfen. Keine Bibliothek angenommen (Lösungszahl fiel). Behoben: `max_tokens` durchgereicht, Standard 1.024. Neustart als Pilot v4.
 
 - **Prequential v2 `mdl` β = 0,1 (`runs/s0a_preq/20261102-185912_preq2_mdl`): 62,14 kbit = uniform — keine Vorhersagekraft**, obwohl derselbe Arm im Trainingsregime (3.764 Beispiele) stabil groked. Ursache: Der Strafterm wird durch die Präfixgröße geteilt; bei 64–1.024 Beispielen ist der Druck so groß, dass das Modell auf den Prior kollabiert (wie β = 1). **Folge: Der primäre Endpunkt benachteiligt MDL in der jetzigen Form systematisch; Protokoll 0a ist nicht freigabereif.** Test: Normierung durch max(Präfix, 3.764) (`--penalty-n-min 3764`), S = 3.000 und 1.000, eingereiht.

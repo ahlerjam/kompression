@@ -25,21 +25,24 @@ def sleep_prompt(programs: list[str], lib: Library) -> str:
 
 
 def propose_functions(lm, programs: list[str], lib: Library, n: int = 2,
-                      temperature: float = 0.7, max_tokens: int = 768,
-                      backend: str = "container") -> list[dict[str, str]]:
+                      temperature: float = 0.7, max_tokens: int = 1536,
+                      backend: str = "container", diag: list | None = None) -> list[dict[str, str]]:
     prefill = lm.tokenizer.encode(PREFILL, add_special_tokens=False)
     prompt = lm.chat(SLEEP_SYSTEM, sleep_prompt(programs, lib)) + prefill
     out = []
     for text in lm.generate([prompt] * n, max_tokens, temperature):
         code = extract_code(PREFILL + text)
         if not code:
+            _diag(diag, "kein Code")
             continue
         try:
             fns = Library.parse(code)
         except SyntaxError:
+            _diag(diag, "Syntaxfehler (abgeschnitten?)" if not text.rstrip().endswith("```") else "Syntaxfehler")
             continue
         fns = {k: v for k, v in fns.items() if k not in lib.functions}
         if not fns:
+            _diag(diag, "keine neuen Funktionen")
             continue
         candidate = lib.with_functions(fns)
         imports = "\n".join(ln for ln in code.splitlines() if ln.startswith(("import ", "from ")))
@@ -48,7 +51,14 @@ def propose_functions(lm, programs: list[str], lib: Library, n: int = 2,
             candidate = lib.with_functions(fns)
         if execute("print('ok')", candidate.source(), backend=backend).ok:
             out.append(fns)
+        else:
+            _diag(diag, "Bibliothek nicht ausführbar")
     return out
+
+
+def _diag(diag: list | None, reason: str) -> None:
+    if diag is not None:
+        diag.append(reason)
 
 
 REWRITE_SYSTEM = (
@@ -70,7 +80,7 @@ def filter_by_verified_reuse(lm, world, solved: list[tuple], fns: dict[str, str]
     prompts = [lm.chat(REWRITE_SYSTEM,
                        f"Library:\n```python\n{cand.source()}\n```\n\nProgram:\n```python\n{p}\n```")
                + prefill for _, p in solved]
-    texts = lm.generate(prompts, 768, 0.2) if prompts else []
+    texts = lm.generate(prompts, 1536, 0.2) if prompts else []
     uses: dict[str, int] = {}
     for (task, _), text in zip(solved, texts, strict=True):
         code = extract_code(PREFILL + text)
@@ -99,7 +109,8 @@ def sleep_cycle(lm, world, probe, lib: Library, programs: list, current: ProbeRe
     best_lib, best = lib, current
     pairs = [p for p in programs if isinstance(p, tuple)]
     codes = [p[1] if isinstance(p, tuple) else p for p in programs]
-    for fns in propose_functions(lm, codes, lib, n=n_proposals, backend=backend):
+    diag: list[str] = []
+    for fns in propose_functions(lm, codes, lib, n=n_proposals, backend=backend, diag=diag):
         uses = None
         if min_uses and pairs:
             fns, uses = filter_by_verified_reuse(lm, world, pairs, fns, lib, min_uses, backend)
@@ -114,4 +125,6 @@ def sleep_cycle(lm, world, probe, lib: Library, programs: list, current: ProbeRe
                     "solved": r.solved, "reuse": r.reuse, "verified_uses": uses})
         if r.total_bits < best.total_bits and r.solved >= best.solved:
             best_lib, best = cand, r
+    if diag:
+        log.append({"verworfene_vorschlaege": diag})
     return best_lib, best, log
