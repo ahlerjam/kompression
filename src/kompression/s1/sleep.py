@@ -88,7 +88,7 @@ def filter_by_verified_reuse(lm, world, solved: list[tuple], fns: dict[str, str]
 
 def sleep_cycle(lm, world, probe, lib: Library, programs: list, current: ProbeResult,
                 n_proposals: int = 2, probe_samples: int = 4, lib_mode: str = "lm",
-                backend: str = "container", min_uses: int = 0):
+                backend: str = "container", min_uses: int = 0, max_tokens: int = 1024):
     """Gibt (neue Bibliothek, ProbeResult, Protokoll) zurück; unverändert, wenn nichts L senkt.
 
     programs: Liste von Programmen oder von (Task, Programm). Mit min_uses > 0 und Paaren
@@ -107,7 +107,8 @@ def sleep_cycle(lm, world, probe, lib: Library, programs: list, current: ProbeRe
                 log.append({"functions": [], "verified_uses": uses, "rejected": "keine Wiederverwendung"})
                 continue
         cand = lib.with_functions(fns)
-        r = evaluate(lm, world, probe, cand, n=probe_samples, lib_mode=lib_mode, backend=backend)
+        r = evaluate(lm, world, probe, cand, n=probe_samples, lib_mode=lib_mode, backend=backend,
+                     max_tokens=max_tokens)
         log.append({"functions": sorted(k for k in fns if k != "__imports__"),
                     "total_bits": r.total_bits, "library_bits": r.library_bits,
                     "solved": r.solved, "reuse": r.reuse, "verified_uses": uses})

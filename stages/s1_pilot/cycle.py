@@ -35,6 +35,7 @@ class Args:
     lib_mode: str = "lm"
     hard: bool = False
     min_uses: int = 2
+    max_tokens: int = 1024
     name: str = "cycle"
 
 
@@ -44,7 +45,8 @@ def main(a: Args) -> None:
     probe = [t for f in a.families for t in world.generate(f, seed=1000, n=a.probe_per_family)]
     lib = Library()
     t0 = time.time()
-    current = evaluate(lm, world, probe, lib, n=a.probe_samples, lib_mode=a.lib_mode)
+    current = evaluate(lm, world, probe, lib, n=a.probe_samples, lib_mode=a.lib_mode,
+                       max_tokens=a.max_tokens)
     run.log(cycle=0, total_bits=current.total_bits, library_bits=current.library_bits,
             solved=current.solved, n_probe=len(probe), functions=[], t=time.time() - t0)
     print(f"Start: L_gesamt={current.total_bits:.0f} Bit, gelöst {current.solved}/{len(probe)}",
@@ -52,7 +54,7 @@ def main(a: Args) -> None:
     for c in range(1, a.cycles + 1):
         wake = [t for f in a.families
                 for t in world.generate(f, seed=2000 + c, n=a.wake_per_family)]
-        res = solve(lm, world, wake, lib, n=a.wake_samples)
+        res = solve(lm, world, wake, lib, n=a.wake_samples, max_tokens=a.max_tokens)
         programs = []
         for atts in res:
             ok = [x for x in atts if x.score >= 1.0 and x.bits is not None]
@@ -61,7 +63,8 @@ def main(a: Args) -> None:
                 programs.append((best_att.task, best_att.code))
         lib, current, log = sleep_cycle(lm, world, probe, lib, programs, current,
                                         n_proposals=a.proposals, probe_samples=a.probe_samples,
-                                        lib_mode=a.lib_mode, min_uses=a.min_uses)
+                                        lib_mode=a.lib_mode, min_uses=a.min_uses,
+                                        max_tokens=a.max_tokens)
         row = dict(cycle=c, wake_solved=len(programs), n_wake=len(wake),
                    total_bits=current.total_bits, library_bits=current.library_bits,
                    library_bits_token=library_bits(lm, lib, "token"), solved=current.solved,

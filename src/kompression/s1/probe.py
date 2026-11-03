@@ -53,8 +53,8 @@ class ProbeResult:
 
 
 def evaluate(lm, world: World, probe: list[Task], lib: Library, n: int = 4,
-             lib_mode: str = "lm", backend: str = "container") -> ProbeResult:
-    res = solve(lm, world, probe, lib, n=n, backend=backend)
+             lib_mode: str = "lm", backend: str = "container", max_tokens: int = 1024) -> ProbeResult:
+    res = solve(lm, world, probe, lib, n=n, backend=backend, max_tokens=max_tokens)
     task_bits, solved, reuse = [], 0, {}
     for t, atts in zip(probe, res, strict=True):
         ok = [a for a in atts if a.score >= 1.0 and a.bits is not None]
