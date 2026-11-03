@@ -16,7 +16,7 @@ from kompression.s1.lm import FrozenLM
 from kompression.s1.probe import evaluate, library_bits
 from kompression.s1.sleep import sleep_cycle
 from kompression.s1.solver import solve
-from kompression.s1.worlds import World
+from kompression.s1.worlds import HARD_CONFIGS, World
 
 FAMS = ("gcd", "lcm", "prime_factorization", "count_primes", "number_sorting",
         "letter_counting", "word_sorting", "power_function")
@@ -33,12 +33,13 @@ class Args:
     proposals: int = 3
     cycles: int = 1
     lib_mode: str = "lm"
+    hard: bool = False
     name: str = "cycle"
 
 
 def main(a: Args) -> None:
     run = Run("s1", a.name, a)
-    lm, world = FrozenLM(a.repo), World()
+    lm, world = FrozenLM(a.repo), World(HARD_CONFIGS if a.hard else None)
     probe = [t for f in a.families for t in world.generate(f, seed=1000, n=a.probe_per_family)]
     lib = Library()
     t0 = time.time()
