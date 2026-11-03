@@ -37,9 +37,7 @@ Zuletzt aktualisiert: 2026-11-02 (Loop-Durchgang 1)
 
 ## Wartet auf Jonas
 
-- **Richtungsentscheidung 0a (Info, kein Stopp):** L(W) ist in 0a kein tauglicher MDL-Maßstab (alle Netze ≫ 25 kbit Daten, siehe Logbuch). Ich baue die prequentielle Codelänge als primären Endpunkt ein (gehört ohnehin zu 0b). Einspruch bitte in STATUS oder im Chat.
-
-- **Hauptlauf 0a starten** (Wechsel in die Messphase), sobald Kalibrierungen ausgewertet und Protokoll ausgefüllt sind.
+- **FREIGABE HAUPTLAUF 0a** (Wechsel in die Messphase). Protokoll: `docs/protokoll_0a.md` (Version 1). Kurz: Seeds 10–19, Arme `mdl` (β = 0,1), `wd`, `wd_normproj`, `bitnet`, `none`; 40k Schritte; primärer Endpunkt prequentielle Codelänge (H1: mdl < wd); Wilcoxon + Holm; Dauer ca. 1–1,5 Tage GPU. Start mit `scripts/hauptlauf_0a.sh`, Auswertung `stages/s0a_grokking/analyse.py`. Antwort im Chat: „Hauptlauf 0a frei“.
 - Optional: Cloud-GPU für Stufe 1 (Kosten grob 50–200 €).
 
 ## Bekannte Befunde Engineering
