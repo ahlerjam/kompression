@@ -39,7 +39,7 @@ class FrozenLM:
         except TypeError:
             return self.tokenizer.apply_chat_template(msgs, add_generation_prompt=True)
 
-    max_batch: int = 8  # begrenzt den GPU-Speicher (35B + parallele Läufe: OOM bei großen Batches)
+    max_batch: int = 4  # begrenzt den GPU-Speicher (35B + parallele Läufe: OOM bei großen Batches)
 
     def generate(self, prompts: list[list[int]], max_tokens: int = 512,
                  temperature: float = 0.7) -> list[str]:
