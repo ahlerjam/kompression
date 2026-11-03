@@ -152,3 +152,9 @@ Neueste Einträge oben. Kurz: Datum, was, Ergebnis, Verweis auf `runs/…`.
 - Befund Engineering: Metal-GPU ist nicht bitgenau deterministisch (Abweichung ca. 6e-8); Tests prüfen mit Toleranz.
 - Befund Engineering: `mx.vmap` über 10 Seeds ≈ 10 × Zeit eines Seeds (4,7 vs. 47,7 Schritte/s). Kein Parallelgewinn bei diesem Modell.
 - Kalibrierungslauf `none` / `wd` gestartet.
+
+### 14:37 Hauptlauf 0a: Hpreq_wd_l3.0 fertig
+
+- `Hpreq_wd_l3.0` (Teil B): 25,7–27,3 kbit (Seeds 10–19), uniform 62,1 kbit. Knapp unter λ = 1 (26,4–28,6); das wd-Gitter ist damit vollständig.
+- Teil B läuft weiter mit `Hpreq_bitnet` (seit 14:31), danach `Hpreq_none`. Teil A: `H_wd_normproj` seit 13:35.
+- Speicher: 79 % frei, Swap 0,7 GB.
