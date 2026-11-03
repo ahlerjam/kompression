@@ -4,6 +4,8 @@ Neueste Einträge oben. Kurz: Datum, was, Ergebnis, Verweis auf `runs/…`.
 
 ## 2026-11-02
 
+- Prequential v2 `wd` (`runs/s0a_preq/20261102-183039_preq2_wd`): **43,7–44,7 kbit** (v1: 44,1–45,2) — konsistent, leicht kürzer; späte Blöcke wählen 1.000–3.000 Schritte.
+
 - **0b mit A-Init (alte Methode, 3.000 Schritte fest; `runs/s0a_preq/20261102-175608_0b_from_wd_none`): 61,7–62,1 kbit — kein Transfer**, obwohl der Smoke mit 30 Schritten/Block 35–53 kbit zeigte. Deutung: Langes Training auf kleinen Präfixen lernt auswendig und überschreibt die übertragbare Struktur; die prequentielle Codelänge hing damit stark von der fest gewählten Schrittzahl ab.
 - **Methodenänderung (vor dem Hauptlauf):** Prequential v2 mit **Self-Switch** — pro Block Wahl aus Trainingsständen {0, 30, 100, 300, 1.000, 3.000 Schritte} × Temperaturen (+ uniform), bezahlt mit log2(49) ≈ 5,6 Bit je Block; weitertrainiert wird vom Endstand (Blier & Ollivier: Early Stopping als Codewahl). Smoke p = 23: 2.076 Bit (v1: 2.100). Alle bisherigen Prequential-Werte sind v1; Kalibrierungen v2 für 0a (`preq2_*`) und 0b (`0b2_*`) neu gestartet.
 
