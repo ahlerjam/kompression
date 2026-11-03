@@ -34,6 +34,7 @@ class Args:
     cycles: int = 1
     lib_mode: str = "lm"
     hard: bool = False
+    min_uses: int = 2
     name: str = "cycle"
 
 
@@ -56,10 +57,11 @@ def main(a: Args) -> None:
         for atts in res:
             ok = [x for x in atts if x.score >= 1.0 and x.bits is not None]
             if ok:
-                programs.append(min(ok, key=lambda x: x.bits).code)
+                best_att = min(ok, key=lambda x: x.bits)
+                programs.append((best_att.task, best_att.code))
         lib, current, log = sleep_cycle(lm, world, probe, lib, programs, current,
                                         n_proposals=a.proposals, probe_samples=a.probe_samples,
-                                        lib_mode=a.lib_mode)
+                                        lib_mode=a.lib_mode, min_uses=a.min_uses)
         row = dict(cycle=c, wake_solved=len(programs), n_wake=len(wake),
                    total_bits=current.total_bits, library_bits=current.library_bits,
                    library_bits_token=library_bits(lm, lib, "token"), solved=current.solved,

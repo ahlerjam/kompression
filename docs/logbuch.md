@@ -4,6 +4,8 @@ Neueste Einträge oben. Kurz: Datum, was, Ergebnis, Verweis auf `runs/…`.
 
 ## 2026-11-02
 
+- Pilot: Schlafphase ReGAL-artig erweitert — vorgeschlagene Funktionen werden nur behalten, wenn gelöste Programme mit ihnen umgeschrieben werden und die Umschrift wieder verifiziert (≥ 2 Nutzungen); Annahme zusätzlich nur ohne Rückgang der gelösten Probe-Aufgaben. Gegen „Library Learning Doesn't“ (Einmal-Funktionen). Pilot v3 läuft noch mit der alten Schlafphase.
+
 - 0b v2 Zufallsstart (Subtraktion, `runs/s0a_preq/20261102-183039_0b2_random`): **61,2–61,4 kbit** (v1: 60,8–61,2) — Basislinie für Transfer.
 
 - Prequential v2 `wd` (`runs/s0a_preq/20261102-183039_preq2_wd`): **43,7–44,7 kbit** (v1: 44,1–45,2) — konsistent, leicht kürzer; späte Blöcke wählen 1.000–3.000 Schritte.

@@ -42,3 +42,20 @@ def test_fallback_and_sleep_accepts_only_if_total_drops():
                                 probe_samples=1, backend="subprocess")
     assert log, "Vorschlag wurde nicht bewertet"
     assert (res.total_bits < empty.total_bits) == bool(lib.functions)
+
+
+def test_verified_reuse_filter_keeps_only_reused_functions():
+    from kompression.s1.sleep import filter_by_verified_reuse
+
+    w = World()
+    tasks = w.generate("gcd", seed=5, n=2)
+
+    class RewriteLM(FakeLM):
+        def generate(self, prompts, max_tokens, temperature):
+            return [f"print(echo({t.answer!r}))\n```" for t in tasks][: len(prompts)]
+
+    fns = {"echo": "def echo(x):\n    return x", "unused": "def unused():\n    return 0"}
+    keep, uses = filter_by_verified_reuse(RewriteLM(tasks[0].answer), w,
+                                          [(t, "print(1)") for t in tasks], fns, Library(),
+                                          min_uses=2, backend="subprocess")
+    assert set(keep) == {"echo"} and uses == {"echo": 2}

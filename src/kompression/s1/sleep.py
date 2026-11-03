@@ -51,18 +51,66 @@ def propose_functions(lm, programs: list[str], lib: Library, n: int = 2,
     return out
 
 
-def sleep_cycle(lm, world, probe, lib: Library, programs: list[str], current: ProbeResult,
+REWRITE_SYSTEM = (
+    "Rewrite the given program so that it uses the library functions wherever they fit. "
+    "The rewritten program must print exactly the same output. Library functions are already "
+    "defined; do not redefine them. Reply with one ```python block."
+)
+
+
+def filter_by_verified_reuse(lm, world, solved: list[tuple], fns: dict[str, str], lib: Library,
+                             min_uses: int = 2, backend: str = "container") -> tuple[dict, dict]:
+    """ReGAL-artig: gelöste Programme mit den neuen Funktionen umschreiben, neu verifizieren
+    und nur Funktionen behalten, die in >= min_uses verifizierten Umschriften vorkommen.
+
+    solved: Liste (Task, Programm). Gibt (behaltene Funktionen, Nutzungszählung) zurück.
+    """
+    cand = lib.with_functions(fns)
+    prefill = lm.tokenizer.encode(PREFILL, add_special_tokens=False)
+    prompts = [lm.chat(REWRITE_SYSTEM,
+                       f"Library:\n```python\n{cand.source()}\n```\n\nProgram:\n```python\n{p}\n```")
+               + prefill for _, p in solved]
+    texts = lm.generate(prompts, 768, 0.2) if prompts else []
+    uses: dict[str, int] = {}
+    for (task, _), text in zip(solved, texts, strict=True):
+        code = extract_code(PREFILL + text)
+        if not code:
+            continue
+        res = execute(code, cand.source(), backend=backend)
+        if res.ok and world.verify(task, res.answer) >= 1.0:
+            for name in cand.called_in(code) & set(fns):
+                uses[name] = uses.get(name, 0) + 1
+    keep = {k: v for k, v in fns.items() if uses.get(k, 0) >= min_uses}
+    if keep and "__imports__" in fns:
+        keep["__imports__"] = fns["__imports__"]
+    return keep, uses
+
+
+def sleep_cycle(lm, world, probe, lib: Library, programs: list, current: ProbeResult,
                 n_proposals: int = 2, probe_samples: int = 4, lib_mode: str = "lm",
-                backend: str = "container"):
-    """Gibt (neue Bibliothek, ProbeResult, Protokoll) zurück; unverändert, wenn nichts L senkt."""
+                backend: str = "container", min_uses: int = 0):
+    """Gibt (neue Bibliothek, ProbeResult, Protokoll) zurück; unverändert, wenn nichts L senkt.
+
+    programs: Liste von Programmen oder von (Task, Programm). Mit min_uses > 0 und Paaren
+    werden Vorschläge erst per verifizierter Umschrift gefiltert (ReGAL-artig).
+    Annahme: L_gesamt sinkt UND die Zahl gelöster Probe-Aufgaben sinkt nicht.
+    """
     log = []
     best_lib, best = lib, current
-    for fns in propose_functions(lm, programs, lib, n=n_proposals, backend=backend):
+    pairs = [p for p in programs if isinstance(p, tuple)]
+    codes = [p[1] if isinstance(p, tuple) else p for p in programs]
+    for fns in propose_functions(lm, codes, lib, n=n_proposals, backend=backend):
+        uses = None
+        if min_uses and pairs:
+            fns, uses = filter_by_verified_reuse(lm, world, pairs, fns, lib, min_uses, backend)
+            if not [k for k in fns if k != "__imports__"]:
+                log.append({"functions": [], "verified_uses": uses, "rejected": "keine Wiederverwendung"})
+                continue
         cand = lib.with_functions(fns)
         r = evaluate(lm, world, probe, cand, n=probe_samples, lib_mode=lib_mode, backend=backend)
         log.append({"functions": sorted(k for k in fns if k != "__imports__"),
                     "total_bits": r.total_bits, "library_bits": r.library_bits,
-                    "solved": r.solved, "reuse": r.reuse})
-        if r.total_bits < best.total_bits:
+                    "solved": r.solved, "reuse": r.reuse, "verified_uses": uses})
+        if r.total_bits < best.total_bits and r.solved >= best.solved:
             best_lib, best = cand, r
     return best_lib, best, log
