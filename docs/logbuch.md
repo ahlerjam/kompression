@@ -4,6 +4,8 @@ Neueste Einträge oben. Kurz: Datum, was, Ergebnis, Verweis auf `runs/…`.
 
 ## 2026-11-02
 
+- 0b-Kalibrierung, Bedingung **Zufallsstart** (Lerner `wd`, Aufgabe B = Subtraktion, Seeds 0–2, `runs/s0a_preq/20261102-172701_0b_random`): **60,8–61,2 kbit** (uniform 62,1). Auffällig: deutlich schlechter als `wd` auf Addition (44–45 kbit, andere Seeds) → Subtraktion ist für diesen Lerner bei 3.000 Schritten/Block schwerer; der letzte Block kostet noch 5,6–5,9 Bit/Label. Vergleichsbedingungen (A-Init, Norm-skaliert, permutiert) laufen.
+
 - Bench Qwen3.6-35B-A3B-4bit auf schweren Familien (3 × 4, `runs/s1/*_bench_hard_35b`): maze 0,83 · shortest_path 1,00 · largest_island 0,92 · graph_color 0,83 · course_schedule 1,00 · mini_sudoku 0,67 · n_queens 0,25 · spiral_matrix 1,00 · game_of_life 0,83 · knights_knaves 0,67 · word_ladder 0,00 · jugs 0,01. Deutlich besser als 4B bei ähnlicher Laufzeit (≈ 50–220 s je Familie, geteilte GPU, ≈ 20 GB). Verifizierte Lösungen 11–101 Bit. **Entscheidung: 35B-A3B wird Pilotmodell** (wie E2 vorgesehen). Folge: Aufgaben über Reasoning-Gym-Schwierigkeitsparameter schwerer machen, damit sie im Bereich „teilweise lösbar“ liegen.
 
 - Prequential `bitnet` (`runs/s0a_preq/20261102-164821_preq_bitnet`): **55,7–56,2 kbit** (uniform 62,1; `wd` 44,1–45,2). Letzter Block 1,7–1,9 Bit/Label.
