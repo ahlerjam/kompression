@@ -49,6 +49,7 @@ class Args:
     lr: float = 1e-3
     mdl_beta: float = 0.1
     penalty_n_min: int = 0  # mdl: Strafterm durch max(Präfixgröße, penalty_n_min) teilen
+    beta_warmup: int = 2000  # mdl: beta linear über die ersten Schritte hochfahren (wie im Training)
     subspace_rank: int = 64
     op: Literal["add", "sub", "mul"] = "add"
     init_from: str = ""
@@ -140,7 +141,8 @@ def main(a: Args) -> None:
                 break
             t += 1
             noise = arm.noise_like(tr) if arm.needs_noise else noise_dummy
-            tr, m, v, _, _ = vstep(tr, const, m, v, mx.array(float(t)), mx.array(a.mdl_beta),
+            beta_t = a.mdl_beta * min(1.0, t / a.beta_warmup) if a.beta_warmup else a.mdl_beta
+            tr, m, v, _, _ = vstep(tr, const, m, v, mx.array(float(t)), mx.array(beta_t),
                                    noise, X[:, :start], Y[:, :start])
             if t % 50 == 0:  # Graph regelmäßig auswerten (sonst Metal-Pufferlimit, v. a. bei mdl)
                 mx.eval(tr, m, v)

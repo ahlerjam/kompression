@@ -4,6 +4,8 @@ Neueste Einträge oben. Kurz: Datum, was, Ergebnis, Verweis auf `runs/…`.
 
 ## 2026-11-02
 
+- Prequential `mdl` mit Normierung ≥ 3.764, S = 3.000 (`runs/s0a_preq/20261102-220035_preq3_mdl_n3764_s3000`): **weiter 62,14 kbit = uniform**. Unterschied zum erfolgreichen Training: dort β-Warmup über 2.000 Schritte, hier voller Druck ab Schritt 1 → sofortiger Prior-Kollaps. Warmup in `prequential.py` ergänzt (`--beta-warmup`, global über alle Schritte); neu gestartet mit S = 3.000/1.000/300 (`preq4_mdl_wu_*`).
+
 - 0b-Kalibrierung komplett (S = 30/100/300/3.000): Transfer nimmt mit S monoton ab; permutierte Kontrolle in jeder Variante ≈ uniform. Minimum über S je Bedingung: Ersparnis A-Init gegenüber Zufall 26,4 / 7,6 / 11,0 kbit (Seeds 0/1/2). Protokoll 0b Version 1 entworfen (`docs/protokoll_0b.md`), inkl. H4: übertragen MDL-komprimierte A-Lösungen besser?
 
 - **0b mit S = 30 Schritten je Block** (Subtraktion, Lerner `wd`, A = `kalib_wd`-Gewichte, Seeds 0–2): Zufall **62,13 kbit** · **A-Init 35,0 / 53,7 / 43,8 kbit** · A-permutiert **62,13 kbit** (`runs/s0a_preq/*_0b3_*_s30`). **Beobachtung (Kalibrierung, 3 Seeds, kein Befund):** Transfer ist in Bit messbar, 8–27 kbit Ersparnis (14–44 %); die permutierte Kontrolle (gleiche Werte, zerstörte Struktur) spart nichts → übertragen wird Struktur, nicht Statistik. Bestätigt die Methodik „S als globaler Hyperparameter“: bei S = 3.000 verschwindet der Effekt. S = 100/300 laufen.
