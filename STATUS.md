@@ -19,7 +19,7 @@
 
    MDL findet die mit Abstand kürzesten Gewichte und ist auf großen Datenmengen doppelt so präzise — **lernt aber später** (ab ≈ 4.096 statt ≈ 2.048 Beispielen) und verliert deshalb in der Gesamtsumme. Die primäre Hypothese H1 („mdl codiert die Daten kürzer als wd“) würde nach dieser Kalibrierung eher scheitern.
 
-**Entscheidung (2026-11-03, von Jonas an Claude delegiert, datenbasiert):** Option B — jeder Arm bekommt ein bezahltes Hyperparameter-Gitter (mdl β ∈ {0,03; 0,1; 0,3}, wd λ ∈ {0,3; 1; 3}), Neustart je Block, primär H1 (mdl < wd) und H4 (bitnet < wd) mit Holm; „Präzision bei viel Daten“ als sekundärer Endpunkt. **Hauptlauf 0a gestartet** (tmux `H-A`, `H-B`; ca. 1,5 Tage).
+**Entscheidung (2026-11-03, von Jonas an Claude delegiert, datenbasiert):** Option B — jeder Arm bekommt ein bezahltes Hyperparameter-Gitter (mdl β ∈ {0,03; 0,1; 0,3}, wd λ ∈ {0,3; 1; 3}), Neustart je Block, primär H1 (mdl < wd) und H4 (bitnet < wd) mit Holm; „Präzision bei viel Daten“ als sekundärer Endpunkt. **Hauptlauf 0a gestartet** 2026-11-03 02:37 (tmux `H-A`, `H-B`). Tempo bei geteilter GPU: `H_mdl` ca. 4.000 Schritte/h → Teil A eher 2–2,5 Tage; Ende voraussichtlich 05.11.
 
 **Stufe 1:** Kampagnen (Kompression vs. Learnability vs. Zufall) laufen; erste Bibliothek wurde in einer Learnability-Kampagne angenommen. Ergebnisse folgen.
 
