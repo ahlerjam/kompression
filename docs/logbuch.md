@@ -4,6 +4,7 @@ Neueste Einträge oben. Kurz: Datum, was, Ergebnis, Verweis auf `runs/…`.
 
 ## 2026-11-03
 
+- 05:37 Hauptlauf 0a, Teil B: `runs/s0a_preq/20261103-023705_Hpreq_mdl_b0.03` fertig (ein Gitterpunkt, kein Befund für sich): Seeds 10–19 = 51,9–54,2 kbit (uniform 62,1), wie Kalibrierung (52–54). `Hpreq_mdl_b0.1` läuft seit 05:10. Teil A: `H_mdl` bei Schritt 17.600/40.000. Speicher 69 % frei, Swap 1,3 GB.
 - 04:20 Speicher kritisch (Swap 19,6 von 20,5 GB belegt; Claude Code beendete einen Wächter wegen Speichermangel). Hauptlauf unversehrt (`H_mdl` Schritt 8.300, `Hpreq_mdl_b0.03` Block 2.048). Zum Schutz des Hauptlaufs Stufe-1-Kampagnen (`s1-amort`, 35B-Modell ≈ 20 GB) pausiert; `KA_learnability_s1` unvollständig, umbenannt in `abgebrochen_KA_learnability_s1_speicher`. Fortsetzung nach dem Hauptlauf.
 
 - Kalibrierung `none` mit Neustart (`runs/s0a_preq/20261103-025209_preq6_none_restart_s3000`): **55,2 / 55,7 / 58,3 kbit** (mit Warmstart: 62,1 = uniform). Auch ohne Regularisierung lernt das Modell bei frischem Start auf großen Präfixen etwas Übertragbares. Kalibrierung mit Neustart damit komplett: bitnet 26,7–26,8 · wd 26,7–27,6 · mdl β 0,1 29,5–29,6 · β 0,3 30,2–36,2 · β 0,03 52,0–53,9 · none 55,2–58,3 kbit.
