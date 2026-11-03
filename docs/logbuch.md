@@ -4,6 +4,9 @@ Neueste Einträge oben. Kurz: Datum, was, Ergebnis, Verweis auf `runs/…`.
 
 ## 2026-11-02
 
+- Prequential `bitnet` (`runs/s0a_preq/20261102-164821_preq_bitnet`): **55,7–56,2 kbit** (uniform 62,1; `wd` 44,1–45,2). Letzter Block 1,7–1,9 Bit/Label.
+- Prequential `mdl` stürzte ab: `metal::malloc Resource limit (499000) exceeded` — der Rechengraph wurde nur am Blockende ausgewertet (bis 3.000 Schritte lazy). Behoben: `mx.eval` alle 50 Schritte. Neu gestartet mit β = 0,1. (Der erste Versuch mit β = 0,01 war aus demselben Grund still abgestürzt.)
+
 - Kalibrierung `mdl` β = 1 (`runs/s0a/20261102-161857_kalib_mdl_b1.0`): **lernt nicht** (Train 1,2–1,4 %, Test ≈ 0,9 %), KL ≈ 17 kbit, L(W) 7,3–7,8 kbit — Kollaps auf den Prior, wie von echtem MDL bei 24,8 kbit Trainingsdaten vorhergesagt. MDL-Kalibrierung komplett: β 0,001/0,01 lernen auswendig, **β = 0,1 groked stabil**, β = 1 lernt nichts → Hauptarm `mdl` mit β = 0,1.
 - Prequential `mdl` lief versehentlich mit Standard-β 0,01 → abgebrochen, Standard auf 0,1 gesetzt, neu gestartet (danach `bitnet`).
 

@@ -129,6 +129,8 @@ def main(a: Args) -> None:
             noise = arm.noise_like(tr) if arm.needs_noise else noise_dummy
             tr, m, v, _, _ = vstep(tr, const, m, v, mx.array(float(t)), mx.array(a.mdl_beta),
                                    noise, X[:, :start], Y[:, :start])
+            if t % 50 == 0:  # Graph regelmäßig auswerten (sonst Metal-Pufferlimit, v. a. bei mdl)
+                mx.eval(tr, m, v)
         lp = vlogp(tr, const, X[:, start:end], Y[:, start:end])
         mx.eval(lp)
         lp = np.array(lp, dtype=np.float64)  # [S, len(temps), block]
