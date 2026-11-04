@@ -70,7 +70,9 @@ class Args:
     init_from: str = ""
     init_control: Literal["none", "scaled", "permuted"] = "none"
     name: str = ""
-    post: Literal["none", "wd", "free", "mdl", "bitnet", "prune"] = "none"  # free: ohne Regularisierung
+    # free: ohne Regularisierung; mdl_norm: Norm-Zwilling (mdl-Schlaf intern, dann nur die
+    # Wachgewichte je Tensor auf die Norm des mdl-Ergebnisses skalieren; nur mit --cycles)
+    post: Literal["none", "wd", "free", "mdl", "mdl_norm", "bitnet", "prune"] = "none"
     post_steps: int = 1000
     post_weight_decay: float = 1.0  # für post wd und prune (Nachtraining mit Weight Decay)
     post_mdl_beta: float = 0.1
@@ -80,6 +82,12 @@ class Args:
     post_mdl_lr_mult: float = 1.0  # Schlaf/Post mdl: Lernrate von rho und Prior × mult
     post_mdl_init_log_sigma: float = -6.0
     post_mdl_snap: bool = False  # Zyklus: nach mdl-Schlaf Gewichte auf Prior-Zentren setzen
+
+
+def _tnorm(x: mx.array) -> mx.array:
+    """Frobenius-Norm je Seed (Achse 0), in die Form von x broadcastbar."""
+    n = mx.sqrt((x * x).reshape(x.shape[0], -1).sum(axis=1))
+    return n.reshape((x.shape[0],) + (1,) * (x.ndim - 1))
 
 
 def load_inits(run_dir: str, seeds, random_inits, control: str):
@@ -150,10 +158,13 @@ def main(a: Args) -> None:
         post_ckpts = tuple(c for c in (30, 100, 300, 1000, 3000) if c < a.post_steps)
         post_ckpts = (*post_ckpts, a.post_steps)
         labels += [f"p{c}" for c in post_ckpts]
-        arm2 = make_arm("none" if a.post == "free" else a.post, prune_frac=a.prune_frac,
+        post_arm = {"free": "none", "mdl_norm": "mdl"}.get(a.post, a.post)
+        if a.post == "mdl_norm" and not a.cycles:
+            raise ValueError("--post mdl_norm nur mit --cycles")
+        arm2 = make_arm(post_arm, prune_frac=a.prune_frac,
                         mdl_init_log_sigma=a.post_mdl_init_log_sigma)
         cfg2 = dataclasses.replace(
-            cfg, arm=a.post, mdl_beta=a.post_mdl_beta, mdl_aux_lr_mult=a.post_mdl_lr_mult,
+            cfg, arm=post_arm, mdl_beta=a.post_mdl_beta, mdl_aux_lr_mult=a.post_mdl_lr_mult,
             weight_decay=a.post_weight_decay if a.post in ("wd", "prune") else 0.0)
     early = tuple(c for c in (30, 100, 300) if c < a.steps_per_block)
     if a.cycles:
@@ -217,7 +228,11 @@ def main(a: Args) -> None:
                                             mx.array(beta2), noise, xs, ys)
                 if t2 % 50 == 0:
                     mx.eval(tr2, m2, v2)
-            if a.post == "mdl" and a.post_mdl_snap:  # Kompression in die Gewichte übernehmen
+            if a.post == "mdl_norm":  # Norm-Zwilling: nur die Normen des mdl-Ergebnisses übernehmen
+                wm = vdet2(tr2, const2)
+                w = tree_map(lambda wa, wb: wa * (_tnorm(wb) / (_tnorm(wa) + 1e-12)), w, wm)
+                out.append(ev(vlogp, w, c1))
+            elif a.post == "mdl" and a.post_mdl_snap:  # Kompression in die Gewichte übernehmen
                 w = mx.vmap(arm2.snap)(tr2)
                 out.append(ev(vlogp, w, c1))
             else:

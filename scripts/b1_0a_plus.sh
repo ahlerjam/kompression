@@ -18,6 +18,7 @@ case "$1" in
   CAL2)
     P --seeds $SE --post mdl --post-mdl-beta 0.3 --name kalZ_mdl_b0.3
     P --seeds $SE --post wd --post-weight-decay 10 --name kalZ_wd_l10
+    P --seeds $SE --post mdl_norm --post-mdl-beta 0.3 --name kalZ_mdlnorm_b0.3
     P --seeds $SE --post bitnet --name kalZ_bitnet ;;
   *) echo "Hauptlauf erst nach Einfrieren; Befehle kommen dann hierher"; exit 1 ;;
 esac

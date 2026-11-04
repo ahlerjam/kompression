@@ -4,6 +4,12 @@ Neueste Einträge oben. Kurz: Datum, was, Ergebnis, Verweis auf `runs/…`.
 
 ## 2026-11-04
 
+### 12:55 Prüfstand: mdl-Schlaf ist überwiegend Norm-Effekt, kleiner Rest echt (Sichtung, kein Befund)
+
+Jonas: Training/Architektur gezielt verbessern ist Claudes Aufgabe; vor großen Läufen immer Testdurchläufe. Neu: `stages/s0a_grokking/eng_bench.py` (Prüfstand, eigene Seeds 200–202, ein MLX-Prozess) und Schlaf `mdl_norm` (Norm-Zwilling: mdl-Schlaf intern, dann nur die Wachgewichte je Tensor auf die Normen des mdl-Ergebnisses skalieren). Architektur mit fester Gewichtsnorm verworfen (mdl könnte Rohgewichte folgenlos schrumpfen).
+Satz `norm`, p = 23, 4 × (250 + 100), Mittel Bit (uniform 2.393; `runs/bench_norm_p23.json`): wd 2.120 · free 2.213 · bitnet 2.023 · **wd λ 10 1.317** · mdl-Norm-Zwilling 1.532 · **mdl β 0,3 1.218** (3/3 Seeds besser als wd λ 10).
+Deutung: Den Großteil holt kräftiges Schrumpfen (λ = 1 war für diesen Aufbau zu schwach); mdl hat einen kleinen Rest über Norm hinaus. Folge für 0a+: Norm-Kontrollen (wd λ 10, Norm-Zwilling) sind Pflicht im Hauptlauf; H1 „mdl < wd“ allein wäre irreführend. Kalibrier-Strang 2 neu: mdl β 0,3, wd λ 10, mdl_norm β 0,3, bitnet (Strang 1 läuft weiter: wd fertig in 30 min, mdl β 0,1, free, prune 0,9).
+
 ### 12:25 Drei Prüf-Agenten (Neuheit Stufe 1, Neuheit Gewichtsseite, Engineering); mdl-Schlaf repariert, Kalibrierung neu
 
 Auftrag Jonas: Neuheit recherchieren, Ansatz verbessern, „next big thing“ suchen. Ergebnisse in `docs/recherche.md` (Abschnitt 2026-11-04). Wichtigste Punkte, selbst nachgeprüft:
