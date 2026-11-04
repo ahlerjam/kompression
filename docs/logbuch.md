@@ -4,6 +4,7 @@ Neueste Einträge oben. Kurz: Datum, was, Ergebnis, Verweis auf `runs/…`.
 
 ## 2026-11-03
 
+- 09:14 (04.11.) 0b mul: A(wd) komplett, Rohwert S 3.000 28,2–45,7 kbit (random bestes S 26,2–28,7) → Transfer auf Multiplikation sieht schwach/negativ aus (kein Befund, Test nach Abschluss). Swap erreichte bei S 3.000 6,5 GB, danach wieder 53 % frei. A(mdl) S 3.000 läuft, danach wd_permuted und bitnet.
 - 07:10 (04.11.) 0b mul: `random` und `wd_scaled` komplett. Rohwerte S 3.000 (kein Befund): random 26,2–28,7, wd_scaled 41,0–44,3 kbit. Es laufen A(wd) und A(mdl).
 - 07:00 (04.11.) Entwurf `docs/entwurf_0a_plus.md` (Switch-Code, β mit Datenmenge, Skalierung) als Grundlage für die Entscheidung mit Jonas. 0b mul: S 3.000 von random/wd_scaled läuft.
 - 06:00 (04.11.) TRC-Antrag v2 vorformuliert (0a + 0b-Subtraktion). 0b mul Rohwerte (kein Befund): random S 1.000 52,1–57,6, wd_scaled S 1.000 41,5–45,6 kbit — bei Multiplikation spart die Norm-Kontrolle etwas, anders als bei Subtraktion. S 3.000 läuft.
