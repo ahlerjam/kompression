@@ -6,7 +6,7 @@
 
 **Ziel danach:** Bewerbung bei Google TPU Research Cloud (nur eine Einreichung pro Person → erst mit Ergebnissen aus 0a/0b). Claude meldet sich bei Jonas, sobald es so weit ist, mit fertigem Antragstext.
 
-**Fortschritt Hauptlauf 0a (17:36):** **Teil B komplett** (mdl-, wd-Gitter, bitnet, none). Teil A fertig: `H_mdl`, `H_wd`; läuft: `H_wd_normproj` (Ende ca. 18:00), `H_none` (tmux `H-B2`, seit 17:36); wartend: `H_bitnet` (tmux `H-A2`, startet nach `H_wd_normproj`). Erwartetes Ende 0a: ca. 22–23 Uhr, dann Auswertung.
+**Fortschritt Hauptlauf 0a (17:57):** **Teil B komplett.** Teil A fertig: `H_mdl`, `H_wd`, `H_wd_normproj`; läuft: `H_bitnet` (tmux `H-A2`), `H_none` (tmux `H-B2`). Erwartetes Ende 0a: ca. 22–23 Uhr, dann Auswertung.
 
 ## Morgen-Zusammenfassung für Jonas (Stand 2026-11-03, 00:35)
 

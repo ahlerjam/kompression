@@ -4,6 +4,7 @@ Neueste Einträge oben. Kurz: Datum, was, Ergebnis, Verweis auf `runs/…`.
 
 ## 2026-11-03
 
+- 17:57 Hauptlauf 0a, Teil A: `H_wd_normproj` fertig (ein Arm, kein Befund für sich): erster Schritt ≥ 0,99 bei 5.100–6.300 (`H_mdl` 4.300–9.600, `H_wd` 2.200–2.800); finale Test-Accuracy 0,981–1,0; L(W) 712–997 kbit (`H_mdl` 78–494, `H_wd` 712–2.308). `H_bitnet` (tmux `H-A2`) automatisch gestartet, `H_none` (`H-B2`) läuft. Zwei MLX-Prozesse, Speicher 71 % frei.
 - 17:36 Hauptlauf 0a, Teil B **komplett**: `runs/s0a_preq/20261103-160502_Hpreq_none` fertig: 54,1–60,8 kbit (uniform 62,1; Untergrenze). Strang B frei → Umverteilung Teil A (Regel aus dem Loop-Auftrag): Skript `hauptlauf_0a.sh A` (zsh, PID 34760) beendet, der laufende `H_wd_normproj` läuft als eigener Prozess zu Ende (Schritt 36.900). Neue tmux-Stränge mit identischen Befehlen aus `scripts/hauptlauf_0a.sh`: `H-A2` wartet auf `H_wd_normproj` und startet dann `H_bitnet`; `H-B2` startet sofort `H_none`. Höchstens zwei MLX-Prozesse.
 - 16:36 Hauptlauf 0a, Teil B: `runs/s0a_preq/20261103-143133_Hpreq_bitnet` fertig (ein Arm, kein Befund für sich): 26,7–27,4 kbit (Seeds 10–19), uniform 62,1. `Hpreq_none` läuft seit 16:05 (letzter Lauf in Teil B). Teil A: `H_wd_normproj` bei Schritt 28.200. Speicher 69 % frei.
 - 14:37 Hauptlauf 0a, Teil B: `runs/s0a_preq/20261103-130256_Hpreq_wd_l3.0` fertig (Gitterpunkt, kein Befund für sich): 25,7–27,3 kbit (λ = 1: 26,4–28,6); wd-Gitter damit komplett. `Hpreq_bitnet` läuft seit 14:31, danach `Hpreq_none`. Teil A: `H_wd_normproj` seit 13:35. Speicher 79 % frei, Swap 0,7 GB.
