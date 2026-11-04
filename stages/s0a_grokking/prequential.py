@@ -70,13 +70,16 @@ class Args:
     init_from: str = ""
     init_control: Literal["none", "scaled", "permuted"] = "none"
     name: str = ""
-    post: Literal["none", "wd", "mdl", "bitnet", "prune"] = "none"
+    post: Literal["none", "wd", "free", "mdl", "bitnet", "prune"] = "none"  # free: ohne Regularisierung
     post_steps: int = 1000
     post_weight_decay: float = 1.0  # für post wd und prune (Nachtraining mit Weight Decay)
     post_mdl_beta: float = 0.1
     post_beta_warmup: int = 0
     prune_frac: float = 0.9
     cycles: int = 0  # > 0: Wach-Schlaf-Zyklen je Block (siehe Docstring)
+    post_mdl_lr_mult: float = 1.0  # Schlaf/Post mdl: Lernrate von rho und Prior × mult
+    post_mdl_init_log_sigma: float = -6.0
+    post_mdl_snap: bool = False  # Zyklus: nach mdl-Schlaf Gewichte auf Prior-Zentren setzen
 
 
 def load_inits(run_dir: str, seeds, random_inits, control: str):
@@ -147,9 +150,10 @@ def main(a: Args) -> None:
         post_ckpts = tuple(c for c in (30, 100, 300, 1000, 3000) if c < a.post_steps)
         post_ckpts = (*post_ckpts, a.post_steps)
         labels += [f"p{c}" for c in post_ckpts]
-        arm2 = make_arm(a.post, prune_frac=a.prune_frac)
+        arm2 = make_arm("none" if a.post == "free" else a.post, prune_frac=a.prune_frac,
+                        mdl_init_log_sigma=a.post_mdl_init_log_sigma)
         cfg2 = dataclasses.replace(
-            cfg, arm=a.post, mdl_beta=a.post_mdl_beta,
+            cfg, arm=a.post, mdl_beta=a.post_mdl_beta, mdl_aux_lr_mult=a.post_mdl_lr_mult,
             weight_decay=a.post_weight_decay if a.post in ("wd", "prune") else 0.0)
     early = tuple(c for c in (30, 100, 300) if c < a.steps_per_block)
     if a.cycles:
@@ -187,6 +191,7 @@ def main(a: Args) -> None:
             mx.eval(lp_c)
             return np.array(lp_c, dtype=np.float64)
 
+        mx.random.seed(start)  # mdl-Rauschen reproduzierbar und über Bedingungen gepaart
         w = stack_trees([q[0] for q in pairs])
         c1 = stack_trees([q[1] for q in pairs])
         out = [ev(vlogp, w, c1)]
@@ -212,8 +217,12 @@ def main(a: Args) -> None:
                                             mx.array(beta2), noise, xs, ys)
                 if t2 % 50 == 0:
                     mx.eval(tr2, m2, v2)
-            out.append(ev(vlogp2, tr2, const2))
-            w = vdet2(tr2, const2)  # nächste Wachphase startet vom komprimierten Stand
+            if a.post == "mdl" and a.post_mdl_snap:  # Kompression in die Gewichte übernehmen
+                w = mx.vmap(arm2.snap)(tr2)
+                out.append(ev(vlogp, w, c1))
+            else:
+                out.append(ev(vlogp2, tr2, const2))
+                w = vdet2(tr2, const2)  # nächste Wachphase startet vom komprimierten Stand
         return out
 
     bounds = doubling_blocks(n, a.first_block)

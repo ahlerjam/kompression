@@ -43,6 +43,7 @@ class TrainConfig:
     mdl_beta: float = 1.0
     beta_warmup: int = 0
     mdl_k: int = 16
+    mdl_aux_lr_mult: float = 1.0  # mdl: Lernrate von rho und Prior relativ zu lr (1 = wie bisher)
     subspace_rank: int = 16
     norm_target_run: str = ""  # Run-Ordner, dessen Normtrajektorie erzwungen wird (E10)
     tags: tuple[str, ...] = field(default_factory=tuple)
@@ -98,7 +99,16 @@ def build_fns(cfg: TrainConfig, arm: Arm, n_train: int):
             p = p - cfg.lr * cfg.weight_decay * p  # entkoppelter Weight Decay (AdamW)
             return p - cfg.lr * (m_ / c1) / (mx.sqrt(v_ / c2) + cfg.eps)
 
-        tr = tree_map(upd, tr, m, v)
+        def upd_aux(p, m_, v_):  # rho/Prior mit eigener Lernrate (nur mdl, nur wenn mult != 1)
+            lr_ = cfg.lr * cfg.mdl_aux_lr_mult
+            return p - lr_ * (m_ / c1) / (mx.sqrt(v_ / c2) + cfg.eps)
+
+        if arm.name == "mdl" and cfg.mdl_aux_lr_mult != 1.0:
+            tr = {"mu": tree_map(upd, tr["mu"], m["mu"], v["mu"]),
+                  "rho": tree_map(upd_aux, tr["rho"], m["rho"], v["rho"]),
+                  "prior": tree_map(upd_aux, tr["prior"], m["prior"], v["prior"])}
+        else:
+            tr = tree_map(upd, tr, m, v)
         return tr, m, v, nll, pen
 
     def evaluate(tr, const, x, y):

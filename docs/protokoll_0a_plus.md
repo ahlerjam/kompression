@@ -20,11 +20,15 @@ Version 2 ersetzt Version 1 (reines Nachtraining als Zweig, ohne Rückkopplung).
   - `mdl` (unser Verfahren), β aus Kalibrierung, Warmup 50 Schritte je Schlaf
   - `bitnet` (ternäres quantisierungsbewusstes Training, Standard)
   - `prune` (Magnitude-Pruning je Matrix, Maske je Schlaf neu, Nachtraining unter wd; Wachphase darf nachwachsen), Anteil aus Kalibrierung
+  - `free` (Kontrolle: Schlaf ohne jede Regularisierung; trennt „mdl hilft“ von „im Schlaf fehlt Weight Decay“)
+  - `wd` mit λ = 10 (Norm-Kontrolle: starkes Schrumpfen ohne Codelängen-Ziel; trennt Kompression von reinem Norm-Effekt)
 - Code: `prequential.py --cycles 4 --post X` (neue Option; `--cycles 0` bitgenau wie vorher geprüft), Start `scripts/b1_0a_plus.sh`.
 
 ## Kalibrierung (Seeds 100–102, kein Befund)
 
-mdl β ∈ {0,03; 0,1}, prune Anteil ∈ {0,5; 0,9}; je ein Wert wird für den Hauptlauf festgelegt (kleinste mittlere Codelänge). [[Ergebnis eintragen]]
+mdl β ∈ {0,1; 0,3} (Einstellungen wie Arm `mdl` in 0a: log σ₀ = −6, gleiche Lernrate für alle Parameter), Schlaf `free`, `wd` λ = 10, prune 0,9, bitnet, wd. β wird für den Hauptlauf festgelegt (kleinste mittlere Codelänge); welche Kontrollen in den Hauptlauf gehen, wird vor dem Einfrieren festgelegt. [[Ergebnis eintragen]]
+
+Hinweis aus der Code-Prüfung (Logbuch 13:40): Mit lr 1e-3 bewegen sich log σ und Prior in 250 Schritten kaum; der mdl-Schlaf wirkt dann vor allem über den Zug des Priors auf die Mittelwerte (große Gewichte werden nach [−0,3; 0,3] gezogen). Eine „reparierte“ Variante (Lernrate ×30 für σ/Prior, log σ₀ = −3, Snapping auf Prior-Zentren) ist als Option vorhanden (`--post-mdl-lr-mult`, `--post-mdl-init-log-sigma`, `--post-mdl-snap`), war im Probelauf (p = 23) aber kaum besser als wd.
 
 ## Hypothesen (Hauptlauf, Seeds 20–29, gepaart)
 

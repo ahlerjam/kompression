@@ -190,6 +190,22 @@ class VariationalMDL(Arm):
         comp = log_pi - 0.5 * z * z - log_s - 0.5 * LOG_2PI
         return mx.logsumexp(comp, axis=-1)
 
+    def snap(self, tr) -> dict:
+        """Soft Weight-Sharing-Abschluss (Ullrich et al. 2017): jedes Matrix-Gewicht auf das Mittel
+        der Prior-Komponente mit größter Verantwortlichkeit setzen. 1D-Parameter bleiben."""
+        means = mx.concatenate([mx.zeros((1,)), tr["prior"]["mean"]])
+        log_s = mx.maximum(tr["prior"]["log_s"], self.min_log_s)
+        log_pi = tr["prior"]["logit_pi"] - mx.logsumexp(tr["prior"]["logit_pi"])
+
+        def one(w):
+            if w.ndim != 2:
+                return w
+            z = (w[..., None] - means) / mx.exp(log_s)
+            k = mx.argmax(log_pi - 0.5 * z * z - log_s, axis=-1)
+            return means[k]
+
+        return tree_map(one, tr["mu"])
+
     def penalty(self, tr, const, noise):
         total = mx.array(0.0)
         leaves = zip(
@@ -202,7 +218,8 @@ class VariationalMDL(Arm):
         return total
 
 
-def make_arm(name: str, subspace_rank: int = 16, mdl_k: int = 16, prune_frac: float = 0.9) -> Arm:
+def make_arm(name: str, subspace_rank: int = 16, mdl_k: int = 16, prune_frac: float = 0.9,
+             mdl_init_log_sigma: float = -6.0) -> Arm:
     if name == "prune":
         return Pruned(prune_frac)
     if name in ("none", "wd"):
@@ -212,5 +229,5 @@ def make_arm(name: str, subspace_rank: int = 16, mdl_k: int = 16, prune_frac: fl
     if name == "subspace":
         return Subspace(subspace_rank)
     if name == "mdl":
-        return VariationalMDL(k=mdl_k)
+        return VariationalMDL(k=mdl_k, init_log_sigma=mdl_init_log_sigma)
     raise ValueError(f"unbekannter Arm: {name}")

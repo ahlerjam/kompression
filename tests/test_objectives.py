@@ -60,3 +60,15 @@ def test_pruned_masks_fraction_and_keeps_1d():
     one_d = [k for k, v in p0.items() if hasattr(v, "ndim") and v.ndim == 1]
     for k in one_d:
         np.testing.assert_allclose(np.array(eff[k]), np.array(p0[k]))
+
+
+def test_mdl_snap_uses_prior_means():
+    p0 = init_params(CFG, 0)
+    arm = VariationalMDL(k=4)
+    tr, _ = arm.init(p0, 0)
+    snapped = arm.snap(tr)
+    means = np.concatenate([[0.0], np.array(tr["prior"]["mean"])]).astype(np.float32)
+    assert np.isin(np.unique(np.array(snapped["unemb"])), means).all()
+    one_d = [k for k, v in p0.items() if hasattr(v, "ndim") and v.ndim == 1]
+    for k in one_d:
+        np.testing.assert_allclose(np.array(snapped[k]), np.array(p0[k]))
