@@ -4,6 +4,7 @@ Neueste Einträge oben. Kurz: Datum, was, Ergebnis, Verweis auf `runs/…`.
 
 ## 2026-11-03
 
+- 00:37 (04.11.) Hauptlauf 0b sub: `random` und `wd_scaled` komplett (S 30–3.000). Rohwerte (kein Befund): `random` S 3.000 = 28,5–32,1 kbit (Zufallsstart lernt Subtraktion bei S 3.000 selbst, starke Baseline), `wd_scaled` S 3.000 = 54,0–54,6. Erste A(wd)-Werte: S 30 = 43,6–62,1. Speicher nach Laufende wieder 79 % frei, Swap 1,2 GB → Speicherspitze kam von den S-3.000-Läufen.
 - 00:26 (04.11.) Hauptlauf 0b: S 3.000 von `random`/`wd_scaled` (sub) im letzten Block. Speicher knapp: je Prozess 24 GB, 25 % frei, Swap 4 GB belegt; System läuft weiter, beobachten. Wenn es bei den folgenden S-3.000-Läufen eng wird: Ursache prüfen (wachsender Präfix-Batch), kein Codeeingriff in der Messphase.
 - 23:26 Hauptlauf 0b läuft stabil (Speicher 75 % frei). Fertig für sub: `random` und `wd_scaled` S 30–1.000 (Rohwerte, kein Befund: random 55,0–62,1 kbit, wd_scaled 54,6–62,1 kbit; uniform 62,1). S 3.000 läuft seit 23:08; Schätzung ca. 2,3 h je Bedingung, beide Stränge zusammen ca. 14 h.
 - 22:25 **Hauptlauf 0a abgeschlossen und ausgewertet** (`H_bitnet` fertig; analyse.py ohne Warnung). Ergebnis unverändert in `docs/ergebnis_0a.md`: **H1 negativ** (mdl 32,5 vs. wd 26,5 kbit, wd signifikant besser), **H4 negativ** (bitnet 27,1 vs. wd 26,5 kbit, knapp, signifikant). Sekundär bestätigt: H3 (mdl kürzeste Gewichte, 143 vs. 1.288 / 813 kbit), H2b (mdl stabiler als normgleiche Kontrolle), H5 bitnet (letzte Blöcke 137 vs. 8.599 Bit). Gate 0a: dokumentierter Negativbefund.
