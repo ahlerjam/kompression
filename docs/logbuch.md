@@ -2,6 +2,39 @@
 
 Neueste Einträge oben. Kurz: Datum, was, Ergebnis, Verweis auf `runs/…`.
 
+## 2026-11-04
+
+### 11:05 0a+ Teil A: Switch-Code-Nachrechnung (EXPLORATIV, nicht vorab registriert)
+
+Neues Skript `stages/s0a_grokking/explor_switch.py` (keine GPU, liest nur `metrics.jsonl` der Hauptläufe; Gegenprobe gegen `results.json` je Seed bestanden). Fixed-Share-Mischung auf Blockebene über „Experten“ (Läufe), α aus {0; 0,01; 0,05; 0,125; 0,25}, bezahlt mit log2 5 Bit. Gültiger Code, weil jeder Experte jeden Block prequentiell codiert. Ausgaben: `runs/explor_switch_add.txt`, `runs/explor_switch_sub.txt`. Mittel über Seeds 10–19, kbit:
+
+| 0a Addition | Switch | Referenz |
+|---|---|---|
+| nur wd-Gitter (λ 0,3/1/3) | 18,40 | wd eingefroren 26,53 |
+| wd + mdl | 18,21 | Switch(wd) 18,40, KI [−0,43; −0,04], 7/10 Seeds, p = 0,027 |
+| wd + bitnet | 17,27 | Switch(wd) 18,40, KI [−1,40; −0,92], 10/10, p = 0,002 |
+| nur mdl-Gitter | 32,13 | Switch(wd) 18,40 (schlechter in 10/10) |
+
+| 0b Subtraktion | Switch | Referenz |
+|---|---|---|
+| Zufall + A(wd) | 12,18 | A(wd) eingefroren 12,46 (KI [−0,45; −0,12]) |
+| Zufall + A(mdl) | 7,26 | Zufall 29,34 |
+| Zufall + A(wd/mdl/bitnet) | 6,39 | bestes Einzelnes 6,78 |
+
+Deutung (explorativ):
+- Der größte Gewinn in 0a kommt NICHT aus dem Wechsel zwischen Kompression und wd, sondern aus dem Wechsel zwischen λ-Werten: Mit Neustart je Block ist jeder Block ein eigener Trainingslauf, und welches λ bei einer Präfixgröße groked, schwankt. Das ist ein gültiger Code, aber eher „bestes von mehreren Trainings je Block“ als ein Effekt der Kompression. Die eingefrorenen Endpunkte (ein Gitterwert für alle Blöcke) unterschätzen damit, was prequentiell möglich ist.
+- Fairer Vergleich (Referenz darf auch wechseln): mdl bringt zusätzlich nur ~0,2 kbit (schwach, 7/10 Seeds); bitnet ~1,1 kbit (10/10). Die Hoffnung „mdl verliert nur früh, mit Switching gewinnt es“ bestätigt sich für 0a NICHT: mdl allein bleibt auch mit Switching weit hinter wd (32,1 vs. 18,4 kbit).
+- 0b Subtraktion: Zufallsstart wird praktisch nie gewählt; der Transfer-Vorteil bleibt mit Switching voll erhalten. Multiplikation folgt nach Ende der Läufe (dort ist die Frage interessanter: A-Init früh, Zufall spät?).
+- Orakel (bestes Modell je Block ohne Codekosten) liegt jeweils < 0,05 kbit unter dem Switch-Code: Wechselkosten sind vernachlässigbar.
+
+### 11:00 Prüfung vor Veröffentlichung des Repos: Funde, daher NICHT veröffentlicht
+
+Ganze Git-Historie (104 Commits) und Arbeitsstand durchsucht. Keine Schlüssel, Tokens, Passwörter, privaten Schlüssel oder absoluten Pfade (`/Users/...`); nur `~/ai/kompression` in Skripten. Funde, über die Jonas entscheiden muss:
+1. `jam@ahler.org` als Autor/Committer aller Commits und in `pyproject.toml`.
+2. `account@ahler.org` in `docs/trc_antrag.md` (auch in der Historie).
+3. Claude-Session-Links (`Claude-Session: https://claude.ai/code/session_...`) in 80 Commit-Nachrichten (nur für Jonas' Konto zugänglich).
+4. Link auf das private Konzept-Doc in `README.md` und `AGENTS.md`.
+
 ## 2026-11-03
 
 - 09:55 (04.11.) Entscheidung Jonas (E28): nach 0b zuerst 0a+, dann TRC-Antrag; Repo nach 0b öffentlich (vorher auf Geheimnisse prüfen). Hauptlauf 0a+ von Jonas freigegeben, Protokoll friert Claude nach Kalibrierung ein.
