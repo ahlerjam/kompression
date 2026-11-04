@@ -45,3 +45,8 @@ Gate 0a: nicht bestanden (Negativbefund dokumentieren)
 {"kontrast": "H5 letzte Blöcke mdl < wd", "n": 10, "mittel_a": 5749.191289849533, "mittel_b": 8599.144546080435, "diff_ki95": [-4521.4935030329925, -1103.9379224728962], "p": 0.02734375, "richtung_wie_erwartet": true, "p_holm": 0.08203125}
 {"kontrast": "H5 letzte Blöcke bitnet < wd", "n": 10, "mittel_a": 137.29028979388366, "mittel_b": 8599.144546080435, "diff_ki95": [-9380.865543659185, -6791.278546400181], "p": 0.001953125, "richtung_wie_erwartet": true, "p_holm": 0.013671875}
 ```
+
+
+## Nachtrag 2026-11-04 (Code-Prüfung, ändert die Zahlen nicht)
+
+Im prequentiellen Teil laufen alle mdl-Parameter mit Adam lr 1e-3; log σ (Start −6) und der Prior bewegen sich in 3.000 Schritten je Block nur wenig, der β-Warmup (2.000 Schritte) lässt volles β nur in 1.000 Schritten wirken. Der Negativbefund H1 misst daher vor allem, ob auf Präfixen von 2.048/4.096 Beispielen in 3.000 Schritten gegroked wird (Grok-Tempo), und nur eingeschränkt den Wert von Kompression. Außerdem: L(W) von mdl (143 kbit) liegt über der uniformen Codierung der ganzen Tabelle (62 kbit); „~9× kürzer als wd“ ist eine relative Aussage. Logbuch 2026-11-04 12:25.

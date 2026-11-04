@@ -25,3 +25,20 @@ Kurzfassung der vier Recherchen. Werte aus Community-Benchmarks sind vor Nutzung
 ## Engineering-Stack
 - Versionen (PyPI, Oktober 2026): mlx 0.32.4, mlx-lm 0.32.2, mlx-lm-lora 5.10.2, torch 2.15.0.
 - [MLX compile](https://ml-explore.github.io/mlx/build/html/usage/compile.html), [Function transforms](https://ml-explore.github.io/mlx/build/html/usage/function_transforms.html), [PyTorch MPS notes](https://docs.pytorch.org/docs/2.15/notes/mps.html)
+
+## Neuheitsprüfung (2026-11-04, drei Agenten; Kernquellen selbst geprüft: 2606.11417, 2510.01265, 2506.11058, 2009.07624)
+
+**Stufe 1 (LLM, Wach-Schlaf, Bibliothek, Proposer-Belohnung Kompressionsfortschritt):**
+- Korrektur der Aussage oben: Kompressionsfortschritt als Belohnung für Aufgabenwahl GIBT es: [Mittal & Gupta 2026, Signed Compression Progress on a Sealed Audit](https://arxiv.org/abs/2606.11417) (Belohnung = Abnahme eines versiegelten Audit-Verlusts, mit Vorzeichen; ARC-TGI-Generatoren; kein LLM-Programm-/Bibliothekssystem). Gefährlichste Vorarbeit.
+- MDL-Kriterium für Code-Bibliotheken mit LM: [Kovačič, …, Ellis 2025, Librarian](https://arxiv.org/abs/2506.11058) (MDL korreliert am besten mit guten Refaktorierungen; Formel nur im Volltext).
+- Wach-Schlaf + L(B)+L(Programme|B): DreamCoder, LILO, Stitch. Proposer/Solver mit Learnability: Absolute Zero. Eingefrorenes LLM + Curriculum + Skill-Bibliothek: [Voyager](https://arxiv.org/abs/2305.16291). Lernfortschritt-Lehrer: SOAR, MAGELLAN, [SEC](https://arxiv.org/abs/2505.14970).
+- Nach Suche neu: Kompressionsfortschritt einer Programmbibliothek (Bit unter eingefrorenem LLM) als Auswahl-Belohnung für selbst erzeugte Aufgaben, im kontrollierten Vergleich mit Learnability bei identischem Mechanismus und Budget. Vorbehalt: 2026er Arbeiten unvollständig indexiert.
+
+**Gewichtsseite (0a, 0b, 0a+, Stufe 2):**
+- 0a: Optimierungsschwäche variationaler Codes bekannt ([Blier & Ollivier 2018](https://arxiv.org/abs/1802.07044), [Shaw et al. 2509.22445](https://arxiv.org/abs/2509.22445)).
+- 0b: Transfer/Vergessen über prequentielle Codelänge: [Zhang et al. 2020, Measuring Information Transfer](https://arxiv.org/abs/2009.07624) (Details im Volltext prüfen). Warmstart-Transfer zwischen Grokking-Aufgaben: [Jia 2609.18078](https://arxiv.org/abs/2609.18078) (nur Abstract, prüfen). Struktur-/Normkontrollen und Herkunftsvergleich MDL/WD/BitNet nicht gefunden. Erklärung mul: Subtraktion teilt den Fourier-Algorithmus der Addition, Multiplikation nicht ([2402.16726](https://arxiv.org/abs/2402.16726)); Norm/Lazy-Regime ([Omnigrok](https://arxiv.org/abs/2210.01117), [Kumar et al.](https://arxiv.org/abs/2310.06110)); Warmstart-Schaden und Shrink & Perturb ([Ash & Adams](https://arxiv.org/abs/1910.08475)).
+- 0a+: Zyklisches Komprimieren/Weitertrainieren bekannt: [DSD](https://arxiv.org/abs/1607.04381), [AC/DC](https://arxiv.org/abs/2106.12379), [Cyclic Sparse Training](https://arxiv.org/abs/2406.02773) (Zyklus hilft teils auch ohne Pruning → Pflichtkontrolle: gleicher Zyklus ohne Kompression, bei uns `--post wd`/`free` mit gleichen Optimizer-Resets); Pruning beschleunigt Grokking ([Grokking Tickets](https://arxiv.org/abs/2310.19470)). Variationales MDL als Schlafphase, prequentiell gemessen: nicht gefunden.
+- Stufe 2: Kern besetzt durch [RLP, Hatamizadeh et al., ICLR 2026](https://arxiv.org/abs/2510.01265) (RL-Belohnung = Informationsgewinn für Vorhersage künftiger Tokens, Qwen3-1.7B, Nemotron-12B; nicht als Kompression formuliert) und [L2T](https://arxiv.org/abs/2505.10425). Neu allenfalls: Belohnung = zweiteilige Codelänge inkl. eigener Gewichte, prequentiell gemessen (schmaler Unterschied).
+- Positionspapier: [Herrmann & Schmidhuber 2026](https://arxiv.org/abs/2605.14831).
+
+**Faire Formulierung (TRC):** Bausteine bekannt (DreamCoder-Wach-Schlaf, MDL-Bibliotheken, Kompressionsfortschritt als Curriculum-Belohnung, Informationsgewinn-RL); Beitrag = kontrollierte, vorregistrierte Tests in Bit (Struktur-/Normkontrollen, Vergleich mit Learnability bei identischem Mechanismus).

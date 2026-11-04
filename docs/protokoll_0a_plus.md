@@ -1,6 +1,6 @@
 # Protokoll 0a+ B1-Zyklus: Wach-Schlaf-Kompression (ENTWURF, Version 2)
 
-Stand: 2026-11-04 12:00. Freigabe der Variante B1 durch Jonas (2026-11-04). Wird nach der Kalibrierung (Seeds 100–102) eingefroren; erst dann Hauptlauf (Seeds 20–29).
+Stand: 2026-11-04 12:25. Freigabe der Variante B1 durch Jonas (2026-11-04). Wird nach der Kalibrierung (Seeds 100–102) eingefroren; erst dann Hauptlauf (Seeds 20–29).
 
 ## Frage
 
@@ -28,7 +28,7 @@ Version 2 ersetzt Version 1 (reines Nachtraining als Zweig, ohne Rückkopplung).
 
 mdl β ∈ {0,1; 0,3} (Einstellungen wie Arm `mdl` in 0a: log σ₀ = −6, gleiche Lernrate für alle Parameter), Schlaf `free`, `wd` λ = 10, prune 0,9, bitnet, wd. β wird für den Hauptlauf festgelegt (kleinste mittlere Codelänge); welche Kontrollen in den Hauptlauf gehen, wird vor dem Einfrieren festgelegt. [[Ergebnis eintragen]]
 
-Hinweis aus der Code-Prüfung (Logbuch 13:40): Mit lr 1e-3 bewegen sich log σ und Prior in 250 Schritten kaum; der mdl-Schlaf wirkt dann vor allem über den Zug des Priors auf die Mittelwerte (große Gewichte werden nach [−0,3; 0,3] gezogen). Eine „reparierte“ Variante (Lernrate ×30 für σ/Prior, log σ₀ = −3, Snapping auf Prior-Zentren) ist als Option vorhanden (`--post-mdl-lr-mult`, `--post-mdl-init-log-sigma`, `--post-mdl-snap`), war im Probelauf (p = 23) aber kaum besser als wd.
+Hinweis aus der Code-Prüfung (Logbuch 12:25): Mit lr 1e-3 bewegen sich log σ und Prior in 250 Schritten kaum; der mdl-Schlaf wirkt dann vor allem über den Zug des Priors auf die Mittelwerte (große Gewichte werden nach [−0,3; 0,3] gezogen). Eine „reparierte“ Variante (Lernrate ×30 für σ/Prior, log σ₀ = −3, Snapping auf Prior-Zentren) ist als Option vorhanden (`--post-mdl-lr-mult`, `--post-mdl-init-log-sigma`, `--post-mdl-snap`), war im Probelauf (p = 23) aber kaum besser als wd.
 
 ## Hypothesen (Hauptlauf, Seeds 20–29, gepaart)
 

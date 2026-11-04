@@ -4,25 +4,35 @@ Neueste Einträge oben. Kurz: Datum, was, Ergebnis, Verweis auf `runs/…`.
 
 ## 2026-11-04
 
-### 12:40 0a+ B auf Wach-Schlaf-Zyklus umgestellt (E29)
+### 12:25 Drei Prüf-Agenten (Neuheit Stufe 1, Neuheit Gewichtsseite, Engineering); mdl-Schlaf repariert, Kalibrierung neu
+
+Auftrag Jonas: Neuheit recherchieren, Ansatz verbessern, „next big thing“ suchen. Ergebnisse in `docs/recherche.md` (Abschnitt 2026-11-04). Wichtigste Punkte, selbst nachgeprüft:
+- **Code-Fund (Engineering-Agent, bestätigt):** Alle Parameter laufen mit Adam lr 1e-3 (`train.py`), ein Parameter bewegt sich also höchstens ~1e-3 je Schritt. Im 250-Schritt-Schlaf bleiben log σ (Start −6) und Prior praktisch fest; nach dem Schlaf ging `mu` unverändert weiter. Damit „materialisiert“ der mdl-Schlaf keine Kompression. Betrifft auch die prequentiellen mdl-Läufe in 0a (3.000 Schritte je Block, β-Warmup 2.000): Der Negativbefund H1 0a misst wohl vor allem Grok-Tempo, nicht Kompression (als Nachtrag in `docs/ergebnis_0a.md`).
+- Neue Optionen (Standard unverändert, `--cycles 0` weiter bitgenau 431/432 Bit): `mdl_aux_lr_mult` (train.py), `snap` (Soft Weight-Sharing-Abschluss), `--post-mdl-*`, Schlaf `free`, `mx.random.seed` je Block im Zyklus. Kalibrierung v2 nach ~15 min abgebrochen → `runs/abgebrochen/`.
+- **Probelauf p = 23, 2 Seeds, 4 × (250 + 100), Bit (uniform 2.393):** wd 2.060/2.254 · free 2.062/2.281 · bitnet 2.036/2.087 · mdl repariert (×30, −3, Snap) β 0,1 2.061/1.953 · **mdl alt β 0,03 1.796/1.613 · mdl alt β 0,3 1.181/1.202**. Der unreparierte mdl-Schlaf hilft deutlich, nicht wegen fehlendem wd (free hilft nicht). Vermuteter Mechanismus: fast flacher Prior auf [−0,3; 0,3] mit steilem Abfall zieht große Gewichte (auch LayerNorm-Gewichte) hart nach innen → Norm-Effekt (Omnigrok)? Deshalb Norm-Kontrolle wd λ = 10 im Schlaf in die Kalibrierung. Probelauf, kein Befund.
+- Kalibrierung v3 seit 12:23: `z-1` wd, mdl β 0,1, free, prune 0,9; `z-2` mdl β 0,3, wd λ 10, bitnet (Seeds 100–102).
+- Weitere Punkte des Engineering-Agenten (noch offen): S-Gitter in 0b war bei Neustart redundant (~48 % Rechenzeit, keine Verzerrung); L(A-Gewichte) fehlt im Transfer (grob L(A)+L(B|A): mdl 39,9, wd 39,0, bitnet 34,0 kbit); L(W) von mdl (143 kbit) ist größer als die uniforme Codierung der Tabelle (62 kbit) → „9× kürzer“ nur relativ formulieren.
+- **„Next big thing“-Vorschlag (Empfehlung Agent, von mir geteilt):** Gesamtcode einer Aufgabenfolge add → sub → … → mul als eine prequentielle Zahl, mit Schlaf zwischen Aufgaben vs. ohne, Neustart je Aufgabe, Switch „weiter/neu“; misst Transfer, negativen Transfer und Vergessen in einer ehrlichen Zahl. Entscheidung Jonas offen.
+
+### 12:07 0a+ B auf Wach-Schlaf-Zyklus umgestellt (E29)
 
 - Jonas: B1 als reines Nachtraining trifft die Idee nicht; gewollt ist der Zyklus, in dem das Modell lernt, sich selbst komprimiert und vom komprimierten Stand weiterlernt. Kalibrierung Version 1 nach ~45 min abgebrochen → `runs/abgebrochen/` (`*kalB1*`).
 - Code: `--cycles C` in `prequential.py` (Wach `steps_per_block` mit wd, Schlaf `post_steps` mit `--post`, nächste Wachphase vom deterministischen Schlafstand, Optimizer-Reset an jedem Wechsel auch in der Kontrolle). `--cycles 0` bitgenau wie vorher (p = 11: 431/432 Bit). Probelauf p = 23, 1 Seed, 4 × (250 + 100): wd 2.051 · mdl 1.764 · prune 1.989 · bitnet 2.021 Bit (uniform 2.393); bei mdl wählt der Code die Wachphase nach dem Schlaf (w4). Probelauf, kein Befund.
 - Protokoll `docs/protokoll_0a_plus.md` Version 2 (Entwurf): 4 × (750 Wach + 250 Schlaf), Kalibrierung `scripts/b1_0a_plus.sh CAL1/CAL2` (Seeds 100–102; mdl β 0,03/0,1; prune 0,5/0,9; bitnet; wd).
 
-### 12:00 Repo öffentlich; 0a+ B1 gebaut
+### 11:52 Repo öffentlich; 0a+ B1 gebaut
 
 - Jonas: Repo so veröffentlichen (Option a) → https://github.com/ahlerjam/kompression ist PUBLIC.
 - Jonas: 0a+ B1 („erst lernen, dann komprimieren“), getestet gegen Standardverfahren. Literatur-Einordnung: unser mdl-Arm ist Soft Weight-Sharing (Ullrich et al. 2017), also selbst ein bekanntes Nachtrainings-Verfahren; Vergleich daher gegen wd weiter, bitnet-QAT und Magnitude-Pruning (Han et al.).
 - Code: `--post wd|mdl|bitnet|prune` in `prequential.py` (Zweig je Block, zusätzliche bezahlte Kandidaten), Arm `Pruned` in `objectives.py`, Test. `--post none` bitgenau wie alter Code (p = 11: 431/432 Bit vorher und nachher). Probelauf p = 23: Nachtrainings-Stände werden gewählt. `make test` 49 grün.
 - Protokoll-Entwurf `docs/protokoll_0a_plus.md`, Kalibrierung `scripts/b1_0a_plus.sh CAL1/CAL2`.
 
-### 11:45 0b Multiplikation fertig und ausgewertet: NEGATIV (negativer Transfer); Messphase 0b beendet
+### 11:27 0b Multiplikation fertig und ausgewertet: NEGATIV (negativer Transfer); Messphase 0b beendet
 
 Alle Läufe `H0b_mul_*` fertig (keine Abstürze). `analyse_0b.py` → `runs/analyse_0b_full.txt`, unverändert in `docs/ergebnis_0b.md`. Mittel kbit: Zufall 27,0 · A(wd) 40,6 · permutiert 40,7 · Norm-skaliert 42,5 · A(mdl) 43,5 · A(bitnet) 42,9. H1 in Gegenrichtung signifikant (Holm p = 0,0078), H2–H4 Holm p = 1,0. Gate 0b (nur Subtraktion) bleibt bestanden.
 Vorhersagen aus 09:40 eingetroffen (A(bitnet) schlecht; permutiert ≈ skaliert). Je Block (bestes S je Bedingung, explorativ): A-Start spart in den Blöcken 512–2.048 (bitnet 10/10 Seeds, bis 0,7 kbit), verliert ab 4.096 in allen Seeds massiv (wd −11,8 kbit, mdl −16,8, bitnet −16,2 im Block [4096, 8192)). Switch-Code (Zufall + A) nimmt das Frühe mit: 0,4–1,0 kbit unter Zufall allein (`runs/explor_switch_mul.txt`).
 
-### 11:20 0a+ B in geplanter Form durch Teil A praktisch vorab beantwortet (explorativ)
+### 10:43 0a+ B in geplanter Form durch Teil A praktisch vorab beantwortet (explorativ)
 
 Mittlere Bits/Label je Block, Hauptlauf 0a (Seeds 10–19), Blöcke ab 64/128/…/8192:
 
@@ -37,7 +47,7 @@ Mittlere Bits/Label je Block, Hauptlauf 0a (Seeds 10–19), Blöcke ab 64/128/�
 - Mit Neustart je Block ist ein Plan β(n) (n = Präfixgröße) gleichbedeutend mit „je Block ein β wählen“. Der Switch-Code über das mdl-Gitter (Teil A) ist dafür eine fast scharfe Obergrenze innerhalb des Gitters: 32,1 kbit gegen Switch(wd) 18,4. Ein β(n)-Plan in [0,03; 0,3] kann wd daher kaum schlagen; β = 1 lernt laut Kalibrierung gar nicht.
 - Folgerung: B wie geplant würde ~1 Tag GPU für eine absehbar negative Antwort verbrauchen. Vorschlag an Jonas (Entscheidung offen), siehe STATUS.
 
-### 11:05 0a+ Teil A: Switch-Code-Nachrechnung (EXPLORATIV, nicht vorab registriert)
+### 10:42 0a+ Teil A: Switch-Code-Nachrechnung (EXPLORATIV, nicht vorab registriert)
 
 Neues Skript `stages/s0a_grokking/explor_switch.py` (keine GPU, liest nur `metrics.jsonl` der Hauptläufe; Gegenprobe gegen `results.json` je Seed bestanden). Fixed-Share-Mischung auf Blockebene über „Experten“ (Läufe), α aus {0; 0,01; 0,05; 0,125; 0,25}, bezahlt mit log2 5 Bit. Gültiger Code, weil jeder Experte jeden Block prequentiell codiert. Ausgaben: `runs/explor_switch_add.txt`, `runs/explor_switch_sub.txt`. Mittel über Seeds 10–19, kbit:
 
@@ -60,7 +70,7 @@ Deutung (explorativ):
 - 0b Subtraktion: Zufallsstart wird praktisch nie gewählt; der Transfer-Vorteil bleibt mit Switching voll erhalten. Multiplikation folgt nach Ende der Läufe (dort ist die Frage interessanter: A-Init früh, Zufall spät?).
 - Orakel (bestes Modell je Block ohne Codekosten) liegt jeweils < 0,05 kbit unter dem Switch-Code: Wechselkosten sind vernachlässigbar.
 
-### 11:00 Prüfung vor Veröffentlichung des Repos: Funde, daher NICHT veröffentlicht
+### 10:40 Prüfung vor Veröffentlichung des Repos: Funde, daher NICHT veröffentlicht
 
 Ganze Git-Historie (104 Commits) und Arbeitsstand durchsucht. Keine Schlüssel, Tokens, Passwörter, privaten Schlüssel oder absoluten Pfade (`/Users/...`); nur `~/ai/kompression` in Skripten. Funde, über die Jonas entscheiden muss:
 1. `jam@ahler.org` als Autor/Committer aller Commits und in `pyproject.toml`.

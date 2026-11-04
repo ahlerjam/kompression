@@ -1,6 +1,6 @@
 # Ergebnis Stufe 0b (Transfer in Bit): Subtraktion und Multiplikation
 
-Stand: 2026-11-04 04:57. Hauptlauf nach `docs/protokoll_0b.md` Version 2 (eingefroren 2026-11-03 22:30), Seeds 10–19, A-Gewichte aus Hauptlauf 0a, Lerner `wd` λ = 1, Neustart je Block, S ∈ {30, 100, 300, 1.000, 3.000}, Codelänge = Minimum über S + log2(5) Bit. Teil Multiplikation ergänzt 2026-11-04 11:45 (gleiches Protokoll, gleiche Seeds).
+Stand: 2026-11-04 04:57. Hauptlauf nach `docs/protokoll_0b.md` Version 2 (eingefroren 2026-11-03 22:30), Seeds 10–19, A-Gewichte aus Hauptlauf 0a, Lerner `wd` λ = 1, Neustart je Block, S ∈ {30, 100, 300, 1.000, 3.000}, Codelänge = Minimum über S + log2(5) Bit. Teil Multiplikation ergänzt 2026-11-04 11:27 (gleiches Protokoll, gleiche Seeds).
 
 ## Kurz
 
