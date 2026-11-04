@@ -4,6 +4,16 @@
 
 **Reihenfolge streng nacheinander (Entscheidung Jonas, 2026-11-03 05:50):** erst 0a fertig messen und auswerten, dann Hauptlauf 0b, dann auf Basis beider Ergebnisse über Stufe 1 entscheiden. **Stufe 1 ruht komplett** (keine Läufe, kein Weiterbau). Alle GPU-Ressourcen gehen an das aktuelle Gate (zwei Stränge `H-A`/`H-B`; ein dritter sprengte den Speicher, siehe Logbuch 06:49); Bauarbeit nur für 0b (Vorbereitung, damit 0b direkt nach 0a starten kann).
 
+## Ergebnis 0b Subtraktion für Jonas (2026-11-04 04:57) — Details: `docs/ergebnis_0b.md`
+
+**Gate 0b bestanden.** Alle vier Transfer-Hypothesen signifikant (Holm p = 0,0078, alle 10 Seeds gleiche Richtung):
+- Additions-Gewichte (wd) sparen beim Lernen der Subtraktion 57 % der Bits gegenüber Zufall (12,5 vs. 29,3 kbit).
+- Übertragen wird Struktur: permutierte oder normgleiche Kontrollen sind sogar schlechter als Zufall (54,4 kbit).
+- **Komprimierte Lösungen übertragen besser:** Start aus mdl-Gewichten 7,4 kbit vs. wd 12,5 kbit (H4). bitnet beschreibend 6,9 kbit.
+- Zusammen mit 0a: mdl verliert auf der eigenen Aufgabe, findet aber ~9× kürzere Gewichte, die besser übertragen.
+
+**Läuft noch:** Multiplikation (zweites Ziel), ca. 7 h. Danach TRC-Antrag fertig und Frage an Jonas zu 0a+/Stufe 1.
+
 ## Ergebnis 0a für Jonas (2026-11-03 22:25) — Details: `docs/ergebnis_0a.md`
 
 **Ehrlich: Die beiden Hauptthesen sind in diesem Versuch widerlegt.**

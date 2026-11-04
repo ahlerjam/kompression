@@ -4,6 +4,7 @@ Neueste Einträge oben. Kurz: Datum, was, Ergebnis, Verweis auf `runs/…`.
 
 ## 2026-11-03
 
+- 04:57 (04.11.) **Auswertung 0b Subtraktion: Gate 0b BESTANDEN.** H1–H4 je Holm p = 0,0078, alle 10 Seeds gleiche Richtung. Mittel: Zufall 29,3 · A(wd) 12,5 · A(wd) permutiert 54,4 · A(wd) Norm-skaliert 54,4 · A(mdl) 7,4 · A(bitnet) 6,9 kbit. H4 (A(mdl) < A(wd)) bestätigt. Details `docs/ergebnis_0b.md`. Multiplikation läuft weiter.
 - 02:46 (04.11.) Hauptlauf 0b sub: A(wd) und A(mdl) komplett. Rohwerte S 3.000 (kein Befund): A(wd) 9,0–17,6 kbit, A(mdl) 6,2–8,8 kbit. Es laufen `wd_permuted` und `bitnet` (letzte sub-Bedingungen, ca. 2,3 h).
 - 01:36 (04.11.) Hauptlauf 0b sub, Rohwerte (kein Befund, S 3.000 läuft noch): A(wd) S 100/300/1.000 = 11,3–61,7 / 9,6–29,1 / 8,9–22,2 kbit; A(mdl) S 300/1.000 = 9,8–21,8 / 6,2–12,7 kbit. Zum Vergleich `random` bestes S 28,5–32,1. Speicher 75 % frei.
 - 00:37 (04.11.) Hauptlauf 0b sub: `random` und `wd_scaled` komplett (S 30–3.000). Rohwerte (kein Befund): `random` S 3.000 = 28,5–32,1 kbit (Zufallsstart lernt Subtraktion bei S 3.000 selbst, starke Baseline), `wd_scaled` S 3.000 = 54,0–54,6. Erste A(wd)-Werte: S 30 = 43,6–62,1. Speicher nach Laufende wieder 79 % frei, Swap 1,2 GB → Speicherspitze kam von den S-3.000-Läufen.
