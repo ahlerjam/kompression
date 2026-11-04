@@ -4,6 +4,12 @@ Neueste Einträge oben. Kurz: Datum, was, Ergebnis, Verweis auf `runs/…`.
 
 ## 2026-11-04
 
+### 12:40 0a+ B auf Wach-Schlaf-Zyklus umgestellt (E29)
+
+- Jonas: B1 als reines Nachtraining trifft die Idee nicht; gewollt ist der Zyklus, in dem das Modell lernt, sich selbst komprimiert und vom komprimierten Stand weiterlernt. Kalibrierung Version 1 nach ~45 min abgebrochen → `runs/abgebrochen/` (`*kalB1*`).
+- Code: `--cycles C` in `prequential.py` (Wach `steps_per_block` mit wd, Schlaf `post_steps` mit `--post`, nächste Wachphase vom deterministischen Schlafstand, Optimizer-Reset an jedem Wechsel auch in der Kontrolle). `--cycles 0` bitgenau wie vorher (p = 11: 431/432 Bit). Probelauf p = 23, 1 Seed, 4 × (250 + 100): wd 2.051 · mdl 1.764 · prune 1.989 · bitnet 2.021 Bit (uniform 2.393); bei mdl wählt der Code die Wachphase nach dem Schlaf (w4). Probelauf, kein Befund.
+- Protokoll `docs/protokoll_0a_plus.md` Version 2 (Entwurf): 4 × (750 Wach + 250 Schlaf), Kalibrierung `scripts/b1_0a_plus.sh CAL1/CAL2` (Seeds 100–102; mdl β 0,03/0,1; prune 0,5/0,9; bitnet; wd).
+
 ### 12:00 Repo öffentlich; 0a+ B1 gebaut
 
 - Jonas: Repo so veröffentlichen (Option a) → https://github.com/ahlerjam/kompression ist PUBLIC.
