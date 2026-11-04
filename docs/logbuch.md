@@ -4,6 +4,7 @@ Neueste Einträge oben. Kurz: Datum, was, Ergebnis, Verweis auf `runs/…`.
 
 ## 2026-11-03
 
+- 09:40 (04.11.) Explorativ (nicht vorab registriert), Frage Jonas „warum ist mdl bei mul schlechter?“: Bits/Label je Block (mul, Mittel über Seeds) zeigen, dass A-Init früh minimal hilft (Blöcke < 2.048: 6,3–6,5 vs. random 6,5–6,6), aber das Lernen bei viel Daten bremst (Block [4.096, 8.192) S 3.000: random 0,27 · A(wd) 3,17 · A(mdl) 4,37). Gesamtnorm der A-Gewichte je Seed: wd 70, mdl 115, bitnet 452. Auch `wd_scaled` (nur Norm von A, keine Struktur) ist bei mul schlechter als random → wahrscheinlich Norm-Effekt (große Anfangsnorm verzögert Grokking, vgl. Omnigrok, Liu et al. 2022) plus fehlende gemeinsame Struktur Addition↔Multiplikation. Vorhersage: A(bitnet) (größte Norm) bei mul ebenfalls schlecht; wd_permuted ≈ wd_scaled.
 - 09:18 (04.11.) 0b mul: A(mdl) komplett, Rohwert S 3.000 41,9–46,7 kbit (schlechter als A(wd) und random). Es laufen die letzten Bedingungen wd_permuted und bitnet (ca. 2,3 h).
 - 09:14 (04.11.) 0b mul: A(wd) komplett, Rohwert S 3.000 28,2–45,7 kbit (random bestes S 26,2–28,7) → Transfer auf Multiplikation sieht schwach/negativ aus (kein Befund, Test nach Abschluss). Swap erreichte bei S 3.000 6,5 GB, danach wieder 53 % frei. A(mdl) S 3.000 läuft, danach wd_permuted und bitnet.
 - 07:10 (04.11.) 0b mul: `random` und `wd_scaled` komplett. Rohwerte S 3.000 (kein Befund): random 26,2–28,7, wd_scaled 41,0–44,3 kbit. Es laufen A(wd) und A(mdl).
