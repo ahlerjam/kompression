@@ -4,6 +4,7 @@ Neueste Einträge oben. Kurz: Datum, was, Ergebnis, Verweis auf `runs/…`.
 
 ## 2026-11-03
 
+- 22:20 0b-Kalibrierung mit Neustart (`0b4_*`, 15 min) fertig, kein Befund: A-Init(wd) auf Subtraktion, Minimum über S je Seed 17,7–22,1 kbit mit Neustart gegenüber 35,0–53,7 ohne (`0b3`); Zufall 62,1 bei S ≤ 300; permutiert 57,4–62,1. Entscheidung: **Neustart je Block ja** → Protokoll 0b Version 2 als Entwurf geschrieben (wird mit Start des Hauptlaufs 0b eingefroren). Hauptlauf 0b startet erst nach Auswertung 0a (Reihenfolge streng nacheinander); `H_bitnet` läuft noch.
 - 22:02 Hauptlauf 0a, Teil A: `runs/s0a/20261103-173627_H_none` fertig (Untergrenze): kein Seed groked, finale Test-Accuracy 0,01–0,17; L(W) 1,7–2,6 Mbit. Letzter offener Lauf: `H_bitnet` (Schritt ≈ 35k). Freier Strang → 0b-Kalibrierung mit Neustart (`scripts/hauptlauf_0b.sh CAL`, tmux `0b-cal`, Seeds 0–2; kein Befund, nur Grundlage für Protokoll 0b v2).
 - 19:56 Hauptlauf 0a: `H_none` bei Schritt 21.100, `H_bitnet` bei 17.000 (Ende ca. 22 Uhr bzw. nach Mitternacht). Speicher 70 % frei. Ohne GPU: Gerüst `docs/trc_antrag.md` (englischer Antragstext mit Platzhaltern; Ergebnisse erst nach Auswertung).
 - 17:57 Hauptlauf 0a, Teil A: `H_wd_normproj` fertig (ein Arm, kein Befund für sich): erster Schritt ≥ 0,99 bei 5.100–6.300 (`H_mdl` 4.300–9.600, `H_wd` 2.200–2.800); finale Test-Accuracy 0,981–1,0; L(W) 712–997 kbit (`H_mdl` 78–494, `H_wd` 712–2.308). `H_bitnet` (tmux `H-A2`) automatisch gestartet, `H_none` (`H-B2`) läuft. Zwei MLX-Prozesse, Speicher 71 % frei.
