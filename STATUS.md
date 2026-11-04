@@ -1,6 +1,6 @@
 # STATUS
 
-**Phase: BAUPHASE 0a+ B1** (Kalibrierung läuft) seit 2026-11-04 11:52. Messphase 0b beendet (Auswertung 11:45, `docs/ergebnis_0b.md`). Protokolle 0a und 0b bleiben eingefroren; Kern unverändert. Stufe 1 ruht.
+**Phase: BAUPHASE 0a+ B1-Zyklus** (Kalibrierung läuft) seit 2026-11-04 12:42. Messphase 0b beendet (Auswertung 11:45, `docs/ergebnis_0b.md`). Protokolle 0a und 0b bleiben eingefroren; Kern unverändert. Stufe 1 ruht.
 
 **Plan ab 2026-11-04 (Jonas, E28):** 0b Multiplikation fertig → auswerten → Repo öffentlich (nach Geheimnis-Prüfung) → **0a+** (A: Switch-Code-Nachrechnung ohne GPU; B: β wachsend mit Datenmenge, Seeds 20–29, ca. 1 Tag) → TRC-Antrag mit allen Ergebnissen → Jonas reicht ein. Stufe 1 ruht weiter.
 
@@ -10,7 +10,7 @@
 
 **0a+ A (explorativ, 11:05):** Switch-Code bringt in 0a vor allem Wechsel zwischen λ-Werten (26,5 → 18,4 kbit); mdl zusätzlich nur ~0,2 kbit, bitnet ~1,1 kbit. Kompression gewinnt auch mit Switching nicht gegen wd. Logbuch 11:05.
 
-**Läuft (seit 11:52): 0a+ B1-Kalibrierung** (Jonas: B1, gegen Standardverfahren). tmux `b1-1` (wd weiter, mdl β 0,03, prune 0,9) und `b1-2` (bitnet, mdl β 0,1, prune 0,5), Seeds 100–102, Logs `runs/kalB1_*.log`. Danach Protokoll `docs/protokoll_0a_plus.md` einfrieren, Hauptlauf Seeds 20–29 (~6 h), dann TRC-Antrag.
+**Läuft (seit 12:42): 0a+ B1-Zyklus-Kalibrierung** (E29: Wach-Schlaf, je Block 4 × (750 wd + 250 Schlaf), nächste Wachphase vom komprimierten Stand). tmux `z-1` (Schlaf wd, mdl β 0,03, prune 0,9) und `z-2` (bitnet, mdl β 0,1, prune 0,5), Seeds 100–102, Logs `runs/kalZ_*.log`. Danach Protokoll `docs/protokoll_0a_plus.md` v2 einfrieren, Hauptlauf Seeds 20–29, dann TRC-Antrag.
 
 **Reihenfolge streng nacheinander (Entscheidung Jonas, 2026-11-03 05:50):** erst 0a fertig messen und auswerten, dann Hauptlauf 0b, dann auf Basis beider Ergebnisse über Stufe 1 entscheiden. **Stufe 1 ruht komplett** (keine Läufe, kein Weiterbau). Alle GPU-Ressourcen gehen an das aktuelle Gate (zwei Stränge `H-A`/`H-B`; ein dritter sprengte den Speicher, siehe Logbuch 06:49); Bauarbeit nur für 0b (Vorbereitung, damit 0b direkt nach 0a starten kann).
 
