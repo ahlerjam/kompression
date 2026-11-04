@@ -1,6 +1,6 @@
 # STATUS
 
-**Phase: MESSPHASE für Stufe 0b** seit 2026-11-03 22:30 (Protokoll 0b Version 2 eingefroren). Stufe 0a abgeschlossen (Protokoll 0a bleibt eingefroren, Kern gesperrt).
+**Phase: BAUPHASE 0a+ B1** (Kalibrierung läuft) seit 2026-11-04 11:52. Messphase 0b beendet (Auswertung 11:45, `docs/ergebnis_0b.md`). Protokolle 0a und 0b bleiben eingefroren; Kern unverändert. Stufe 1 ruht.
 
 **Plan ab 2026-11-04 (Jonas, E28):** 0b Multiplikation fertig → auswerten → Repo öffentlich (nach Geheimnis-Prüfung) → **0a+** (A: Switch-Code-Nachrechnung ohne GPU; B: β wachsend mit Datenmenge, Seeds 20–29, ca. 1 Tag) → TRC-Antrag mit allen Ergebnissen → Jonas reicht ein. Stufe 1 ruht weiter.
 
