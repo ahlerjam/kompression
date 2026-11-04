@@ -6,11 +6,11 @@
 
 **Ergebnis 0b Multiplikation (11:45): NEGATIV.** Start aus Additions-Gewichten codiert Multiplikation 13,6 kbit länger als Zufall (27,0 vs. 40,6 kbit, Holm p = 0,008, Gegenrichtung); Struktur-, Norm- und mdl-Hypothesen nicht bestätigt (p = 1,0). Alle A-Starts gleich schlecht wie normgleiche Kontrollen → Norm-Effekt, kein Strukturtransfer. Gate 0b (Subtraktion) bleibt bestanden. Messphase 0b beendet. Details `docs/ergebnis_0b.md`.
 
-**Wartet auf Jonas (2026-11-04 11:00): Repo NICHT veröffentlicht.** Geheimnis-Prüfung ohne Schlüssel/Tokens/Pfade, aber Funde: `jam@ahler.org` in allen Commits und `pyproject.toml`; `account@ahler.org` in `docs/trc_antrag.md`; Claude-Session-Links in 80 Commit-Nachrichten; Link auf das private Konzept-Doc. Optionen: (a) so veröffentlichen, (b) Historie neu schreiben (GitHub-noreply-Adresse, Session-Zeilen und Formular-Mail entfernen), (c) neues öffentliches Repo mit einem einzigen Start-Commit. Details: Logbuch 11:00.
+**Repo öffentlich (12:00, Option a von Jonas):** https://github.com/ahlerjam/kompression
 
 **0a+ A (explorativ, 11:05):** Switch-Code bringt in 0a vor allem Wechsel zwischen λ-Werten (26,5 → 18,4 kbit); mdl zusätzlich nur ~0,2 kbit, bitnet ~1,1 kbit. Kompression gewinnt auch mit Switching nicht gegen wd. Logbuch 11:05.
 
-**Wartet auf Jonas (11:20): 0a+ B umplanen?** Die Nachrechnung zeigt: Mit Neustart je Block ist „β wachsend mit n“ dasselbe wie „je Block ein β wählen“, und das liefert schon 32,1 kbit gegen 18,4 bei wd; das optimale β fällt sogar mit n. Vorschläge: (B1) zweiphasig: erst wd bis zum Grokking, dann mdl-Druck („erst lernen, dann komprimieren“); (B2) B weglassen und mit 0a, 0b, 0a+ A zum TRC-Antrag; (B3) B trotzdem wie geplant. Empfehlung Claude: B1 (neue Frage, ~5 h Hauptlauf), sonst B2. Logbuch 11:20.
+**Läuft (seit 11:52): 0a+ B1-Kalibrierung** (Jonas: B1, gegen Standardverfahren). tmux `b1-1` (wd weiter, mdl β 0,03, prune 0,9) und `b1-2` (bitnet, mdl β 0,1, prune 0,5), Seeds 100–102, Logs `runs/kalB1_*.log`. Danach Protokoll `docs/protokoll_0a_plus.md` einfrieren, Hauptlauf Seeds 20–29 (~6 h), dann TRC-Antrag.
 
 **Reihenfolge streng nacheinander (Entscheidung Jonas, 2026-11-03 05:50):** erst 0a fertig messen und auswerten, dann Hauptlauf 0b, dann auf Basis beider Ergebnisse über Stufe 1 entscheiden. **Stufe 1 ruht komplett** (keine Läufe, kein Weiterbau). Alle GPU-Ressourcen gehen an das aktuelle Gate (zwei Stränge `H-A`/`H-B`; ein dritter sprengte den Speicher, siehe Logbuch 06:49); Bauarbeit nur für 0b (Vorbereitung, damit 0b direkt nach 0a starten kann).
 
