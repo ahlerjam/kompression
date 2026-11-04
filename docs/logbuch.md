@@ -4,6 +4,13 @@ Neueste Einträge oben. Kurz: Datum, was, Ergebnis, Verweis auf `runs/…`.
 
 ## 2026-11-04
 
+### 12:00 Repo öffentlich; 0a+ B1 gebaut
+
+- Jonas: Repo so veröffentlichen (Option a) → https://github.com/ahlerjam/kompression ist PUBLIC.
+- Jonas: 0a+ B1 („erst lernen, dann komprimieren“), getestet gegen Standardverfahren. Literatur-Einordnung: unser mdl-Arm ist Soft Weight-Sharing (Ullrich et al. 2017), also selbst ein bekanntes Nachtrainings-Verfahren; Vergleich daher gegen wd weiter, bitnet-QAT und Magnitude-Pruning (Han et al.).
+- Code: `--post wd|mdl|bitnet|prune` in `prequential.py` (Zweig je Block, zusätzliche bezahlte Kandidaten), Arm `Pruned` in `objectives.py`, Test. `--post none` bitgenau wie alter Code (p = 11: 431/432 Bit vorher und nachher). Probelauf p = 23: Nachtrainings-Stände werden gewählt. `make test` 49 grün.
+- Protokoll-Entwurf `docs/protokoll_0a_plus.md`, Kalibrierung `scripts/b1_0a_plus.sh CAL1/CAL2`.
+
 ### 11:45 0b Multiplikation fertig und ausgewertet: NEGATIV (negativer Transfer); Messphase 0b beendet
 
 Alle Läufe `H0b_mul_*` fertig (keine Abstürze). `analyse_0b.py` → `runs/analyse_0b_full.txt`, unverändert in `docs/ergebnis_0b.md`. Mittel kbit: Zufall 27,0 · A(wd) 40,6 · permutiert 40,7 · Norm-skaliert 42,5 · A(mdl) 43,5 · A(bitnet) 42,9. H1 in Gegenrichtung signifikant (Holm p = 0,0078), H2–H4 Holm p = 1,0. Gate 0b (nur Subtraktion) bleibt bestanden.

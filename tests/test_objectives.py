@@ -46,3 +46,17 @@ def test_mdl_penalty_is_kl_for_gaussian_prior():
 def test_arms_train_without_nan(arm):
     r = train(TrainConfig(steps=60, arm=arm, beta_warmup=50, **SMALL))
     assert all(np.isfinite(v) for v in r["final_delta_norm"].values())
+
+
+def test_pruned_masks_fraction_and_keeps_1d():
+    from kompression.objectives import Pruned
+
+    p0 = init_params(CFG, 0)
+    arm = Pruned(frac=0.75)
+    tr, const = arm.init(p0, 0)
+    eff = arm.effective(tr, const, None)
+    w = np.array(eff["unemb"])
+    assert abs((w == 0).mean() - 0.75) < 0.01
+    one_d = [k for k, v in p0.items() if hasattr(v, "ndim") and v.ndim == 1]
+    for k in one_d:
+        np.testing.assert_allclose(np.array(eff[k]), np.array(p0[k]))

@@ -69,6 +69,39 @@ class BitNet(Arm):
         return self.effective(tr, const, None)
 
 
+class Pruned(Arm):
+    """Magnitude-Pruning (Han et al. 2015/2016) für alle Matrizen: Beim `init` werden je Matrix
+    die betragskleinsten `frac` der Gewichte auf 0 gesetzt und bleiben dort (feste Maske);
+    der Rest wird weitertrainiert. 1D-Parameter bleiben unmaskiert. Gedacht als Nachtraining
+    nach einer ersten Lernphase (0a+ B1), nicht als Training von Grund auf."""
+
+    name = "prune"
+
+    def __init__(self, frac: float = 0.9):
+        if not 0.0 <= frac < 1.0:
+            raise ValueError("frac muss in [0, 1) liegen")
+        self.frac = frac
+
+    def _mask(self, w: mx.array) -> mx.array:
+        if w.ndim != 2 or self.frac == 0.0:
+            return mx.ones_like(w)
+        a = mx.abs(w).reshape(-1)
+        k = int(self.frac * a.size)
+        thr = mx.sort(a)[k]
+        return (mx.abs(w) >= thr).astype(w.dtype)
+
+    def init(self, params0, seed):
+        mask = tree_map(self._mask, params0)
+        tr = tree_map(lambda w, m: w * m, params0, mask)
+        return tr, {"w0": params0, "mask": mask}
+
+    def effective(self, tr, const, noise):
+        return tree_map(lambda w, m: w * m, tr, const["mask"])
+
+    def deterministic(self, tr, const):
+        return self.effective(tr, const, None)
+
+
 class Subspace(Arm):
     """Zufallsbasis-Unterraum (Idee E27, verwandt mit Li et al. 2018 und VeRA):
     W = W0(seed) + A Z B^T je Matrix; A, B fest aus dem Seed, nur Z (r x r) wird trainiert.
@@ -169,7 +202,9 @@ class VariationalMDL(Arm):
         return total
 
 
-def make_arm(name: str, subspace_rank: int = 16, mdl_k: int = 16) -> Arm:
+def make_arm(name: str, subspace_rank: int = 16, mdl_k: int = 16, prune_frac: float = 0.9) -> Arm:
+    if name == "prune":
+        return Pruned(prune_frac)
     if name in ("none", "wd"):
         return Plain(name)
     if name == "bitnet":

@@ -16,6 +16,12 @@ Stufe 0b (Transfer): `--op sub --init-from runs/s0a/<A-Lauf>` startet von den Ge
 auf Aufgabe A trainierten Laufs (gleiche Seeds). Kontrollen: `--init-control scaled`
 (Zufallsinit, je Tensor auf die Norm der A-Gewichte skaliert) und `permuted` (A-Gewichte je
 Tensor zufällig permutiert: gleiche Werteverteilung, Struktur zerstört). Nur für Arme none/wd.
+
+0a+ B1 („erst lernen, dann komprimieren“): `--post wd|mdl|bitnet|prune --post-steps K` hängt je
+Block an den Endstand der Phase 1 (Arm none/wd) eine Nachtrainings-Phase mit K Schritten an.
+Sie ist ein Zweig: Der nächste Block geht vom Stand der Phase 1 aus. Ihre Trainingsstände
+(p30, p100, …, pK) kommen als zusätzliche Self-Switch-Kandidaten hinzu; die Wahl wird wie immer
+bezahlt (alle Post-Varianten zahlen dieselben Bits). `--post none` (Standard) = Verhalten wie vorher.
 """
 
 from __future__ import annotations
@@ -56,6 +62,12 @@ class Args:
     init_from: str = ""
     init_control: Literal["none", "scaled", "permuted"] = "none"
     name: str = ""
+    post: Literal["none", "wd", "mdl", "bitnet", "prune"] = "none"
+    post_steps: int = 1000
+    post_weight_decay: float = 1.0  # für post wd und prune (Nachtraining mit Weight Decay)
+    post_mdl_beta: float = 0.1
+    post_beta_warmup: int = 0
+    prune_frac: float = 0.9
 
 
 def load_inits(run_dir: str, seeds, random_inits, control: str):
@@ -118,14 +130,32 @@ def main(a: Args) -> None:
     checkpoints = tuple(c for c in (0, 30, 100, 300, 1000, 3000, 10000) if c <= a.steps_per_block)
     if a.steps_per_block not in checkpoints:
         checkpoints = (*checkpoints, a.steps_per_block)
-    switch_bits = math.log2(len(checkpoints) * len(temps) + 1)  # + uniform
+    labels = [f"c{c}" for c in checkpoints]
+    post_ckpts: tuple[int, ...] = ()
+    if a.post != "none":
+        if a.arm not in ("none", "wd"):
+            raise ValueError("Nachtraining (--post) nur nach Phase-1-Arm none/wd")
+        post_ckpts = tuple(c for c in (30, 100, 300, 1000, 3000) if c < a.post_steps)
+        post_ckpts = (*post_ckpts, a.post_steps)
+        labels += [f"p{c}" for c in post_ckpts]
+        arm2 = make_arm(a.post, prune_frac=a.prune_frac)
+        cfg2 = dataclasses.replace(
+            cfg, arm=a.post, mdl_beta=a.post_mdl_beta,
+            weight_decay=a.post_weight_decay if a.post in ("wd", "prune") else 0.0)
+    switch_bits = math.log2(len(labels) * len(temps) + 1)  # + uniform
 
-    def block_logp(tr_, const_, x, y):
-        p_ = arm.deterministic(tr_, const_)
-        logits = forward(p_, x, mcfg)
-        return mx.stack([label_logprobs(logits / tt, y, cfg.use_stablemax) for tt in temps])
+    def make_vlogp(arm_):
+        def block_logp(tr_, const_, x, y):
+            p_ = arm_.deterministic(tr_, const_)
+            logits = forward(p_, x, mcfg)
+            return mx.stack([label_logprobs(logits / tt, y, cfg.use_stablemax) for tt in temps])
 
-    vlogp = mx.vmap(block_logp, in_axes=(0, 0, 0, 0))
+        return mx.vmap(block_logp, in_axes=(0, 0, 0, 0))
+
+    vlogp = make_vlogp(arm)
+    if a.post != "none":
+        vlogp2 = make_vlogp(arm2)
+    vdet_phase1 = mx.vmap(arm.deterministic, in_axes=(0, 0))
     bounds = doubling_blocks(n, a.first_block)
     per_seed_logp: dict[tuple[int, int], np.ndarray] = {}
     t0 = time.time()
@@ -152,7 +182,29 @@ def main(a: Args) -> None:
                                    noise, X[:, :start], Y[:, :start])
             if t % 50 == 0:  # Graph regelmäßig auswerten (sonst Metal-Pufferlimit, v. a. bei mdl)
                 mx.eval(tr, m, v)
-        lp = np.concatenate(cands, axis=1)  # [S, len(checkpoints)*len(temps), block]
+        if a.post != "none":  # Zweig: Nachtraining vom Endstand der Phase 1
+            vstep2, _, _ = build_fns(cfg2, arm2, n_train=max(start, a.penalty_n_min))
+            p1 = vdet_phase1(tr, const)
+            pairs2 = [arm2.init(tree_map(lambda x, i=i: x[i], p1), s) for i, s in enumerate(a.seeds)]
+            tr2 = stack_trees([q[0] for q in pairs2])
+            const2 = stack_trees([q[1] for q in pairs2])
+            m2 = tree_map(mx.zeros_like, tr2)
+            v2 = tree_map(mx.zeros_like, tr2)
+            for t2 in range(1, a.post_steps + 1):
+                noise = arm2.noise_like(tr2) if arm2.needs_noise else noise_dummy
+                if a.post_beta_warmup:
+                    beta2 = a.post_mdl_beta * min(1.0, t2 / a.post_beta_warmup)
+                else:
+                    beta2 = a.post_mdl_beta
+                tr2, m2, v2, _, _ = vstep2(tr2, const2, m2, v2, mx.array(float(t2)),
+                                           mx.array(beta2), noise, X[:, :start], Y[:, :start])
+                if t2 % 50 == 0:
+                    mx.eval(tr2, m2, v2)
+                if t2 in post_ckpts:
+                    lp_c = vlogp2(tr2, const2, X[:, start:end], Y[:, start:end])
+                    mx.eval(lp_c)
+                    cands.append(np.array(lp_c, dtype=np.float64))
+        lp = np.concatenate(cands, axis=1)  # [S, len(labels)*len(temps), block]
         uni = np.full(lp.shape[-1], -math.log(task.p))
         chosen, bits = [], []
         for i in range(len(a.seeds)):
@@ -162,7 +214,7 @@ def main(a: Args) -> None:
             # Wahl der Temperatur wird als Teil des Codes bezahlt (switch_bits)
             per_seed_logp[(i, start)] = options[k] - switch_bits * math.log(2) / len(uni)
             chosen.append("uniform" if k == lp.shape[1] else
-                          f"c{checkpoints[k // len(temps)]}/T{temps[k % len(temps)]:g}")
+                          f"{labels[k // len(temps)]}/T{temps[k % len(temps)]:g}")
             bits.append(costs[k] / math.log(2) + switch_bits)
         bits = np.array(bits)
         run.log(block_start=start, block_end=end, bits_per_seed=bits.tolist(),
