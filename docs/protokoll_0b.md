@@ -1,4 +1,4 @@
-# Protokoll Stufe 0b (Version 2, ENTWURF; wird mit dem Start des Hauptlaufs 0b eingefroren)
+# Protokoll Stufe 0b (Version 2, EINGEFROREN 2026-11-03 22:30)
 
 Stand: 2026-11-03 22:20. Version 2 ersetzt Version 1 (unten unverändert erhalten). Entscheidung datenbasiert durch Claude im Auftrag von Jonas.
 

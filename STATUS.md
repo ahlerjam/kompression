@@ -1,12 +1,25 @@
 # STATUS
 
-**Phase: MESSPHASE für Stufe 0a** seit 2026-11-03 (Protokoll v2 eingefroren; Kern und `docs/protokoll_0a.md` gesperrt).
+**Phase: MESSPHASE für Stufe 0b** seit 2026-11-03 22:30 (Protokoll 0b Version 2 eingefroren). Stufe 0a abgeschlossen (Protokoll 0a bleibt eingefroren, Kern gesperrt).
 
 **Reihenfolge streng nacheinander (Entscheidung Jonas, 2026-11-03 05:50):** erst 0a fertig messen und auswerten, dann Hauptlauf 0b, dann auf Basis beider Ergebnisse über Stufe 1 entscheiden. **Stufe 1 ruht komplett** (keine Läufe, kein Weiterbau). Alle GPU-Ressourcen gehen an das aktuelle Gate (zwei Stränge `H-A`/`H-B`; ein dritter sprengte den Speicher, siehe Logbuch 06:49); Bauarbeit nur für 0b (Vorbereitung, damit 0b direkt nach 0a starten kann).
 
-**Ziel danach:** Bewerbung bei Google TPU Research Cloud (nur eine Einreichung pro Person → erst mit Ergebnissen aus 0a/0b). Claude meldet sich bei Jonas, sobald es so weit ist, mit fertigem Antragstext.
+## Ergebnis 0a für Jonas (2026-11-03 22:25) — Details: `docs/ergebnis_0a.md`
 
-**Fortschritt Hauptlauf 0a (17:57):** **Teil B komplett.** Teil A fertig: `H_mdl`, `H_wd`, `H_wd_normproj`; läuft: `H_bitnet` (tmux `H-A2`), `H_none` (tmux `H-B2`). Erwartetes Ende 0a: ca. 22–23 Uhr, dann Auswertung.
+**Ehrlich: Die beiden Hauptthesen sind in diesem Versuch widerlegt.**
+- H1: Das MDL-Netz codiert die Daten **nicht** kürzer als Weight Decay, sondern länger (32,5 vs. 26,5 kbit; signifikant).
+- H4: bitnet ist minimal länger als Weight Decay (27,1 vs. 26,5 kbit; signifikant, aber klein).
+
+**Was bestätigt ist:**
+- MDL findet ~9× kürzere Gewichte als wd (143 kbit vs. 1,29 Mbit) und ~5,7× kürzere als die normgleiche Kontrolle → es ist nicht nur die Norm.
+- MDL groked stabiler als die normgleiche Kontrolle.
+- Bei viel Daten codiert bitnet die Tabelle praktisch exakt (137 vs. 8.599 Bit in den letzten Blöcken); mdl tendenziell auch präziser (nicht signifikant).
+
+**Deutung:** Kompression gewinnt spät, verliert früh, und die Summe misst vor allem „früh“. Genau das kann das Folgeexperiment 0a+ (Switch-Code, β wachsend mit Datenmenge) angehen — Entscheidung nach 0b mit Jonas.
+
+**Läuft jetzt:** Hauptlauf 0b (Transfer in Bit), tmux `0b-1`/`0b-2`, Protokoll 0b Version 2 (Neustart je Block). Dauer grob 1 Tag.
+
+**Ziel danach:** Bewerbung bei Google TPU Research Cloud (nur eine Einreichung pro Person → erst mit Ergebnissen aus 0a/0b). Claude meldet sich bei Jonas, sobald es so weit ist, mit fertigem Antragstext.
 
 ## Morgen-Zusammenfassung für Jonas (Stand 2026-11-03, 00:35)
 
