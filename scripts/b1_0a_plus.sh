@@ -9,6 +9,7 @@ cd ~/ai/kompression
 P() { uv run python stages/s0a_grokking/prequential.py --arm wd --weight-decay 1.0 --restart \
   --steps-per-block 750 --cycles 4 --post-steps 250 --post-beta-warmup 50 "$@" }
 SE=(100 101 102)
+H=(20 21 22 23 24 25 26 27 28 29)
 case "$1" in
   CAL1)
     P --seeds $SE --post wd --name kalZ_wd
@@ -20,5 +21,21 @@ case "$1" in
     P --seeds $SE --post wd --post-weight-decay 10 --name kalZ_wd_l10
     P --seeds $SE --post mdl_norm --post-mdl-beta 0.3 --name kalZ_mdlnorm_b0.3
     P --seeds $SE --post bitnet --name kalZ_bitnet ;;
-  *) echo "Hauptlauf erst nach Einfrieren; Befehle kommen dann hierher"; exit 1 ;;
+  # Hauptlauf (Protokoll Version 2, eingefroren): β = 0,1 aus Kalibrierung; wichtigste Bedingungen zuerst
+  1)
+    P --seeds $H --post mdl --post-mdl-beta 0.1 --name B1_mdl
+    P --seeds $H --post wd --name B1_wd
+    P --seeds $H --post prune --prune-frac 0.9 --name B1_prune
+    P --seeds $H --post free --name B1_free ;;
+  2)
+    P --seeds $H --post wd --post-weight-decay 10 --name B1_wd_l10
+    P --seeds $H --post mdl_norm --post-mdl-beta 0.1 --name B1_mdlnorm
+    P --seeds $H --post bitnet --name B1_bitnet ;;
+  # Testdurchlauf der Hauptlauf-Befehle auf kleinem p (kein Befund)
+  T)
+    for a in "mdl --post-mdl-beta 0.1" "wd" "wd --post-weight-decay 10" "mdl_norm --post-mdl-beta 0.1" \
+             "bitnet" "prune --prune-frac 0.9" "free"; do
+      P --p 23 --first-block 64 --seeds 200 201 --post ${=a} --name testB1_${a%% *}
+    done ;;
+  *) echo "unbekannt: $1"; exit 1 ;;
 esac

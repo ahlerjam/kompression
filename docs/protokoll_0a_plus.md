@@ -30,14 +30,18 @@ mdl β ∈ {0,1; 0,3} (Einstellungen wie Arm `mdl` in 0a: log σ₀ = −6, glei
 
 Hinweis aus der Code-Prüfung (Logbuch 12:25): Mit lr 1e-3 bewegen sich log σ und Prior in 250 Schritten kaum; der mdl-Schlaf wirkt dann vor allem über den Zug des Priors auf die Mittelwerte (große Gewichte werden nach [−0,3; 0,3] gezogen). Eine „reparierte“ Variante (Lernrate ×30 für σ/Prior, log σ₀ = −3, Snapping auf Prior-Zentren) ist als Option vorhanden (`--post-mdl-lr-mult`, `--post-mdl-init-log-sigma`, `--post-mdl-snap`), war im Probelauf (p = 23) aber kaum besser als wd.
 
-## Hypothesen (Hauptlauf, Seeds 20–29, gepaart)
+## Hypothesen (Hauptlauf, Seeds 20–29, gepaart; geschärft nach Prüfstand und Kalibrierung)
+
+Bedingungen im Hauptlauf (Laufnamen `B1_*`): `mdl` (β = 0,1), `wd`, `wd_l10`, `mdlnorm` (Norm-Zwilling von mdl, β = 0,1), `bitnet`, `prune` (0,9), `free`.
 
 | | Hypothese | Endpunkt |
 |---|---|---|
 | H1 (primär) | Zyklen mit `mdl`-Schlaf codieren kürzer als nur lernen (`wd`) | prequentielle Codelänge |
-| H2 | `mdl`-Schlaf kürzer als `bitnet`-Schlaf | prequentielle Codelänge |
-| H3 | `mdl`-Schlaf kürzer als `prune`-Schlaf | prequentielle Codelänge |
-| H4 (sekundär) | `mdl`-Schlaf präziser bei viel Daten als nur lernen | Bits der letzten beiden Blöcke |
+| H2 | `mdl`-Schlaf kürzer als `wd` λ = 10 im Schlaf (Norm-Kontrolle: schrumpfen ohne Codelängen-Ziel) | prequentielle Codelänge |
+| H3 | `mdl`-Schlaf kürzer als sein Norm-Zwilling `mdl_norm` (nach jedem Schlaf werden die Wachgewichte nur auf die Frobenius-Norm des mdl-Ergebnisses skaliert) | prequentielle Codelänge |
+| H4 (sekundär) | `mdl`-Schlaf präziser bei viel Daten als nur lernen | Bits der Blöcke [4096, 8192) und [8192, 9409) |
 
-- Wilcoxon gepaart (10 Seeds), Bootstrap-95-%-KI, Holm über H1–H4. Beschreibend zusätzlich: bitnet und prune gegen wd weiter.
-- Grenzen: eine Aufgabe, eine Modellgröße, ein Wachverfahren, feste Zyklenzahl; Wahl von β und Pruning-Anteil auf anderen Seeds kalibriert; Prior und Unsicherheiten von `mdl` werden je Schlaf neu initialisiert.
+- Wilcoxon gepaart (10 Seeds), Bootstrap-95-%-KI, Holm über H1–H4. Auswertung: `stages/s0a_grokking/analyse_b1.py` (Test `tests/test_analyse_b1.py`).
+- Deutung: Nur H1 → Schlaf hilft, aber womöglich bloß über die Norm. H1 + H2 + H3 → mdl-Schlaf hilft über die Norm hinaus (echte Kompression). Nach dem Prüfstand (p = 23) wird ein großer Teil des Gewinns als Norm-Effekt erwartet.
+- Beschreibend (ohne Test-Anspruch): `bitnet`, `prune`, `free`, `wd_l10`, `mdlnorm` jeweils gegen `wd`.
+- Grenzen: eine Aufgabe, eine Modellgröße, ein Wachverfahren, feste Zyklenzahl; β auf anderen Seeds kalibriert; Prior und Unsicherheiten von `mdl` werden je Schlaf neu initialisiert. Der Gewinn kann fast ganz aus einem einzigen Block stammen (ob das Netz bei 2.048 Beispielen schon grokt); das ist Teil des Ergebnisses, nicht Störung.
