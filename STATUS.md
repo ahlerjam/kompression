@@ -10,9 +10,9 @@
 
 **0a+ A (explorativ, 10:42):** Switch-Code bringt in 0a vor allem Wechsel zwischen λ-Werten (26,5 → 18,4 kbit); mdl zusätzlich nur ~0,2 kbit, bitnet ~1,1 kbit. Kompression gewinnt auch mit Switching nicht gegen wd. Logbuch 10:42.
 
-**Läuft (seit 12:23): 0a+ B1-Zyklus-Kalibrierung** (E29: Wach-Schlaf, je Block 4 × (750 wd + 250 Schlaf), nächste Wachphase vom komprimierten Stand). tmux `z-1` (Schlaf wd, mdl β 0,1, frei, prune 0,9) und `z-2` (mdl β 0,3, wd λ 10 als Norm-Kontrolle, bitnet), Seeds 100–102, Logs `runs/kalZ_*.log`. Danach Protokoll `docs/protokoll_0a_plus.md` v2 einfrieren, Hauptlauf Seeds 20–29, dann TRC-Antrag.
+**Läuft (seit 12:23): 0a+ B1-Zyklus-Kalibrierung** (E29: Wach-Schlaf, je Block 4 × (750 wd + 250 Schlaf), nächste Wachphase vom komprimierten Stand). tmux `z-1` (Schlaf wd, mdl β 0,1, frei, prune 0,9) und `z-2` (seit 12:55: mdl β 0,3, wd λ 10 und mdl-Norm-Zwilling als Norm-Kontrollen, bitnet; Prüfstand zeigte: mdl-Schlaf überwiegend Norm-Effekt, Logbuch 12:55), Seeds 100–102, Logs `runs/kalZ_*.log`. Danach Protokoll `docs/protokoll_0a_plus.md` v2 einfrieren, Hauptlauf Seeds 20–29, dann TRC-Antrag.
 
-**Wartet auf Jonas (12:25): nächstes großes Experiment wählen.** Vorschlag aus der Agenten-Prüfung: „Gesamtcode einer Aufgabenfolge“ (Logbuch 12:25). Neuheitsprüfung in `docs/recherche.md`.
+**Plan (Jonas 12:55):** 0a+ autonom abschließen, dann Zwischenbericht mit Empfehlung. **Vorschlag danach:** Vorschlag aus der Agenten-Prüfung: „Gesamtcode einer Aufgabenfolge“ (Logbuch 12:25). Neuheitsprüfung in `docs/recherche.md`.
 
 **Reihenfolge streng nacheinander (Entscheidung Jonas, 2026-11-03 05:50):** erst 0a fertig messen und auswerten, dann Hauptlauf 0b, dann auf Basis beider Ergebnisse über Stufe 1 entscheiden. **Stufe 1 ruht komplett** (keine Läufe, kein Weiterbau). Alle GPU-Ressourcen gehen an das aktuelle Gate (zwei Stränge `H-A`/`H-B`; ein dritter sprengte den Speicher, siehe Logbuch 06:49); Bauarbeit nur für 0b (Vorbereitung, damit 0b direkt nach 0a starten kann).
 
