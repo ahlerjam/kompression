@@ -255,3 +255,7 @@ Ganze Git-Historie (104 Commits) und Arbeitsstand durchsucht. Keine Schlüssel, 
 - Befund Engineering: Metal-GPU ist nicht bitgenau deterministisch (Abweichung ca. 6e-8); Tests prüfen mit Toleranz.
 - Befund Engineering: `mx.vmap` über 10 Seeds ≈ 10 × Zeit eines Seeds (4,7 vs. 47,7 Schritte/s). Kein Parallelgewinn bei diesem Modell.
 - Kalibrierungslauf `none` / `wd` gestartet.
+
+### 14:20 Kalibrierung 0a+ B1, Zwischenstand (kein Befund)
+
+Fertig (Seeds 100–102, Gesamt-Codelänge je Seed, bit): `wd` 26.152 / 25.004 / 26.284 (Mittel 25,8 kbit); `mdl` β 0,1: 14.415 / 14.754 / 14.433 (14,5 kbit); `mdl` β 0,3: 17.850 / 26.418 / 15.250 (19,8 kbit); `free` Mittel 26,3 kbit. Der Unterschied entsteht fast ganz im Block [2048, 4096): mit mdl-Schlaf grokt das Netz dort (≈ 380 bit), mit wd nicht (≈ 11 kbit). Laut Log grokt auch `wd` λ 10 im Schlaf dort (≈ 0,5 bit/Label ≈ 1.000 bit), also wie im Prüfstand zum großen Teil Norm-Effekt. Festlegung: β = 0,1 (kleinste mittlere Codelänge). Hypothesen geschärft (H2 gegen wd λ 10, H3 gegen Norm-Zwilling), Auswerteskript `analyse_b1.py` mit Test, Hauptlauf-Befehle (`B1_*`, Seeds 20–29) und Testdurchlauf `T` (p = 23) im Skript. Offen: prune, mdl_norm, bitnet; danach Testdurchlauf, Einfrieren, Hauptlauf.
