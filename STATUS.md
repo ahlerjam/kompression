@@ -8,6 +8,8 @@
 
 **0a+ A (explorativ, 11:05):** Switch-Code bringt in 0a vor allem Wechsel zwischen λ-Werten (26,5 → 18,4 kbit); mdl zusätzlich nur ~0,2 kbit, bitnet ~1,1 kbit. Kompression gewinnt auch mit Switching nicht gegen wd. Logbuch 11:05.
 
+**Wartet auf Jonas (11:20): 0a+ B umplanen?** Die Nachrechnung zeigt: Mit Neustart je Block ist „β wachsend mit n“ dasselbe wie „je Block ein β wählen“, und das liefert schon 32,1 kbit gegen 18,4 bei wd; das optimale β fällt sogar mit n. Vorschläge: (B1) zweiphasig: erst wd bis zum Grokking, dann mdl-Druck („erst lernen, dann komprimieren“); (B2) B weglassen und mit 0a, 0b, 0a+ A zum TRC-Antrag; (B3) B trotzdem wie geplant. Empfehlung Claude: B1 (neue Frage, ~5 h Hauptlauf), sonst B2. Logbuch 11:20.
+
 **Reihenfolge streng nacheinander (Entscheidung Jonas, 2026-11-03 05:50):** erst 0a fertig messen und auswerten, dann Hauptlauf 0b, dann auf Basis beider Ergebnisse über Stufe 1 entscheiden. **Stufe 1 ruht komplett** (keine Läufe, kein Weiterbau). Alle GPU-Ressourcen gehen an das aktuelle Gate (zwei Stränge `H-A`/`H-B`; ein dritter sprengte den Speicher, siehe Logbuch 06:49); Bauarbeit nur für 0b (Vorbereitung, damit 0b direkt nach 0a starten kann).
 
 ## Ergebnis 0b Subtraktion für Jonas (2026-11-04 04:57) — Details: `docs/ergebnis_0b.md`

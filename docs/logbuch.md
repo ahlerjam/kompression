@@ -4,6 +4,21 @@ Neueste Einträge oben. Kurz: Datum, was, Ergebnis, Verweis auf `runs/…`.
 
 ## 2026-11-04
 
+### 11:20 0a+ B in geplanter Form durch Teil A praktisch vorab beantwortet (explorativ)
+
+Mittlere Bits/Label je Block, Hauptlauf 0a (Seeds 10–19), Blöcke ab 64/128/…/8192:
+
+| Arm | … 1024 | 2048 | 4096 | 8192 |
+|---|---|---|---|---|
+| wd λ 0,3 / 1 / 3 | 6,61 / 6,58 / 6,57 | 6,60 / 6,17 / 1,77 | 6,38 / 0,24 / 1,77 | 0,38 / 0,36 / 1,81 |
+| mdl β 0,03 / 0,1 / 0,3 | 6,61 | 6,60 / 6,58 / 6,36 | 6,35 / 2,20 / 1,80 | 0,06 / 0,14 / 0,31 |
+| bitnet | 6,61 | 6,54 | 0,03 | 0,01 |
+
+- Entschieden wird alles in den Blöcken ab 2.048 und 4.096 (groked das Netz auf dem Präfix in 3.000 Schritten?). Früher codiert niemand besser als uniform.
+- Optimales β **fällt** mit der Datenmenge (β 0,3 bei 4.096, β 0,03 bei 8.192), es wächst nicht.
+- Mit Neustart je Block ist ein Plan β(n) (n = Präfixgröße) gleichbedeutend mit „je Block ein β wählen“. Der Switch-Code über das mdl-Gitter (Teil A) ist dafür eine fast scharfe Obergrenze innerhalb des Gitters: 32,1 kbit gegen Switch(wd) 18,4. Ein β(n)-Plan in [0,03; 0,3] kann wd daher kaum schlagen; β = 1 lernt laut Kalibrierung gar nicht.
+- Folgerung: B wie geplant würde ~1 Tag GPU für eine absehbar negative Antwort verbrauchen. Vorschlag an Jonas (Entscheidung offen), siehe STATUS.
+
 ### 11:05 0a+ Teil A: Switch-Code-Nachrechnung (EXPLORATIV, nicht vorab registriert)
 
 Neues Skript `stages/s0a_grokking/explor_switch.py` (keine GPU, liest nur `metrics.jsonl` der Hauptläufe; Gegenprobe gegen `results.json` je Seed bestanden). Fixed-Share-Mischung auf Blockebene über „Experten“ (Läufe), α aus {0; 0,01; 0,05; 0,125; 0,25}, bezahlt mit log2 5 Bit. Gültiger Code, weil jeder Experte jeden Block prequentiell codiert. Ausgaben: `runs/explor_switch_add.txt`, `runs/explor_switch_sub.txt`. Mittel über Seeds 10–19, kbit:
