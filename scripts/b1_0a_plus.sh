@@ -35,7 +35,7 @@ case "$1" in
   T)
     for a in "mdl --post-mdl-beta 0.1" "wd" "wd --post-weight-decay 10" "mdl_norm --post-mdl-beta 0.1" \
              "bitnet" "prune --prune-frac 0.9" "free"; do
-      P --p 23 --first-block 64 --seeds 200 201 --post ${=a} --name testB1_${a%% *}
+      P --p 23 --first-block 64 --seeds 200 201 --post ${=a} --name testB1_${${a//--post-/}// /_}
     done ;;
   *) echo "unbekannt: $1"; exit 1 ;;
 esac

@@ -1,6 +1,6 @@
-# Protokoll 0a+ B1-Zyklus: Wach-Schlaf-Kompression (ENTWURF, Version 2)
+# Protokoll 0a+ B1-Zyklus: Wach-Schlaf-Kompression (EINGEFROREN, Version 2, 2026-11-04 15:20)
 
-Stand: 2026-11-04 12:25. Freigabe der Variante B1 durch Jonas (2026-11-04). Wird nach der Kalibrierung (Seeds 100–102) eingefroren; erst dann Hauptlauf (Seeds 20–29).
+Stand: 2026-11-04 12:25. Freigabe der Variante B1 durch Jonas (2026-11-04). Eingefroren am 2026-11-04 15:20 nach Kalibrierung (Seeds 100–102) und Testdurchlauf; Änderungen nur als neue datierte Version. Hauptlauf Seeds 20–29 (`scripts/b1_0a_plus.sh 1` und `2`).
 
 ## Frage
 
@@ -26,7 +26,24 @@ Version 2 ersetzt Version 1 (reines Nachtraining als Zweig, ohne Rückkopplung).
 
 ## Kalibrierung (Seeds 100–102, kein Befund)
 
-mdl β ∈ {0,1; 0,3} (Einstellungen wie Arm `mdl` in 0a: log σ₀ = −6, gleiche Lernrate für alle Parameter), Schlaf `free`, `wd` λ = 10, prune 0,9, bitnet, wd. β wird für den Hauptlauf festgelegt (kleinste mittlere Codelänge); welche Kontrollen in den Hauptlauf gehen, wird vor dem Einfrieren festgelegt. [[Ergebnis eintragen]]
+mdl β ∈ {0,1; 0,3} (Einstellungen wie Arm `mdl` in 0a: log σ₀ = −6, gleiche Lernrate für alle Parameter), Schlaf `free`, `wd` λ = 10, prune 0,9, `mdl_norm` β 0,3, bitnet, wd.
+
+Ergebnis (Gesamt-Codelänge je Seed 100 / 101 / 102 in bit, Mittel in kbit; Läufe `runs/s0a_preq/*_kalZ_*`):
+
+| Schlaf | Seeds 100 / 101 / 102 | Mittel |
+|---|---|---|
+| `wd` (nur lernen) | 26.152 / 25.004 / 26.284 | 25,8 |
+| `mdl` β 0,1 | 14.415 / 14.754 / 14.433 | **14,5** |
+| `mdl` β 0,3 | 17.850 / 26.418 / 15.250 | 19,8 |
+| `wd` λ 10 | 16.777 / 17.505 / 18.373 | 17,6 |
+| `mdl_norm` β 0,3 | 16.057 / 24.586 / 25.030 | 21,9 |
+| `free` | 26.010 / 26.464 / 26.361 | 26,3 |
+| `prune` 0,9 | 27.269 / 28.104 / 27.716 | 27,7 |
+| `bitnet` | 20.969 / 27.279 / 20.092 | 22,8 |
+
+Festlegung: **β = 0,1** (kleinste mittlere Codelänge); der Norm-Zwilling im Hauptlauf nutzt dasselbe β. Pruning-Anteil 0,9 (nur ein Wert kalibriert; prune ist im Hauptlauf beschreibend). Alle sieben Bedingungen gehen in den Hauptlauf. Der Unterschied mdl gegen wd entsteht fast ganz im Block [2048, 4096) (ob das Netz dort grokt). Kalibrierungen sind keine Befunde.
+
+Testdurchlauf der Hauptlauf-Befehle (p = 23, Seeds 200–201, `runs/testB1.log`, Läufe `testB1_*`): alle sieben Bedingungen rechnen ohne NaN, die Konfigurationen stimmen, Schlaf-Kandidaten werden im Self-Switch gewählt.
 
 Hinweis aus der Code-Prüfung (Logbuch 12:25): Mit lr 1e-3 bewegen sich log σ und Prior in 250 Schritten kaum; der mdl-Schlaf wirkt dann vor allem über den Zug des Priors auf die Mittelwerte (große Gewichte werden nach [−0,3; 0,3] gezogen). Eine „reparierte“ Variante (Lernrate ×30 für σ/Prior, log σ₀ = −3, Snapping auf Prior-Zentren) ist als Option vorhanden (`--post-mdl-lr-mult`, `--post-mdl-init-log-sigma`, `--post-mdl-snap`), war im Probelauf (p = 23) aber kaum besser als wd.
 
