@@ -32,6 +32,7 @@ Status: E1–E27 am 2026-11-02 freigegeben.
 | E25 | „Welten mit bekannter Lösung“: Aufgaben aus einer versteckten, selbst geschriebenen Bibliothek erzeugen; messen, ob das System sie wiederfindet | eindeutiger als jeder Benchmark, keine Kontamination |
 | E26 | BitNet (ternäre Gewichte, QAT) als zusätzlicher Arm in 0a, nicht als Hauptarchitektur | L(W) exakt messbar; als Hauptarchitektur erst bei Milliarden Parametern sinnvoll |
 | E27 | L(W) als Minimum aus „W absolut“ und „Seed (32 Bit) + Differenz zu W0“ (Rezept `uq-entropy-v2`); dazu Arm `subspace`: W = W0 + A·Z·Bᵀ mit festen Zufallsbasen aus dem Seed, nur Z trainiert | Idee von Jonas: Die Initialisierung ist aus dem Seed reproduzierbar und darf nichts kosten; der Unterraum macht die Beschreibungslänge exakt steuerbar (verwandt: Li et al. 2018, VeRA, SeedLM) |
+| E28 | Nach 0b zuerst Folgeexperiment 0a+ (Switch-Code-Nachrechnung ohne GPU, dann β wachsend mit Datenmenge auf Seeds 20–29, Protokoll vor Hauptlauf eingefroren), **danach** TRC-Antrag mit allen Ergebnissen; Repo nach 0b öffentlich; Stufe 1 ruht weiter (Jonas, 2026-11-04) | 0a+ adressiert die Schwäche „früh verlieren“ und die Frage, wann altes Wissen hilft; ein Ergebnis stärkt den Antrag (nur eine Einreichung) |
 
 ## Was das Konzept-Doc ändern sollte
 
