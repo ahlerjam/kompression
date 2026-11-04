@@ -4,6 +4,7 @@ Neueste Einträge oben. Kurz: Datum, was, Ergebnis, Verweis auf `runs/…`.
 
 ## 2026-11-03
 
+- 07:10 (04.11.) 0b mul: `random` und `wd_scaled` komplett. Rohwerte S 3.000 (kein Befund): random 26,2–28,7, wd_scaled 41,0–44,3 kbit. Es laufen A(wd) und A(mdl).
 - 07:00 (04.11.) Entwurf `docs/entwurf_0a_plus.md` (Switch-Code, β mit Datenmenge, Skalierung) als Grundlage für die Entscheidung mit Jonas. 0b mul: S 3.000 von random/wd_scaled läuft.
 - 06:00 (04.11.) TRC-Antrag v2 vorformuliert (0a + 0b-Subtraktion). 0b mul Rohwerte (kein Befund): random S 1.000 52,1–57,6, wd_scaled S 1.000 41,5–45,6 kbit — bei Multiplikation spart die Norm-Kontrolle etwas, anders als bei Subtraktion. S 3.000 läuft.
 - 04:57 (04.11.) **Auswertung 0b Subtraktion: Gate 0b BESTANDEN.** H1–H4 je Holm p = 0,0078, alle 10 Seeds gleiche Richtung. Mittel: Zufall 29,3 · A(wd) 12,5 · A(wd) permutiert 54,4 · A(wd) Norm-skaliert 54,4 · A(mdl) 7,4 · A(bitnet) 6,9 kbit. H4 (A(mdl) < A(wd)) bestätigt. Details `docs/ergebnis_0b.md`. Multiplikation läuft weiter.
