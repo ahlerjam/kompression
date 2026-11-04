@@ -4,6 +4,8 @@
 
 **Plan ab 2026-11-04 (Jonas, E28):** 0b Multiplikation fertig → auswerten → Repo öffentlich (nach Geheimnis-Prüfung) → **0a+** (A: Switch-Code-Nachrechnung ohne GPU; B: β wachsend mit Datenmenge, Seeds 20–29, ca. 1 Tag) → TRC-Antrag mit allen Ergebnissen → Jonas reicht ein. Stufe 1 ruht weiter.
 
+**Ergebnis 0b Multiplikation (11:45): NEGATIV.** Start aus Additions-Gewichten codiert Multiplikation 13,6 kbit länger als Zufall (27,0 vs. 40,6 kbit, Holm p = 0,008, Gegenrichtung); Struktur-, Norm- und mdl-Hypothesen nicht bestätigt (p = 1,0). Alle A-Starts gleich schlecht wie normgleiche Kontrollen → Norm-Effekt, kein Strukturtransfer. Gate 0b (Subtraktion) bleibt bestanden. Messphase 0b beendet. Details `docs/ergebnis_0b.md`.
+
 **Wartet auf Jonas (2026-11-04 11:00): Repo NICHT veröffentlicht.** Geheimnis-Prüfung ohne Schlüssel/Tokens/Pfade, aber Funde: `jam@ahler.org` in allen Commits und `pyproject.toml`; `account@ahler.org` in `docs/trc_antrag.md`; Claude-Session-Links in 80 Commit-Nachrichten; Link auf das private Konzept-Doc. Optionen: (a) so veröffentlichen, (b) Historie neu schreiben (GitHub-noreply-Adresse, Session-Zeilen und Formular-Mail entfernen), (c) neues öffentliches Repo mit einem einzigen Start-Commit. Details: Logbuch 11:00.
 
 **0a+ A (explorativ, 11:05):** Switch-Code bringt in 0a vor allem Wechsel zwischen λ-Werten (26,5 → 18,4 kbit); mdl zusätzlich nur ~0,2 kbit, bitnet ~1,1 kbit. Kompression gewinnt auch mit Switching nicht gegen wd. Logbuch 11:05.

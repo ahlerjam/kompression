@@ -4,6 +4,11 @@ Neueste Einträge oben. Kurz: Datum, was, Ergebnis, Verweis auf `runs/…`.
 
 ## 2026-11-04
 
+### 11:45 0b Multiplikation fertig und ausgewertet: NEGATIV (negativer Transfer); Messphase 0b beendet
+
+Alle Läufe `H0b_mul_*` fertig (keine Abstürze). `analyse_0b.py` → `runs/analyse_0b_full.txt`, unverändert in `docs/ergebnis_0b.md`. Mittel kbit: Zufall 27,0 · A(wd) 40,6 · permutiert 40,7 · Norm-skaliert 42,5 · A(mdl) 43,5 · A(bitnet) 42,9. H1 in Gegenrichtung signifikant (Holm p = 0,0078), H2–H4 Holm p = 1,0. Gate 0b (nur Subtraktion) bleibt bestanden.
+Vorhersagen aus 09:40 eingetroffen (A(bitnet) schlecht; permutiert ≈ skaliert). Je Block (bestes S je Bedingung, explorativ): A-Start spart in den Blöcken 512–2.048 (bitnet 10/10 Seeds, bis 0,7 kbit), verliert ab 4.096 in allen Seeds massiv (wd −11,8 kbit, mdl −16,8, bitnet −16,2 im Block [4096, 8192)). Switch-Code (Zufall + A) nimmt das Frühe mit: 0,4–1,0 kbit unter Zufall allein (`runs/explor_switch_mul.txt`).
+
 ### 11:20 0a+ B in geplanter Form durch Teil A praktisch vorab beantwortet (explorativ)
 
 Mittlere Bits/Label je Block, Hauptlauf 0a (Seeds 10–19), Blöcke ab 64/128/…/8192:
