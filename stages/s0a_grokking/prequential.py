@@ -85,6 +85,12 @@ class Args:
     post_mdl_wd: float = 0.0  # Schlaf mdl/mdl_norm: zusätzlicher L2 nur auf die Gewichte (Hybrid)
     post_mdl_pi0: float = 0.0  # Schlaf mdl: Start-Logit der Null-Komponente des Priors
     post_mdl_s0: float = 0.05  # Schlaf mdl: Startbreite der Null-Komponente des Priors
+    # Zyklus, selbst gewählter Schlaf (E30): Kandidaten "mdl:<beta>" oder "wd:<lambda>"; jeder
+    # Kandidat schläft auf dem Präfix ohne die letzten Anteil post_select_holdout, jeder Seed
+    # behält den Kandidaten mit der kürzesten Codelänge (Temperatur 1) auf diesem zurückgehaltenen
+    # Teil. Wach lernt weiter auf dem ganzen Präfix. Leer (Standard) = Verhalten wie vorher.
+    post_select: tuple[str, ...] = ()
+    post_select_holdout: float = 0.125
 
 
 def _tnorm(x: mx.array) -> mx.array:
@@ -195,6 +201,65 @@ def main(a: Args) -> None:
     if a.post != "none":
         vdet2 = mx.vmap(arm2.deterministic, in_axes=(0, 0))
 
+    sel_counts: dict[str, int] = {}
+    if a.post_select:
+        if not a.cycles:
+            raise ValueError("--post-select nur mit --cycles")
+        sel = []
+        for c_ in a.post_select:
+            kind, val = c_.split(":")
+            if kind == "mdl":
+                arm_k = make_arm("mdl", mdl_init_log_sigma=a.post_mdl_init_log_sigma,
+                                 mdl_pi0_logit=a.post_mdl_pi0, mdl_s0=a.post_mdl_s0)
+                cfg_k = dataclasses.replace(cfg, arm="mdl", mdl_beta=float(val), weight_decay=0.0,
+                                            mdl_aux_lr_mult=a.post_mdl_lr_mult)
+            elif kind == "wd":
+                arm_k = make_arm("wd")
+                cfg_k = dataclasses.replace(cfg, arm="wd", weight_decay=float(val))
+            else:
+                raise ValueError(f"unbekannter Schlaf-Kandidat: {c_}")
+            sel.append((c_, arm_k, cfg_k, float(val) if kind == "mdl" else 0.0,
+                        mx.vmap(arm_k.deterministic, in_axes=(0, 0))))
+            sel_counts[c_] = 0
+
+    def select_sleep(w, xs, ys, start):
+        """Jeder Kandidat schläft vom selben Wachstand; je Seed gewinnt die kürzeste Holdout-Codelänge."""
+        h = max(1, int(round(start * a.post_select_holdout)))
+        xt, yt, xh, yh = xs[:, :start - h], ys[:, :start - h], xs[:, start - h:], ys[:, start - h:]
+        dummy = mx.zeros((1,))
+        c1 = stack_trees([q[1] for q in pairs])
+        ws, scores = [], []
+        for _, arm_k, cfg_k, beta_k, vdet_k in sel:
+            vstep_k, _, _ = build_fns(cfg_k, arm_k, n_train=max(start - h, a.penalty_n_min))
+            pk = [arm_k.init(tree_map(lambda x, i=i: x[i], w), s) for i, s in enumerate(a.seeds)]
+            trk, ck = stack_trees([q[0] for q in pk]), stack_trees([q[1] for q in pk])
+            mk, vk = tree_map(mx.zeros_like, trk), tree_map(mx.zeros_like, trk)
+            for t2 in range(1, a.post_steps + 1):
+                noise = arm_k.noise_like(trk) if arm_k.needs_noise else dummy
+                b2 = beta_k * (min(1.0, t2 / a.post_beta_warmup) if a.post_beta_warmup else 1.0)
+                trk, mk, vk, _, _ = vstep_k(trk, ck, mk, vk, mx.array(float(t2)), mx.array(b2),
+                                            noise, xt, yt)
+                if t2 % 50 == 0:
+                    mx.eval(trk, mk, vk)
+            wk = vdet_k(trk, ck)
+            lp_h = vlogp(wk, c1, xh, yh)[:, 0, :].sum(axis=1)  # [S], Temperatur 1
+            mx.eval(wk, lp_h)
+            ws.append(wk)
+            scores.append(-np.array(lp_h, dtype=np.float64))
+        best = np.argmin(np.stack(scores), axis=0)  # [S]
+        for b in best:
+            sel_counts[sel[int(b)][0]] += 1
+        idx = mx.array(best)
+
+        def pick(*cs):
+            out_ = cs[0]
+            for k_ in range(1, len(cs)):
+                mask = (idx == k_).reshape((-1,) + (1,) * (cs[k_].ndim - 1))
+                out_ = mx.where(mask, cs[k_], out_)
+            return out_
+
+        return tree_map(pick, *ws)
+
     def cycle_block(start, end):
         """Wach-Schlaf-Zyklen auf dem Präfix; liefert die Kandidaten-Logprobs für den Block."""
         vstep_w, _, _ = build_fns(cfg, arm, n_train=max(start, a.penalty_n_min))
@@ -221,6 +286,10 @@ def main(a: Args) -> None:
                 if c == 0 and t_ in early:
                     out.append(ev(vlogp, w, c1))
             out.append(ev(vlogp, w, c1))
+            if a.post_select:
+                w = select_sleep(w, xs, ys, start)
+                out.append(ev(vlogp, w, c1))
+                continue
             pairs2 = [arm2.init(tree_map(lambda x, i=i: x[i], w), s) for i, s in enumerate(a.seeds)]
             tr2 = stack_trees([q[0] for q in pairs2])
             const2 = stack_trees([q[1] for q in pairs2])
@@ -313,14 +382,15 @@ def main(a: Args) -> None:
                 bits_per_label=(bits / (end - start)).tolist(), temperature=chosen,
                 elapsed_s=time.time() - t0)
         print(f"Block [{start},{end}) Bits/Label je Seed: {np.round(bits / (end - start), 3)} T={chosen}",
-              flush=True)
+              *([f"Schlafwahl bisher: {sel_counts}"] if a.post_select else []), flush=True)
 
     results = {}
     for i, s in enumerate(a.seeds):
         r = prequential_codelength(n, task.p, bounds, lambda st, en, i=i: per_seed_logp[(i, st)])
         results[s] = {"total_bits": r["total_bits"], "uniform_bits": r["uniform_bits"],
                       "per_block_bits": r["per_block_bits"]}
-    run.finish({"prequential": results, "bounds": bounds, "seconds": time.time() - t0})
+    run.finish({"prequential": results, "bounds": bounds, "seconds": time.time() - t0,
+                **({"post_select_counts": sel_counts} if a.post_select else {})})
     print({s: round(v["total_bits"]) for s, v in results.items()}, "uniform",
           round(results[a.seeds[0]]["uniform_bits"]), flush=True)
 

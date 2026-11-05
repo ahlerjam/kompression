@@ -1,6 +1,6 @@
 # STATUS
 
-**Phase: WARTEN AUF ENTSCHEIDUNG JONAS** (seit 2026-11-04 22:35). Messphase 0a+ beendet (`docs/ergebnis_0a_plus.md`), Zwischenbericht `docs/zwischenbericht.md`. Protokolle 0a, 0b, 0a+ eingefroren; Kern unverändert. Stufe 1 ruht. Keine Läufe aktiv.
+**Phase: VERBESSERUNG NACH E30 (Prüfstand, keine Befunde)** (seit 2026-11-04 23:40). Jonas: „fair bleiben und alles verbessern, was geht“. Prüfstand v2/v3: kein Kandidat schlägt wd λ 10 auf p = 23 UND p = 47 (Logbuch 2026-11-05 01:40). Läuft: v3 Rest (tmux b-v3), v4 selbst gewählter Schlaf (tmux b-v4, `runs/bench_v4_p47.log`). Messphase 0a+ beendet (`docs/ergebnis_0a_plus.md`), Zwischenbericht `docs/zwischenbericht.md`. Protokolle eingefroren; Kern unverändert. Stufe 1 ruht.
 
 **Plan ab 2026-11-04 (Jonas, E28):** 0b Multiplikation fertig → auswerten → Repo öffentlich (nach Geheimnis-Prüfung) → **0a+** (A: Switch-Code-Nachrechnung ohne GPU; B: β wachsend mit Datenmenge, Seeds 20–29, ca. 1 Tag) → TRC-Antrag mit allen Ergebnissen → Jonas reicht ein. Stufe 1 ruht weiter.
 

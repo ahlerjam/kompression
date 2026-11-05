@@ -38,6 +38,19 @@ SETS: dict[str, dict[str, list[str]]] = {
         "prior0": [*MDL, "--post-mdl-pi0", "3", "--post-mdl-s0", "0.01"],
         "prior0_hyb3": [*MDL, "--post-mdl-pi0", "3", "--post-mdl-s0", "0.01", "--post-mdl-wd", "3"],
     },
+    # Feinabstimmung Hybrid (nach v2 p = 23: hyb3 vorn)
+    "v3": {
+        "hyb1": [*MDL, "--post-mdl-wd", "1"],
+        "hyb5": [*MDL, "--post-mdl-wd", "5"],
+        "hyb3_b0.3": [*HL, "--post", "mdl", "--post-mdl-beta", "0.3", "--post-mdl-wd", "3"],
+        "hyb3_b0.03": [*HL, "--post", "mdl", "--post-mdl-beta", "0.03", "--post-mdl-wd", "3"],
+    },
+    # Selbst gewählter Schlaf (Holdout-Codelänge je Seed); faire Kontrolle: gleiche Auswahl nur über L2
+    "v4": {
+        "sel_mdl": [*HL, "--post", "wd", "--post-select", "mdl:0.03", "mdl:0.1", "mdl:0.3", "mdl:1"],
+        "sel_l2": [*HL, "--post", "wd", "--post-select", "wd:1", "wd:3", "wd:10", "wd:30"],
+        "sel_mix": [*HL, "--post", "wd", "--post-select", "mdl:0.1", "mdl:0.3", "wd:10", "wd:30"],
+    },
     # Ist der mdl-Schlaf echte Kompression oder ein Norm-Effekt?
     "norm": {
         "wd": [*CYC, "--post", "wd"],

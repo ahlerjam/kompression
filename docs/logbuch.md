@@ -271,3 +271,11 @@ Alle sieben Bedingungen fertig (15:17–22:20, Seeds 20–29, git_dirty false, k
 ### 23:40 Strategie E30, neue Schlaf-Optionen, Prüfstand v2 gestartet
 
 Jonas: „fair bleiben und alles verbessern, was geht“ → E30 (erst auf Prüfstand filtern, dann messen; stärkste Kontrolle wd λ 10). Neue Optionen, Standard unverändert: `--post-mdl-wd` (Hybrid: L2 nur auf mu im mdl-Schlaf, `TrainConfig.mdl_mu_weight_decay`), `--post-mdl-pi0`/`--post-mdl-s0` (Start-Gewicht und -Breite der Null-Komponente des GMM-Priors). Test `test_mdl_prior_null_komponente_option`. Gleichheitsprüfung alter/neuer Code (p = 11, Zyklus mit mdl-Schlaf): 435,35 bit beide, bitgenau (Läufe nach `runs/abgebrochen/*gleich_*`). Prüfstand `eng_bench.py v2` (Einstellung wie Hauptlauf 0a+, Seeds 200–204) auf p = 23 (tmux b-23) und p = 47 (b-47): wd, wd λ 10, mdl, Hybrid λ 3/10, Null-Prior, Null-Prior + Hybrid 3.
+
+## 2026-11-05
+
+### 01:40 Prüfstand v2/v3 (kein Befund), selbst gewählter Schlaf
+
+Prüfstand v2, Seeds 200–204, Gesamt-Codelänge Mittel (bit): p = 23: wd 1.261, wd λ 10 1.200, mdl 1.195, **hyb3 1.174** (schlägt wd λ 10 in 5/5 Seeds), hyb10 1.626, prior0 1.285, prior0_hyb3 1.633. p = 47: wd 5.592, **wd λ 10 3.326** (alle Seeds 3.274–3.388), mdl 4.397 (3.409–5.457), hyb3 5.224, hyb10 6.562, prior0 6.301, prior0_hyb3 5.410. v3 (p = 47): hyb1 4.616, hyb5 5.138, hyb3 β 0,3 3.855. → **Kein Kandidat besteht das E30-Gate.** Auf p = 47 grokt starkes L2 verlässlich, unsere Varianten nur in einem Teil der Seeds (zweigipflig). Der p = 23-Vorteil von hyb3 überträgt sich nicht.
+
+Nächste Verbesserung: `--post-select` (neue Option, Standard leer): Je Schlaf schlafen mehrere Kandidaten vom selben Wachstand auf dem Präfix ohne die letzten 12,5 %; jeder Seed behält den Kandidaten mit der kürzesten Codelänge auf diesem zurückgehaltenen Teil (nur Vergangenheit). Faire Kontrolle: dieselbe Auswahl nur über L2-Stärken. Prüfstand v4 auf p = 47 (tmux b-v4): sel_mdl (β 0,03/0,1/0,3/1), sel_l2 (λ 1/3/10/30), sel_mix (beschreibend). Probelauf p = 11 ok (nach `runs/abgebrochen/`), make test 54 grün.
