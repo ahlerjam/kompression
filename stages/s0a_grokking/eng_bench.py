@@ -63,6 +63,11 @@ SETS: dict[str, dict[str, list[str]]] = {
         "plan_llmm": [*HL, "--post", "wd", "--post-schedule", "wd:10", "wd:10", "mdl:0.1", "mdl:0.1"],
         "plan_lmlm": [*HL, "--post", "wd", "--post-schedule", "wd:10", "mdl:0.1", "wd:10", "mdl:0.1"],
     },
+    # Gate-Prüfung des besten Plans (v6: llmm auf p = 47 5/5 besser als wd λ 10)
+    "v7": {
+        "wd_l10": [*HL, "--post", "wd", "--post-weight-decay", "10"],
+        "plan_llmm": [*HL, "--post", "wd", "--post-schedule", "wd:10", "wd:10", "mdl:0.1", "mdl:0.1"],
+    },
     # Ist der mdl-Schlaf echte Kompression oder ein Norm-Effekt?
     "norm": {
         "wd": [*CYC, "--post", "wd"],

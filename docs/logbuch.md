@@ -291,3 +291,10 @@ v4 p = 23 (Mittel bit; wd λ 10 1.200, mdl 1.195): sel_mdl 1.230, sel_l2 1.284 (
 Neu `--post-schedule` (fester Schlaf je Zyklus, z. B. `wd:10 wd:10 wd:10 mdl:0.1`; Standard leer). Idee aus 0a+: starkes L2 hilft früh beim Groken, mdl ist spät präziser. Prüfstand v6 auf p = 47 (b-v6a) und p = 23 (b-v6b).
 
 **Wichtig für die Messung:** Zwei identische Läufe des alten Pfads (p = 11, Seeds 200/201, Schlaf wd λ 10) ergeben 426/435 und 426/429 bit; MLX ist hier nicht bitgenau reproduzierbar (am 2026-11-04 war ein mdl-Lauf bitgleich). Der neue Plan-Pfad mit `wd:10 wd:10` liegt im selben Bereich (423/433). Folge: „Gepaart über Seeds“ paart Daten und Init, aber nicht die GPU-Rundung; bei Schwellen-Effekten (Groken ja/nein) kann das den Ausgang einzelner Seeds kippen. Für Hauptläufe: mehr Seeds (E30: 20) und Wiederholbarkeit einzelner Seeds prüfen.
+
+### 04:00 Prüfstand v6 Schlafplan (kein Befund)
+
+Seeds 200–204, bit (wd λ 10 zum Vergleich: p = 23 1.197/1.188/1.196/1.195/1.224, Mittel 1.200; p = 47 3.353/3.301/3.316/3.274/3.388, Mittel 3.326).
+p = 23: lllm 1.189, **llmm 1.198** (1.202/1.201/1.187/1.216/1.183, besser in 2/5), lmlm 1.228 (ein Seed 1.388).
+p = 47: lllm 3.438, **llmm 3.119** (3.076/3.121/3.109/3.049/3.240, **besser in 5/5**, −6 %), lmlm 5.035 (grokt meist nicht).
+→ Erster Kandidat mit klarem Vorteil auf p = 47; auf p = 23 Gleichstand im Bereich der GPU-Streuung. Gate noch offen. Prüfung: v7 (wd λ 10 gegen llmm) auf p = 97 mit 5 Seeds (b-v7a) und p = 23 mit 10 Seeds (b-v7b; Seeds 200–204 dabei zugleich Wiederholung).
