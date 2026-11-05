@@ -263,3 +263,7 @@ Fertig (Seeds 100–102, Gesamt-Codelänge je Seed, bit): `wd` 26.152 / 25.004 /
 ### 15:20 Kalibrierung fertig, Testdurchlauf, Protokoll 0a+ Version 2 eingefroren
 
 Restliche Kalibrierwerte (Mittel kbit, Seeds 100–102): `wd` λ 10 im Schlaf 17,6; `mdl_norm` β 0,3 21,9 (16,1 / 24,6 / 25,0); bitnet 22,8; free 26,3; prune 0,9 27,7. Wie im Prüfstand holt starkes Schrumpfen (wd λ 10) einen großen Teil des mdl-Gewinns (25,8 → 17,6 gegen 14,5 kbit); Pruning schadet. Testdurchlauf `scripts/b1_0a_plus.sh T` (p = 23, Seeds 200–201): alle sieben Hauptlauf-Bedingungen ohne NaN/Fehler, Konfigurationen in `config.json` geprüft, Schlaf-Stände (s1, s4) werden im Self-Switch gewählt. Fund: zwei Testläufe hießen gleich `testB1_wd` (Label ohne λ); Hauptlauf-Namen geprüft eindeutig, Testlabel korrigiert. Protokoll eingefroren (Version 2, 15:20), Hauptlauf startet.
+
+### 22:35 Hauptlauf 0a+ B1 ausgewertet, Zwischenbericht
+
+Alle sieben Bedingungen fertig (15:17–22:20, Seeds 20–29, git_dirty false, keine NaN). `analyse_b1.py` unverändert: H1 ja (Holm 0,041), H2 nein (p 1,0; wd λ 10 17,9 vs. mdl 18,3 kbit), H3 ja (0,041), H4 ja (0,008). Blockzerlegung: Unterschied fast nur im Block [2048, 4096); mdl grokt dort in 7/10 Seeds, wd λ 10 in 10/10, wd/Norm-Zwilling/bitnet in 1/10, prune/free in 0/10; wd λ 10 zahlt dafür in den späten Blöcken (3.083 vs. 787 bit). `docs/ergebnis_0a_plus.md` geschrieben, `docs/zwischenbericht.md` vervollständigt (Empfehlung Aufgabenfolge mit wd λ 10 als starker Kontrolle). Wartet auf Jonas.

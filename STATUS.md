@@ -1,6 +1,6 @@
 # STATUS
 
-**Phase: MESSPHASE 0a+ B1-Zyklus** (Hauptlauf seit 2026-11-04 15:17, Protokoll `docs/protokoll_0a_plus.md` Version 2 eingefroren 15:20). Messphase 0b beendet (`docs/ergebnis_0b.md`). Protokolle 0a und 0b bleiben eingefroren; Kern unverändert. Stufe 1 ruht.
+**Phase: WARTEN AUF ENTSCHEIDUNG JONAS** (seit 2026-11-04 22:35). Messphase 0a+ beendet (`docs/ergebnis_0a_plus.md`), Zwischenbericht `docs/zwischenbericht.md`. Protokolle 0a, 0b, 0a+ eingefroren; Kern unverändert. Stufe 1 ruht. Keine Läufe aktiv.
 
 **Plan ab 2026-11-04 (Jonas, E28):** 0b Multiplikation fertig → auswerten → Repo öffentlich (nach Geheimnis-Prüfung) → **0a+** (A: Switch-Code-Nachrechnung ohne GPU; B: β wachsend mit Datenmenge, Seeds 20–29, ca. 1 Tag) → TRC-Antrag mit allen Ergebnissen → Jonas reicht ein. Stufe 1 ruht weiter.
 
@@ -10,7 +10,7 @@
 
 **0a+ A (explorativ, 10:42):** Switch-Code bringt in 0a vor allem Wechsel zwischen λ-Werten (26,5 → 18,4 kbit); mdl zusätzlich nur ~0,2 kbit, bitnet ~1,1 kbit. Kompression gewinnt auch mit Switching nicht gegen wd. Logbuch 10:42.
 
-**Läuft (seit 15:17): Hauptlauf 0a+ B1-Zyklus**, Seeds 20–29, tmux `h-1` (`B1_mdl`, `B1_wd`, `B1_prune`, `B1_free`) und `h-2` (`B1_wd_l10`, `B1_mdlnorm`, `B1_bitnet`), Logs `runs/B1_1.log`, `runs/B1_2.log`, geschätzt 6–8 h. Auswertung `uv run python stages/s0a_grokking/analyse_b1.py`. Kalibrierung (Seeds 100–102, kein Befund, Mittel kbit): wd 25,8; mdl β 0,1 14,5; wd λ 10 17,6; mdl_norm β 0,3 21,9; bitnet 22,8; free 26,3; prune 27,7 → β = 0,1. Testdurchlauf (p = 23) unauffällig. Danach: Auswertung, `docs/ergebnis_0a_plus.md`, Zwischenbericht an Jonas.
+**Ergebnis 0a+ B1 (22:30):** H1 mdl-Schlaf < nur lernen ja (18,3 vs. 25,5 kbit, Holm 0,04); H2 mdl < wd λ 10 im Schlaf **nein** (17,9 kbit, gleich gut); H3 mdl < Norm-Zwilling ja (24,8 kbit); H4 letzte Blöcke ja. Gewinn fast ganz im Block 2048 (groken oder nicht). Schluss: Schlaf mit gezieltem Schrumpfen hilft, unser GMM-Ziel ist aber nicht besser als L2. Details `docs/ergebnis_0a_plus.md`.
 
 **Plan (Jonas 12:55):** 0a+ autonom abschließen, dann Zwischenbericht mit Empfehlung. **Vorschlag danach:** Vorschlag aus der Agenten-Prüfung: „Gesamtcode einer Aufgabenfolge“ (Logbuch 12:25). Neuheitsprüfung in `docs/recherche.md`.
 
