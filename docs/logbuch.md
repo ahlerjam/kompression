@@ -309,3 +309,9 @@ p = 23, Seeds 200–209: wd λ 10 Mittel 1.204, llmm 1.261 (besser in 5/10; Seed
 
 p = 47: llww 3.142/3.122/3.138/3.199/3.189 (3.158), ll33 3.330. p = 97: llww 15.052/14.816/15.259/16.131/14.761 (15.204), ll33 15.711.
 llmm gegen llww: p = 47 besser in 4/5 (−1 %), p = 97 besser in 4/5 (−2,5 %). → **Der Großteil des llmm-Gewinns gegenüber wd λ 10 ist ein Zeitplan-Effekt** (früh stark, spät schwach schrumpfen; p = 97: ~2.000 von 2.375 bit), mdl trägt ~375 bit bei. Neue stärkste Kontrolle: llww. Gate gegen sie knapp verfehlt (4/5). Faire, gleiche Abstimmung beider Seiten der späten Phasen: v9m (mdl β 0,03 / 0,3) und v9w (L2 λ 0,3 / 0) auf p = 97 (b-v9m, b-v9w).
+
+### 08:00 Prüfstand v9 abgebrochen, Kompressions-Strang beendet, neues Ziel E31
+
+v9 (p = 97, späte Schlafphasen fair abgestimmt) bis zum Abbruch: llmm β 0,03 14.374/14.615/14.707/14.913/14.400 (14.602), ll mit L2 λ 0,3 14.053/14.530/14.308/15.006/14.151 (**14.410**, besser als mdl in 4/5). Nicht fertig: mdl β 0,3 und L2 λ 0 (nach `runs/abgebrochen/`). → Nach fairer Abstimmung schlägt mdl in den späten Phasen schwaches L2 nicht; der Gewinn gegenüber wd λ 10 ist ein Zeitplan-Effekt (erst stark, dann schwach schrumpfen). Neuheit: mäßig (`docs/recherche.md`, Nachtrag 2026-11-05).
+
+Jonas: alles stoppen und umplanen; neues Ziel „ein kleines Netz lernt aus sehr wenigen Beispielen eine Regel und wendet sie richtig auf größere oder neue Fälle an“ → E31, Plan `docs/plan_e31.md` (Prüfstand Regeln, fair abgestimmte Standard-Kontrollen, Ideen-Woche K1–K6, Gate ≥ 30 Prozentpunkte). Keine Läufe aktiv.

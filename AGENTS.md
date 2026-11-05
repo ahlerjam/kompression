@@ -43,7 +43,7 @@ docs/                   Entscheidungen, Bauplan, Protokolle, Recherche, Logbuch.
 
 ## Phasen und Regeln (freigegeben von Jonas am 2026-11-02)
 
-Aktuelle Phase: **BAUPHASE 0a+ B1** (Kalibrierung, Protokoll `docs/protokoll_0a_plus.md` noch Entwurf); 0a und 0b abgeschlossen (Ergebnisse `docs/ergebnis_0a.md`, `docs/ergebnis_0b.md`, Protokolle eingefroren). **Stufe 1 ruht.** Steht auch oben in `STATUS.md`.
+Aktuelle Phase: **NEUPLANUNG E31** (Ziel: Regel aus wenigen Beispielen lernen und richtig auf größere/neue Fälle anwenden, `docs/plan_e31.md`). Kompressions-Strang 0a, 0b, 0a+ abgeschlossen (Ergebnisse `docs/ergebnis_*.md`, Protokolle eingefroren). **Stufe 1 ruht.** Steht auch oben in `STATUS.md`.
 
 | | Bauphase | Messphase (ab Start eines Hauptlaufs) |
 |---|---|---|
