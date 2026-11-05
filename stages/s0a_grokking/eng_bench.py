@@ -51,6 +51,12 @@ SETS: dict[str, dict[str, list[str]]] = {
         "sel_l2": [*HL, "--post", "wd", "--post-select", "wd:1", "wd:3", "wd:10", "wd:30"],
         "sel_mix": [*HL, "--post", "wd", "--post-select", "mdl:0.1", "mdl:0.3", "wd:10", "wd:30"],
     },
+    # Varianten der gemischten Auswahl (nach v4 p = 47: sel_mix knapp vor wd λ 10, 4/5 Seeds)
+    "v5": {
+        "mix2": [*HL, "--post", "wd", "--post-select", "mdl:0.1", "wd:10"],
+        "mix_h25": [*HL, "--post", "wd", "--post-select", "mdl:0.1", "mdl:0.3", "wd:10", "wd:30",
+                    "--post-select-holdout", "0.25"],
+    },
     # Ist der mdl-Schlaf echte Kompression oder ein Norm-Effekt?
     "norm": {
         "wd": [*CYC, "--post", "wd"],
