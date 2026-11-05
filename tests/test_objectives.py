@@ -72,3 +72,19 @@ def test_mdl_snap_uses_prior_means():
     one_d = [k for k, v in p0.items() if hasattr(v, "ndim") and v.ndim == 1]
     for k in one_d:
         np.testing.assert_allclose(np.array(snapped[k]), np.array(p0[k]))
+
+
+def test_mdl_prior_null_komponente_option():
+    import math
+
+    import mlx.core as mx
+
+    from kompression.objectives import VariationalMDL
+    p0 = {"w": mx.zeros((3, 3))}
+    std, _ = VariationalMDL().init(p0, 0)
+    assert float(std["prior"]["logit_pi"][0]) == 0.0
+    assert abs(float(std["prior"]["log_s"][0]) - math.log(0.05)) < 1e-6
+    tr, _ = VariationalMDL(pi0_logit=3.0, s0=0.01).init(p0, 0)
+    assert float(tr["prior"]["logit_pi"][0]) == 3.0
+    assert abs(float(tr["prior"]["log_s"][0]) - math.log(0.01)) < 1e-6
+    assert float(tr["prior"]["logit_pi"][1]) == 0.0

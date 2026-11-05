@@ -267,3 +267,7 @@ Restliche Kalibrierwerte (Mittel kbit, Seeds 100–102): `wd` λ 10 im Schlaf 17
 ### 22:35 Hauptlauf 0a+ B1 ausgewertet, Zwischenbericht
 
 Alle sieben Bedingungen fertig (15:17–22:20, Seeds 20–29, git_dirty false, keine NaN). `analyse_b1.py` unverändert: H1 ja (Holm 0,041), H2 nein (p 1,0; wd λ 10 17,9 vs. mdl 18,3 kbit), H3 ja (0,041), H4 ja (0,008). Blockzerlegung: Unterschied fast nur im Block [2048, 4096); mdl grokt dort in 7/10 Seeds, wd λ 10 in 10/10, wd/Norm-Zwilling/bitnet in 1/10, prune/free in 0/10; wd λ 10 zahlt dafür in den späten Blöcken (3.083 vs. 787 bit). `docs/ergebnis_0a_plus.md` geschrieben, `docs/zwischenbericht.md` vervollständigt (Empfehlung Aufgabenfolge mit wd λ 10 als starker Kontrolle). Wartet auf Jonas.
+
+### 23:40 Strategie E30, neue Schlaf-Optionen, Prüfstand v2 gestartet
+
+Jonas: „fair bleiben und alles verbessern, was geht“ → E30 (erst auf Prüfstand filtern, dann messen; stärkste Kontrolle wd λ 10). Neue Optionen, Standard unverändert: `--post-mdl-wd` (Hybrid: L2 nur auf mu im mdl-Schlaf, `TrainConfig.mdl_mu_weight_decay`), `--post-mdl-pi0`/`--post-mdl-s0` (Start-Gewicht und -Breite der Null-Komponente des GMM-Priors). Test `test_mdl_prior_null_komponente_option`. Gleichheitsprüfung alter/neuer Code (p = 11, Zyklus mit mdl-Schlaf): 435,35 bit beide, bitgenau (Läufe nach `runs/abgebrochen/*gleich_*`). Prüfstand `eng_bench.py v2` (Einstellung wie Hauptlauf 0a+, Seeds 200–204) auf p = 23 (tmux b-23) und p = 47 (b-47): wd, wd λ 10, mdl, Hybrid λ 3/10, Null-Prior, Null-Prior + Hybrid 3.

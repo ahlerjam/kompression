@@ -154,18 +154,22 @@ class VariationalMDL(Arm):
     name = "mdl"
     needs_noise = True
 
-    def __init__(self, k: int = 16, init_log_sigma: float = -6.0, min_log_s: float = -9.0):
+    def __init__(self, k: int = 16, init_log_sigma: float = -6.0, min_log_s: float = -9.0,
+                 pi0_logit: float = 0.0, s0: float = 0.05):
         self.k = k
         self.init_log_sigma = init_log_sigma
         self.min_log_s = min_log_s
+        self.pi0_logit = pi0_logit  # Startgewicht der Null-Komponente (Logit; 0 = wie bisher)
+        self.s0 = s0  # Startbreite der Null-Komponente (0,05 = wie bisher)
 
     def init(self, params0, seed):
         k = self.k
-        prior = {
-            "logit_pi": mx.zeros((k,)),
-            "mean": mx.linspace(-0.3, 0.3, k - 1),
-            "log_s": mx.full((k,), math.log(0.05)),
-        }
+        logit_pi = mx.zeros((k,))
+        log_s = mx.full((k,), math.log(0.05))
+        if self.pi0_logit or self.s0 != 0.05:
+            logit_pi = mx.concatenate([mx.array([self.pi0_logit]), logit_pi[1:]])
+            log_s = mx.concatenate([mx.array([math.log(self.s0)]), log_s[1:]])
+        prior = {"logit_pi": logit_pi, "mean": mx.linspace(-0.3, 0.3, k - 1), "log_s": log_s}
         tr = {
             "mu": params0,
             "rho": tree_map(lambda a: mx.full(a.shape, self.init_log_sigma), params0),
@@ -219,7 +223,8 @@ class VariationalMDL(Arm):
 
 
 def make_arm(name: str, subspace_rank: int = 16, mdl_k: int = 16, prune_frac: float = 0.9,
-             mdl_init_log_sigma: float = -6.0) -> Arm:
+             mdl_init_log_sigma: float = -6.0, mdl_pi0_logit: float = 0.0,
+             mdl_s0: float = 0.05) -> Arm:
     if name == "prune":
         return Pruned(prune_frac)
     if name in ("none", "wd"):
@@ -229,5 +234,6 @@ def make_arm(name: str, subspace_rank: int = 16, mdl_k: int = 16, prune_frac: fl
     if name == "subspace":
         return Subspace(subspace_rank)
     if name == "mdl":
-        return VariationalMDL(k=mdl_k, init_log_sigma=mdl_init_log_sigma)
+        return VariationalMDL(k=mdl_k, init_log_sigma=mdl_init_log_sigma, pi0_logit=mdl_pi0_logit,
+                              s0=mdl_s0)
     raise ValueError(f"unbekannter Arm: {name}")

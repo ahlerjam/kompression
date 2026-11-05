@@ -82,6 +82,9 @@ class Args:
     post_mdl_lr_mult: float = 1.0  # Schlaf/Post mdl: Lernrate von rho und Prior × mult
     post_mdl_init_log_sigma: float = -6.0
     post_mdl_snap: bool = False  # Zyklus: nach mdl-Schlaf Gewichte auf Prior-Zentren setzen
+    post_mdl_wd: float = 0.0  # Schlaf mdl/mdl_norm: zusätzlicher L2 nur auf die Gewichte (Hybrid)
+    post_mdl_pi0: float = 0.0  # Schlaf mdl: Start-Logit der Null-Komponente des Priors
+    post_mdl_s0: float = 0.05  # Schlaf mdl: Startbreite der Null-Komponente des Priors
 
 
 def _tnorm(x: mx.array) -> mx.array:
@@ -162,9 +165,11 @@ def main(a: Args) -> None:
         if a.post == "mdl_norm" and not a.cycles:
             raise ValueError("--post mdl_norm nur mit --cycles")
         arm2 = make_arm(post_arm, prune_frac=a.prune_frac,
-                        mdl_init_log_sigma=a.post_mdl_init_log_sigma)
+                        mdl_init_log_sigma=a.post_mdl_init_log_sigma,
+                        mdl_pi0_logit=a.post_mdl_pi0, mdl_s0=a.post_mdl_s0)
         cfg2 = dataclasses.replace(
             cfg, arm=post_arm, mdl_beta=a.post_mdl_beta, mdl_aux_lr_mult=a.post_mdl_lr_mult,
+            mdl_mu_weight_decay=a.post_mdl_wd,
             weight_decay=a.post_weight_decay if a.post in ("wd", "prune") else 0.0)
     early = tuple(c for c in (30, 100, 300) if c < a.steps_per_block)
     if a.cycles:
