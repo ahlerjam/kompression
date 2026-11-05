@@ -283,3 +283,11 @@ Nächste Verbesserung: `--post-select` (neue Option, Standard leer): Je Schlaf s
 ### 02:40 Prüfstand v3/v4 p = 47 (kein Befund)
 
 v3: hyb3 β 0,03 4.285. v4 (selbst gewählter Schlaf, Seeds 200–204, Mittel bit): sel_mdl 4.395 (Wahl: β 0,03 61×, 0,1 29×, 0,3 11×, 1 19×), **sel_l2 5.592** (wählt fast immer λ 1: 116 von 120; grokt nicht, so schlecht wie wd), **sel_mix 3.298** (3.128/3.592/3.250/3.142/3.378; wd λ 10: 3.353/3.301/3.316/3.274/3.388 → besser in 4/5 Seeds, Mittel −1 %; Wahl: mdl 0,1 37×, mdl 0,3 10×, wd 10 67×, wd 30 6×). Lehre: Die Holdout-Auswahl ist kurzsichtig. Sie bevorzugt schwaches Schrumpfen, obwohl starkes Schrumpfen über mehrere Zyklen erst das Groken bringt. Gate noch nicht bestanden (ein Seed schlechter, Abstand klein, Auswahl kostet ~2,3× Schlafrechnung). Weiter: v4 auf p = 23 (tmux b-v4s), v5 auf p = 47 (b-v5: mix2 = mdl 0,1 + wd 10; mix_h25 = sel_mix mit 25 % Holdout).
+
+### 03:45 Prüfstand v4 p = 23, v5 p = 47 (kein Befund); Schlafplan; Reproduzierbarkeit
+
+v4 p = 23 (Mittel bit; wd λ 10 1.200, mdl 1.195): sel_mdl 1.230, sel_l2 1.284 (wählt immer λ 1), sel_mix 1.231 (verliert gegen wd λ 10 in 4/5 Seeds). v5 p = 47: mix2 (mdl 0,1 + wd 10) 3.384 (ein Seed 4.450), mix_h25 3.213 (3.070/3.066/3.124/3.143/3.662; besser als wd λ 10 in 4/5). → Holdout-Auswahl besteht das Gate nicht (p = 23 negativ).
+
+Neu `--post-schedule` (fester Schlaf je Zyklus, z. B. `wd:10 wd:10 wd:10 mdl:0.1`; Standard leer). Idee aus 0a+: starkes L2 hilft früh beim Groken, mdl ist spät präziser. Prüfstand v6 auf p = 47 (b-v6a) und p = 23 (b-v6b).
+
+**Wichtig für die Messung:** Zwei identische Läufe des alten Pfads (p = 11, Seeds 200/201, Schlaf wd λ 10) ergeben 426/435 und 426/429 bit; MLX ist hier nicht bitgenau reproduzierbar (am 2026-11-04 war ein mdl-Lauf bitgleich). Der neue Plan-Pfad mit `wd:10 wd:10` liegt im selben Bereich (423/433). Folge: „Gepaart über Seeds“ paart Daten und Init, aber nicht die GPU-Rundung; bei Schwellen-Effekten (Groken ja/nein) kann das den Ausgang einzelner Seeds kippen. Für Hauptläufe: mehr Seeds (E30: 20) und Wiederholbarkeit einzelner Seeds prüfen.

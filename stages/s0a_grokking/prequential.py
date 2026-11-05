@@ -91,6 +91,9 @@ class Args:
     # Teil. Wach lernt weiter auf dem ganzen Präfix. Leer (Standard) = Verhalten wie vorher.
     post_select: tuple[str, ...] = ()
     post_select_holdout: float = 0.125
+    # Zyklus, fester Schlafplan: je Zyklus ein Kandidat (Format wie post_select), Länge = cycles,
+    # Schlaf auf dem ganzen Präfix. Leer (Standard) = Verhalten wie vorher.
+    post_schedule: tuple[str, ...] = ()
 
 
 def _tnorm(x: mx.array) -> mx.array:
@@ -202,11 +205,15 @@ def main(a: Args) -> None:
         vdet2 = mx.vmap(arm2.deterministic, in_axes=(0, 0))
 
     sel_counts: dict[str, int] = {}
-    if a.post_select:
+    if a.post_select and a.post_schedule:
+        raise ValueError("--post-select und --post-schedule schließen sich aus")
+    if a.post_schedule and len(a.post_schedule) != a.cycles:
+        raise ValueError("--post-schedule braucht genau --cycles Einträge")
+    if a.post_select or a.post_schedule:
         if not a.cycles:
-            raise ValueError("--post-select nur mit --cycles")
+            raise ValueError("--post-select/--post-schedule nur mit --cycles")
         sel = []
-        for c_ in a.post_select:
+        for c_ in dict.fromkeys(a.post_select or a.post_schedule):
             kind, val = c_.split(":")
             if kind == "mdl":
                 arm_k = make_arm("mdl", mdl_init_log_sigma=a.post_mdl_init_log_sigma,
@@ -222,14 +229,17 @@ def main(a: Args) -> None:
                         mx.vmap(arm_k.deterministic, in_axes=(0, 0))))
             sel_counts[c_] = 0
 
-    def select_sleep(w, xs, ys, start):
-        """Jeder Kandidat schläft vom selben Wachstand; je Seed gewinnt die kürzeste Holdout-Codelänge."""
-        h = max(1, int(round(start * a.post_select_holdout)))
+    def select_sleep(w, xs, ys, start, only: str = ""):
+        """Jeder Kandidat schläft vom selben Wachstand; je Seed gewinnt die kürzeste Holdout-Codelänge.
+        Mit only: nur dieser Kandidat, Schlaf auf dem ganzen Präfix, keine Auswahl (Schlafplan)."""
+        h = 0 if only else max(1, int(round(start * a.post_select_holdout)))
         xt, yt, xh, yh = xs[:, :start - h], ys[:, :start - h], xs[:, start - h:], ys[:, start - h:]
         dummy = mx.zeros((1,))
         c1 = stack_trees([q[1] for q in pairs])
         ws, scores = [], []
-        for _, arm_k, cfg_k, beta_k, vdet_k in sel:
+        for name_k, arm_k, cfg_k, beta_k, vdet_k in sel:
+            if only and name_k != only:
+                continue
             vstep_k, _, _ = build_fns(cfg_k, arm_k, n_train=max(start - h, a.penalty_n_min))
             pk = [arm_k.init(tree_map(lambda x, i=i: x[i], w), s) for i, s in enumerate(a.seeds)]
             trk, ck = stack_trees([q[0] for q in pk]), stack_trees([q[1] for q in pk])
@@ -242,6 +252,9 @@ def main(a: Args) -> None:
                 if t2 % 50 == 0:
                     mx.eval(trk, mk, vk)
             wk = vdet_k(trk, ck)
+            if only:
+                sel_counts[name_k] += len(a.seeds)
+                return wk
             lp_h = vlogp(wk, c1, xh, yh)[:, 0, :].sum(axis=1)  # [S], Temperatur 1
             mx.eval(wk, lp_h)
             ws.append(wk)
@@ -286,8 +299,8 @@ def main(a: Args) -> None:
                 if c == 0 and t_ in early:
                     out.append(ev(vlogp, w, c1))
             out.append(ev(vlogp, w, c1))
-            if a.post_select:
-                w = select_sleep(w, xs, ys, start)
+            if a.post_select or a.post_schedule:
+                w = select_sleep(w, xs, ys, start, a.post_schedule[c] if a.post_schedule else "")
                 out.append(ev(vlogp, w, c1))
                 continue
             pairs2 = [arm2.init(tree_map(lambda x, i=i: x[i], w), s) for i, s in enumerate(a.seeds)]
@@ -382,7 +395,7 @@ def main(a: Args) -> None:
                 bits_per_label=(bits / (end - start)).tolist(), temperature=chosen,
                 elapsed_s=time.time() - t0)
         print(f"Block [{start},{end}) Bits/Label je Seed: {np.round(bits / (end - start), 3)} T={chosen}",
-              *([f"Schlafwahl bisher: {sel_counts}"] if a.post_select else []), flush=True)
+              *([f"Schlafwahl bisher: {sel_counts}"] if sel_counts else []), flush=True)
 
     results = {}
     for i, s in enumerate(a.seeds):
@@ -390,7 +403,7 @@ def main(a: Args) -> None:
         results[s] = {"total_bits": r["total_bits"], "uniform_bits": r["uniform_bits"],
                       "per_block_bits": r["per_block_bits"]}
     run.finish({"prequential": results, "bounds": bounds, "seconds": time.time() - t0,
-                **({"post_select_counts": sel_counts} if a.post_select else {})})
+                **({"post_select_counts": sel_counts} if sel_counts else {})})
     print({s: round(v["total_bits"]) for s, v in results.items()}, "uniform",
           round(results[a.seeds[0]]["uniform_bits"]), flush=True)
 

@@ -57,6 +57,12 @@ SETS: dict[str, dict[str, list[str]]] = {
         "mix_h25": [*HL, "--post", "wd", "--post-select", "mdl:0.1", "mdl:0.3", "wd:10", "wd:30",
                     "--post-select-holdout", "0.25"],
     },
+    # Fester Schlafplan je Zyklus (starkes L2 hilft früh beim Groken, mdl ist spät präziser)
+    "v6": {
+        "plan_lllm": [*HL, "--post", "wd", "--post-schedule", "wd:10", "wd:10", "wd:10", "mdl:0.1"],
+        "plan_llmm": [*HL, "--post", "wd", "--post-schedule", "wd:10", "wd:10", "mdl:0.1", "mdl:0.1"],
+        "plan_lmlm": [*HL, "--post", "wd", "--post-schedule", "wd:10", "mdl:0.1", "wd:10", "mdl:0.1"],
+    },
     # Ist der mdl-Schlaf echte Kompression oder ein Norm-Effekt?
     "norm": {
         "wd": [*CYC, "--post", "wd"],
