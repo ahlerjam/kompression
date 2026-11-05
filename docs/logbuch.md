@@ -298,3 +298,9 @@ Seeds 200–204, bit (wd λ 10 zum Vergleich: p = 23 1.197/1.188/1.196/1.195/1.2
 p = 23: lllm 1.189, **llmm 1.198** (1.202/1.201/1.187/1.216/1.183, besser in 2/5), lmlm 1.228 (ein Seed 1.388).
 p = 47: lllm 3.438, **llmm 3.119** (3.076/3.121/3.109/3.049/3.240, **besser in 5/5**, −6 %), lmlm 5.035 (grokt meist nicht).
 → Erster Kandidat mit klarem Vorteil auf p = 47; auf p = 23 Gleichstand im Bereich der GPU-Streuung. Gate noch offen. Prüfung: v7 (wd λ 10 gegen llmm) auf p = 97 mit 5 Seeds (b-v7a) und p = 23 mit 10 Seeds (b-v7b; Seeds 200–204 dabei zugleich Wiederholung).
+
+### 05:15 Prüfstand v7 Gate-Prüfung llmm (kein Befund)
+
+p = 97, Seeds 200–204: wd λ 10 16.505/17.184/17.870/17.232/17.229 (Mittel 17.204), **llmm 15.272/14.674/14.978/14.842/14.377 (14.829, besser in 5/5, −14 %)**.
+p = 23, Seeds 200–209: wd λ 10 Mittel 1.204, llmm 1.261 (besser in 5/10; Seed 207 grokt nicht: 1.886). Wiederholung Seeds 200–204 wd λ 10: 1.201/1.203/1.176/1.195/1.190 statt 1.197/1.188/1.196/1.195/1.224 → GPU-Streuung bis ~3 % auf p = 23.
+→ Gate auf p = 47 und p = 97 erfüllt (je 5/5), auf p = 23 nicht (Gleichstand mit einem Ausreißer); wird so berichtet. Vor einem Protokoll fehlt die Kontrolle, ob mdl oder nur das spätere schwächere Schrumpfen wirkt: v8 Pläne ohne mdl (llww = λ 10,10,1,1; ll33 = λ 10,10,3,3) auf p = 97 (b-v8a) und p = 47 (b-v8b).
