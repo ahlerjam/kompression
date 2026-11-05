@@ -42,3 +42,14 @@ Kurzfassung der vier Recherchen. Werte aus Community-Benchmarks sind vor Nutzung
 - Positionspapier: [Herrmann & Schmidhuber 2026](https://arxiv.org/abs/2605.14831).
 
 **Faire Formulierung (TRC):** Bausteine bekannt (DreamCoder-Wach-Schlaf, MDL-Bibliotheken, Kompressionsfortschritt als Curriculum-Belohnung, Informationsgewinn-RL); Beitrag = kontrollierte, vorregistrierte Tests in Bit (Struktur-/Normkontrollen, Vergleich mit Learnability bei identischem Mechanismus).
+
+## Nachtrag 2026-11-05: Neuheit Zeitplan-Effekt (Prüfstand E30) und Richtungssuche
+
+Befund (Prüfstand, kein Hauptlauf): Schlaf „erst stark schrumpfen (L2 λ 10), dann schwach“ schlägt dauerhaft starkes L2 auf p = 47/97 in allen Seeds; mdl statt schwachem L2 in den späten Phasen bringt nach fairer Abstimmung keinen Vorteil (Logbuch 2026-11-05).
+
+Neuheit: **mäßig.** Bekannt: stärkerer Weight Decay beschleunigt Grokking ([Nanda et al. 2023](https://arxiv.org/pdf/2301.05217), [Lyu et al. 2023](https://arxiv.org/pdf/2311.18817)); Weight-Decay-Pläne allgemein: optimaler WD geht bei langem Training gegen 0 ([Xie et al., Stable Weight Decay](https://arxiv.org/abs/2011.11152)), [Scheduled Weight Decay, NeurIPS 2023](https://proceedings.neurips.cc/paper_files/paper/2023/hash/040d3b6af368bf71f952c18da5713b48-Abstract.html), [Cyclical Weight Decay](https://arxiv.org/abs/2202.08835); WD nach dem Auswendiglernen erhöhen beschleunigt Grokking auf (a+b) mod 97 ([Thermodynamic Weight Decay 2026](https://arxiv.org/html/2607.20552), ohne Kontrolle mit festem Zuschlag); Theorie der WD-Zeitskala ([2607.23967](https://arxiv.org/abs/2607.23967), [2606.13753](https://arxiv.org/html/2606.13753)). Nicht gefunden: „stark, dann schwach“ im Wach-Schlaf-Zyklus, gemessen als prequentielle Codelänge; Weight-Decay-Pläne für prequentielles MDL sind laut [Bornschein et al. 2023](https://arxiv.org/abs/2210.07931) offen. → Kleiner, regularisierungsseitiger Beitrag, kein Kompressionsbefund.
+
+Wo Kompression strukturell gegen Standard gewinnen kann (Richtungssuche):
+- MDL-Ziel macht die perfekt verallgemeinernde Lösung zum Optimum, wo L1/L2/Early Stopping es nicht tun; Gradientenabstieg findet sie aber oft nicht (Suchproblem) ([Lan et al. 2022](https://arxiv.org/abs/2111.00600), [Lan et al. ACL 2024](https://arxiv.org/abs/2402.10013), [Abudy et al. 2025](https://arxiv.org/abs/2505.13398)).
+- [CompressARC (Liao & Gu 2025)](https://arxiv.org/abs/2512.06104): 76 k Parameter, ohne Vortraining, nur MDL je Rätsel, ~20 % ARC-AGI-1.
+- MDL für Transformer: asymptotisch optimale Beschreibungslängen-Ziele ([Shaw et al., ICLR 2026](https://arxiv.org/pdf/2509.22445)); Längen-Generalisierung in Arithmetik bisher über Positionscodierung/Looping gelöst ([Fan et al. ICLR 2025](https://mlanthology.org/iclr/2025/fan2025iclr-looped)), nicht über MDL (keine Arbeit gefunden).
