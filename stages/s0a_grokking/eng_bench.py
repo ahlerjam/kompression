@@ -73,6 +73,15 @@ SETS: dict[str, dict[str, list[str]]] = {
         "plan_llww": [*HL, "--post", "wd", "--post-schedule", "wd:10", "wd:10", "wd:1", "wd:1"],
         "plan_ll33": [*HL, "--post", "wd", "--post-schedule", "wd:10", "wd:10", "wd:3", "wd:3"],
     },
+    # Gleiche Abstimmung der späten Schlafphasen für beide Seiten (nach v8: llww stärkste Kontrolle)
+    "v9m": {
+        "plan_llmm_b0.03": [*HL, "--post", "wd", "--post-schedule", "wd:10", "wd:10", "mdl:0.03", "mdl:0.03"],
+        "plan_llmm_b0.3": [*HL, "--post", "wd", "--post-schedule", "wd:10", "wd:10", "mdl:0.3", "mdl:0.3"],
+    },
+    "v9w": {
+        "plan_ll_w0.3": [*HL, "--post", "wd", "--post-schedule", "wd:10", "wd:10", "wd:0.3", "wd:0.3"],
+        "plan_ll_w0": [*HL, "--post", "wd", "--post-schedule", "wd:10", "wd:10", "wd:0", "wd:0"],
+    },
     # Ist der mdl-Schlaf echte Kompression oder ein Norm-Effekt?
     "norm": {
         "wd": [*CYC, "--post", "wd"],

@@ -304,3 +304,8 @@ p = 47: lllm 3.438, **llmm 3.119** (3.076/3.121/3.109/3.049/3.240, **besser in 5
 p = 97, Seeds 200–204: wd λ 10 16.505/17.184/17.870/17.232/17.229 (Mittel 17.204), **llmm 15.272/14.674/14.978/14.842/14.377 (14.829, besser in 5/5, −14 %)**.
 p = 23, Seeds 200–209: wd λ 10 Mittel 1.204, llmm 1.261 (besser in 5/10; Seed 207 grokt nicht: 1.886). Wiederholung Seeds 200–204 wd λ 10: 1.201/1.203/1.176/1.195/1.190 statt 1.197/1.188/1.196/1.195/1.224 → GPU-Streuung bis ~3 % auf p = 23.
 → Gate auf p = 47 und p = 97 erfüllt (je 5/5), auf p = 23 nicht (Gleichstand mit einem Ausreißer); wird so berichtet. Vor einem Protokoll fehlt die Kontrolle, ob mdl oder nur das spätere schwächere Schrumpfen wirkt: v8 Pläne ohne mdl (llww = λ 10,10,1,1; ll33 = λ 10,10,3,3) auf p = 97 (b-v8a) und p = 47 (b-v8b).
+
+### 06:30 Prüfstand v8 Plan-Kontrollen ohne mdl (kein Befund)
+
+p = 47: llww 3.142/3.122/3.138/3.199/3.189 (3.158), ll33 3.330. p = 97: llww 15.052/14.816/15.259/16.131/14.761 (15.204), ll33 15.711.
+llmm gegen llww: p = 47 besser in 4/5 (−1 %), p = 97 besser in 4/5 (−2,5 %). → **Der Großteil des llmm-Gewinns gegenüber wd λ 10 ist ein Zeitplan-Effekt** (früh stark, spät schwach schrumpfen; p = 97: ~2.000 von 2.375 bit), mdl trägt ~375 bit bei. Neue stärkste Kontrolle: llww. Gate gegen sie knapp verfehlt (4/5). Faire, gleiche Abstimmung beider Seiten der späten Phasen: v9m (mdl β 0,03 / 0,3) und v9w (L2 λ 0,3 / 0) auf p = 97 (b-v9m, b-v9w).
